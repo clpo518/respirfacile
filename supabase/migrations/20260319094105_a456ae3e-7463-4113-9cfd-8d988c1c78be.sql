@@ -1,0 +1,1 @@
+UPDATE profiles SET trial_end_date = '2026-04-19T16:30:21.061+00', updated_at = NOW() WHERE id = '7f2959c5-c035-4e82-aaa3-c0ca491d2cf0';

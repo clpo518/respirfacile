@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN fluency_goal text DEFAULT 'speed' CHECK (fluency_goal IN ('speed', 'fluency'));

@@ -1,0 +1,138 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+async function sendEmail(
+  type: string,
+  to: string,
+  data: Record<string, unknown>
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await fetch(
+      `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-email`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
+        },
+        body: JSON.stringify({ type, to, data }),
+      }
+    );
+    const result = await response.json();
+    if (!response.ok) {
+      console.error(`Failed to send to ${to}:`, result);
+      return { success: false, error: result.error };
+    }
+    return { success: true };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error(`Error sending to ${to}:`, errorMessage);
+    return { success: false, error: errorMessage };
+  }
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { templateType, dryRun } = await req.json();
+
+    if (!templateType) {
+      return new Response(
+        JSON.stringify({ error: "templateType is required" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
+    // Get all therapists
+    const { data: therapists, error } = await supabaseAdmin
+      .from("profiles")
+      .select("id, full_name")
+      .eq("is_therapist", true);
+
+    if (error) {
+      throw new Error(`Failed to fetch therapists: ${error.message}`);
+    }
+
+    // Resolve emails and filter out test/fake accounts
+    const fakePatterns = [
+      /^fdfd/i, /^dfdfd/i, /^dfdffg/i, /^tesdf/i, /^testtut/i, /^toto@/i,
+      /^fdjfnjfd/i, /^ortho1@/i, /^ortho@gmail/i, /^clement@gmail/i,
+      /^tedfer@/i, /^fhj\./i, /^test1@/i, /^teststet@/i, /^lionel@gmail/i,
+    ];
+
+    const recipients: { id: string; email: string; name: string }[] = [];
+    for (const t of therapists || []) {
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(t.id);
+      if (authUser?.user?.email) {
+        const email = authUser.user.email;
+        const isFake = fakePatterns.some((p) => p.test(email));
+        if (!isFake) {
+          recipients.push({ id: t.id, email, name: t.full_name || email.split("@")[0] });
+        } else {
+          console.log(`Skipping test account: ${email}`);
+        }
+      }
+    }
+
+    console.log(`Found ${recipients.length} real therapists (filtered from ${therapists?.length || 0})`);
+
+    if (dryRun) {
+      return new Response(
+        JSON.stringify({ dryRun: true, count: recipients.length, emails: recipients.map((r) => r.email) }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    let sent = 0;
+    let errors = 0;
+    const failedEmails: string[] = [];
+
+    // Send in batches of 5 to avoid timeout
+    const batchSize = 5;
+    for (let i = 0; i < recipients.length; i += batchSize) {
+      const batch = recipients.slice(i, i + batchSize);
+      const results = await Promise.all(
+        batch.map(async (recipient) => {
+          console.log(`Sending ${templateType} to ${recipient.email}...`);
+          return { email: recipient.email, ...(await sendEmail(templateType, recipient.email, {})) };
+        })
+      );
+      for (const r of results) {
+        if (r.success) sent++;
+        else { errors++; failedEmails.push(r.email); }
+      }
+      // Small delay between batches
+      if (i + batchSize < recipients.length) {
+        await new Promise((r) => setTimeout(r, 200));
+      }
+    }
+
+    console.log(`Newsletter blast complete: ${sent} sent, ${errors} errors`);
+
+    return new Response(
+      JSON.stringify({ success: true, sent, errors, failedEmails }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error in send-newsletter-blast:", errorMessage);
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+});

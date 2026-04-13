@@ -1,0 +1,57 @@
+# ParlerMoinsVite
+
+> Application d'entraînement vocal pour les troubles de la fluence :
+> bredouillement (cluttering), tachylalie et bégaiement (stuttering).
+> Biofeedback en syllabes par seconde (SPS) basé sur les normes cliniques
+> de Van Zaalen. Analyse de fluence automatique (répétitions, blocages,
+> allongements). Créée par un bredouilleur, validée par des orthophonistes.
+> Éditée par POCLE (Annecy, France).
+
+## Qu'est-ce que ParlerMoinsVite ?
+
+ParlerMoinsVite est une application web d'entraînement vocal conçue pour les personnes présentant un trouble de la fluence : bredouillement (cluttering), tachylalie ou bégaiement (stuttering). Elle propose un biofeedback visuel en temps réel mesurant le débit articulatoire en syllabes par seconde (SPS), basé sur les seuils cliniques de Van Zaalen (2009). L'application inclut une analyse de fluence automatique détectant les répétitions, blocages et allongements de syllabes. L'outil est utilisé par des orthophonistes en France et en Belgique pour le suivi à domicile de leurs patients.
+
+### Fonctionnalités principales
+
+- **Biofeedback vocal en temps réel** : mesure automatique du débit articulatoire (syllabes/seconde) pendant la lecture ou la parole spontanée.
+- **Test vocal gratuit** : diagnostic du débit de parole en 30 secondes, sans inscription, avec résultat clinique instantané.
+- **Auto-évaluation (Predictive Cluttering Inventory)** : questionnaire de dépistage du bredouillement en 10 questions.
+- **Bibliothèque de +95 exercices** : textes de difficulté progressive pour l'entraînement articulatoire.
+- **Mode Rébus** : exercices visuels pour les enfants non-lecteurs (4-6 ans).
+- **Espace orthophoniste** : suivi multi-patients, métriques cliniques, rapports d'évolution, assignation d'exercices.
+- **Gamification** : séries de jours, objectifs quotidiens, badges pour maintenir la motivation du patient.
+
+### Normes cliniques utilisées
+
+- Débit articulatoire normal : 3.5 à 4.5 syllabes/seconde (adulte francophone)
+- Seuil de bredouillement : > 5.0 syllabes/seconde (Van Zaalen, 2009)
+- Objectifs thérapeutiques : 3.0 SPS (lent), 4.0 SPS (moyen), 5.0 SPS (rapide)
+
+## Pages principales
+
+- [Accueil](https://www.parlermoinsvite.fr/) : Présentation de la plateforme et de la méthode de biofeedback vocal.
+- [Test Vocal Gratuit](https://www.parlermoinsvite.fr/diagnostic) : Mesurer son débit de parole en 30 secondes, sans inscription. Résultat clinique instantané.
+- [Auto-évaluation](https://www.parlermoinsvite.fr/assessment) : Test de dépistage du bredouillement (Predictive Cluttering Inventory) en 10 questions.
+- [Espace Orthophonistes](https://www.parlermoinsvite.fr/pro) : Fonctionnalités professionnelles pour le suivi des patients (métriques, rapports, exercices assignés).
+- [Tarifs](https://www.parlermoinsvite.fr/pricing) : Plans et abonnements (gratuit pour les patients, abonnement pour les orthophonistes).
+- [À propos](https://www.parlermoinsvite.fr/about) : L'histoire du fondateur et la mission du projet.
+
+## Blog — Articles experts
+
+- [Tout le monde vous dit de « ralentir », mais vous n'y arrivez pas ? Voici pourquoi.](https://www.parlermoinsvite.fr/blog/pourquoi-ralentir-ne-marche-pas) : Pourquoi « faire un effort » ne suffit pas (déficit de monitoring) et comment le biofeedback visuel répare le compteur interne.
+- [Parlez-vous trop vite ? Faites le test vocal gratuit en 30 secondes](https://www.parlermoinsvite.fr/blog/test-vocal-debit-parole-gratuit) : Comment mesurer objectivement son débit de parole avec un outil en ligne gratuit.
+- [Je mange mes mots et je parle trop vite : Suis-je bredouilleur ?](https://www.parlermoinsvite.fr/blog/comprendre-le-bredouillement) : Guide complet sur le bredouillement (cluttering) : symptômes, causes neurologiques, différence avec le bégaiement.
+- [3 exercices d'orthophoniste pour arrêter de parler trop vite](https://www.parlermoinsvite.fr/blog/3-exercices-ralentir-debit) : Techniques mécaniques de rééducation orthophonique : lecture syllabique, chunking, biofeedback.
+- [Comment j'ai codé un algorithme pour soigner mon débit de parole](https://www.parlermoinsvite.fr/blog/mon-histoire-bredouillement-ia) : Témoignage du fondateur, développeur et bredouilleur, qui a créé ParlerMoinsVite.
+- [Comment parler moins vite ? Comprendre le bredouillement pour retrouver un débit fluide](https://www.parlermoinsvite.fr/blog/comment-parler-moins-vite) : Solutions concrètes pour maîtriser son débit de parole.
+- [Mesurer la vitesse articulatoire : Fini la galère avec Praat ?](https://www.parlermoinsvite.fr/blog/mesurer-vitesse-articulatoire-praat) : Comparaison entre la méthode manuelle (Praat) et la mesure automatique pour les orthophonistes.
+- ["Euh...", "Du coup..." : Le Guide Complet pour supprimer vos tics de langage](https://www.parlermoinsvite.fr/blog/guide-supprimer-mots-parasites-tics-langage) : Psychologie des mots parasites et méthode en 3 étapes pour les éliminer.
+- [Pourquoi je parle trop vite quand je suis stressé ?](https://www.parlermoinsvite.fr/blog/stress-parler-trop-vite-solutions) : Mécanique du stress sur le débit vocal et 4 techniques pour reprendre le contrôle.
+- [Orthophonie et enfant non-lecteur : comment travailler le débit sans savoir lire ?](https://www.parlermoinsvite.fr/blog/exercice-orthophonie-enfant-non-lecteur-rebus) : Le Mode Rébus, une approche visuelle pour le ralentissement articulatoire chez l'enfant pré-lecteur.
+
+## Informations légales
+
+- **Éditeur** : POCLE (Annecy, France)
+- **Fondateur** : Clément
+- **Contact** : contact@parlermoinsvite.fr
+- **Site web** : https://www.parlermoinsvite.fr

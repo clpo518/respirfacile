@@ -1,0 +1,367 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   ParlerMoinsVite Design System v3
+   Style: Soft & Organique — Headspace / Calm
+   Palettes douces, formes arrondies, animations fluides
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* -------- Core Palette (warm but neutral) -------- */
+    --background: 40 18% 97%;
+    --foreground: 230 18% 22%;
+
+    /* Cards: cream-white with warmth */
+    --card: 40 40% 99%;
+    --card-foreground: 230 18% 22%;
+
+    --popover: 40 40% 99%;
+    --popover-foreground: 230 18% 22%;
+
+    /* Primary: Soft teal — calming & medical */
+    --primary: 170 45% 41%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Warm blush */
+    --secondary: 28 60% 95%;
+    --secondary-foreground: 170 40% 30%;
+
+    /* Muted: Warm sand */
+    --muted: 34 25% 93%;
+    --muted-foreground: 230 10% 48%;
+
+    /* Accent: Peach glow */
+    --accent: 22 75% 93%;
+    --accent-foreground: 22 60% 35%;
+
+    /* -------- Clinical Feedback Colors -------- */
+    --speed-calm: 160 50% 45%;
+    --speed-fast: 38 85% 55%;
+    --speed-critical: 2 65% 55%;
+
+    /* Semantic colors */
+    --destructive: 2 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 50% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 85% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    /* -------- Borders & Inputs -------- */
+    --border: 36 20% 88%;
+    --input: 36 20% 88%;
+    --ring: 170 45% 41%;
+
+    /* Radius: generous for organic feel */
+    --radius: 1.125rem;
+
+    /* -------- Sidebar -------- */
+    --sidebar-background: 36 33% 97%;
+    --sidebar-foreground: 230 18% 22%;
+    --sidebar-primary: 170 45% 41%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 34 30% 94%;
+    --sidebar-accent-foreground: 170 40% 30%;
+    --sidebar-border: 36 20% 90%;
+    --sidebar-ring: 170 45% 41%;
+
+    /* -------- Shadows: soft & diffused -------- */
+    --shadow-sm: 0 1px 3px 0 hsl(230 18% 22% / 0.03), 0 1px 2px -1px hsl(230 18% 22% / 0.02);
+    --shadow-md: 0 6px 16px -4px hsl(230 18% 22% / 0.06), 0 2px 6px -2px hsl(230 18% 22% / 0.03);
+    --shadow-lg: 0 16px 40px -8px hsl(230 18% 22% / 0.08), 0 4px 12px -4px hsl(230 18% 22% / 0.03);
+    --shadow-card: 0 2px 12px -4px hsl(170 45% 41% / 0.06), 0 0 0 1px hsl(36 20% 88% / 0.5);
+    --shadow-card-hover: 0 12px 32px -8px hsl(170 45% 41% / 0.12), 0 0 0 1px hsl(170 45% 41% / 0.12);
+  }
+
+  .dark {
+    --background: 230 22% 9%;
+    --foreground: 36 20% 94%;
+
+    --card: 230 22% 12%;
+    --card-foreground: 36 20% 94%;
+
+    --popover: 230 22% 12%;
+    --popover-foreground: 36 20% 94%;
+
+    --primary: 170 42% 52%;
+    --primary-foreground: 230 22% 9%;
+
+    --secondary: 230 22% 16%;
+    --secondary-foreground: 170 42% 68%;
+
+    --muted: 230 22% 15%;
+    --muted-foreground: 230 12% 58%;
+
+    --accent: 28 35% 20%;
+    --accent-foreground: 28 70% 78%;
+
+    --speed-calm: 160 50% 52%;
+    --speed-fast: 38 85% 55%;
+    --speed-critical: 2 65% 60%;
+
+    --destructive: 2 55% 42%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 50% 52%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 85% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 230 22% 20%;
+    --input: 230 22% 20%;
+    --ring: 170 42% 52%;
+
+    --sidebar-background: 230 22% 11%;
+    --sidebar-foreground: 36 20% 94%;
+    --sidebar-primary: 170 42% 52%;
+    --sidebar-primary-foreground: 230 22% 9%;
+    --sidebar-accent: 230 22% 16%;
+    --sidebar-accent-foreground: 170 42% 68%;
+    --sidebar-border: 230 22% 20%;
+    --sidebar-ring: 170 42% 52%;
+
+    --shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.15);
+    --shadow-md: 0 6px 16px -4px hsl(0 0% 0% / 0.25);
+    --shadow-lg: 0 16px 40px -8px hsl(0 0% 0% / 0.35);
+    --shadow-card: 0 2px 12px -4px hsl(0 0% 0% / 0.2), 0 0 0 1px hsl(230 22% 20% / 0.7);
+    --shadow-card-hover: 0 12px 32px -8px hsl(0 0% 0% / 0.3), 0 0 0 1px hsl(170 42% 52% / 0.15);
+  }
+}
+
+/* ============================================================
+   Custom Animations — organic, fluid
+   ============================================================ */
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes wave {
+  0% { transform: scaleY(1); }
+  50% { transform: scaleY(1.5); }
+  100% { transform: scaleY(1); }
+}
+
+@keyframes gauge-fill {
+  from { stroke-dashoffset: 283; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+@keyframes blob {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+}
+
+.animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+.animate-wave { animation: wave 0.5s ease-in-out infinite; }
+.animate-fade-up { animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.animate-fade-in { animation: fade-in 0.4s ease-out forwards; }
+.animate-scale-in { animation: scale-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.animate-float { animation: float 5s ease-in-out infinite; }
+.animate-breathe { animation: breathe 6s ease-in-out infinite; }
+.animate-blob { animation: blob 8s ease-in-out infinite; }
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--background)) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    overflow-x: clip;
+    max-width: 100vw;
+  }
+  body {
+    max-width: 100vw;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  
+  .container {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Improved focus states */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+/* ============================================================
+   Component Utilities
+   ============================================================ */
+
+@layer components {
+  /* Soft elevated card */
+  .card-elevated {
+    @apply bg-card rounded-2xl border border-border/50;
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .card-elevated:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-3px);
+  }
+
+  /* Soft card — no hover lift, just gentle presence */
+  .card-soft {
+    @apply bg-card/90 rounded-2xl border border-border/30;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(8px);
+  }
+
+  /* Glass effect — organic blur */
+  .glass {
+    @apply bg-card/70 backdrop-blur-2xl border border-border/30;
+    box-shadow: 0 4px 16px -4px hsl(170 45% 41% / 0.04);
+  }
+
+  /* Smooth interactive element */
+  .interactive {
+    @apply transition-all duration-300;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .interactive:hover {
+    @apply scale-[1.02];
+  }
+
+  .interactive:active {
+    @apply scale-[0.98];
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(170 45% 52%) 60%,
+      hsl(160 50% 45%) 100%
+    );
+  }
+
+  /* Organic gradient background */
+  .gradient-subtle {
+    background: linear-gradient(
+      160deg,
+      hsl(var(--background)) 0%,
+      hsl(var(--secondary)) 40%,
+      hsl(var(--accent) / 0.25) 100%
+    );
+  }
+
+  /* Organic gradient — warm flowing */
+  .gradient-organic {
+    background: linear-gradient(
+      145deg,
+      hsl(var(--secondary)) 0%,
+      hsl(var(--background)) 35%,
+      hsl(var(--accent) / 0.3) 70%,
+      hsl(var(--secondary)) 100%
+    );
+  }
+
+  /* Blob shape for decorative backgrounds */
+  .blob {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+
+  /* Clinical badge styles */
+  .badge-clinical {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold;
+    @apply bg-primary/10 text-primary border border-primary/20;
+  }
+
+  /* Staggered animation delays */
+  .stagger-1 { animation-delay: 0.08s; }
+  .stagger-2 { animation-delay: 0.16s; }
+  .stagger-3 { animation-delay: 0.24s; }
+  .stagger-4 { animation-delay: 0.32s; }
+  .stagger-5 { animation-delay: 0.40s; }
+}
+
+/* ============================================================
+   Utility Classes
+   ============================================================ */
+
+@layer utilities {
+  /* Shadow utilities using CSS vars */
+  .shadow-elevated {
+    box-shadow: var(--shadow-md);
+  }
+
+  .shadow-elevated-lg {
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Smooth scrolling */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

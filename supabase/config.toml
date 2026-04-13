@@ -1,0 +1,43 @@
+project_id = "lllzwnffmdicoqqxqmeh"
+
+[functions.create-checkout-session]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.scheduled-emails]
+verify_jwt = false
+
+[functions.send-welcome-email]
+verify_jwt = false
+
+[functions.get-deepgram-token]
+verify_jwt = false
+
+[functions.notify-first-win]
+verify_jwt = false
+
+[functions.notify-patient-joined]
+verify_jwt = false
+
+[functions.admin-stats]
+verify_jwt = false
+
+[functions.analyze-retelling]
+verify_jwt = false
+
+[functions.notify-prescription]
+verify_jwt = false
+
+[functions.generate-wrapped]
+verify_jwt = false
+
+[functions.send-wrapped-blast]
+verify_jwt = false
+
+[functions.notify-magic-moment]
+verify_jwt = false

@@ -1,0 +1,1 @@
+UPDATE profiles SET subscription_status = 'none' WHERE id IN ('61f51621-7109-4c63-8ae5-76978e4976e7', 'd0fd8ad7-d62e-4db0-8259-3037d98b3291');

@@ -1,0 +1,41 @@
+# Standard crawlers
+User-agent: *
+Allow: /
+
+# Disallow app pages (require auth)
+Disallow: /dashboard
+Disallow: /library
+Disallow: /practice
+Disallow: /settings
+Disallow: /session/
+Disallow: /patient/list
+Disallow: /patient/
+Disallow: /subscription/
+Disallow: /pro/subscription
+
+# AI Crawlers - Welcome
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+Sitemap: https://www.parlermoinsvite.fr/sitemap.xml

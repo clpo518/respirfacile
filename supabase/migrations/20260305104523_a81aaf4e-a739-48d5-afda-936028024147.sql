@@ -1,0 +1,1 @@
+UPDATE profiles SET trial_end_date = NOW() + INTERVAL '6 months', updated_at = NOW() WHERE id = 'd6afd5d8-faf7-44ec-beb0-23c4a940dea8';
