@@ -88,4 +88,16 @@ export default function UnifiedLanding() {
                 </div>
               </div>
             </div>
-    
+          </div>
+        </div>
+      </section>
+
+      <ProSections />
+      <FounderStorySection />
+      <UnifiedFAQ />
+      <CTA />
+    </main>
+    <Footer />
+    </div>
+  );
+}
