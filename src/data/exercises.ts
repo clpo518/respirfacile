@@ -6,6 +6,13 @@ export type ExerciseCategory =
   | 'diaphragmatique'
   | 'relaxation';
 
+// Compatibility type for legacy PMV components
+export interface RebusSegment {
+  text: string;
+  isPause?: boolean;
+  duration?: number;
+}
+
 export type PatientProfile =
   | 'adult_saos_mild'
   | 'adult_saos_severe'
@@ -348,3 +355,75 @@ export function getExerciseById(id: string): Exercise | undefined {
 export function getExerciseFamily(id: string) {
   return EXERCISE_FAMILIES.find((f) => f.id === id);
 }
+
+export function getCategoryById(id: string) {
+  const family = EXERCISE_FAMILIES.find((f) => f.id === id);
+  if (!family) return undefined;
+  return {
+    ...family,
+    title: family.label, // alias for compatibility
+  };
+}
+
+// ── Compatibility exports for legacy components ─────────────────────────────
+
+// exerciseCategories: array used by AssignExerciseModal, Library, useDailyExercise
+export const exerciseCategories = EXERCISE_FAMILIES.map((f) => ({
+  id: f.id as ExerciseCategory,
+  title: f.label,
+  icon: f.icon,
+  color: f.color,
+  description: '',
+}));
+
+// EXERCISES_BY_CATEGORY: used by Practice.tsx
+export const EXERCISES_BY_CATEGORY: Record<ExerciseCategory, Exercise[]> = {
+  pause_controlee: EXERCISES.filter((e) => e.category === 'pause_controlee'),
+  coherence_cardiaque: EXERCISES.filter((e) => e.category === 'coherence_cardiaque'),
+  respiration_nasale: EXERCISES.filter((e) => e.category === 'respiration_nasale'),
+  myofonctionnel: EXERCISES.filter((e) => e.category === 'myofonctionnel'),
+  diaphragmatique: EXERCISES.filter((e) => e.category === 'diaphragmatique'),
+  relaxation: [],
+};
+
+// PROGRAM_TEMPLATES: used by usePatientProgram
+export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
+  adult_saos_mild: {
+    exerciseIds: [
+      'pause_decouverte',
+      'coherence_5_5',
+      'langue_repos',
+      'nasale_consciente',
+      'respiration_diaphragmatique',
+    ],
+  },
+  adult_saos_severe: {
+    exerciseIds: [
+      'coherence_5_5',
+      'coherence_4_6',
+      'langue_repos',
+      'aspiration_langue',
+      'respiration_diaphragmatique',
+    ],
+  },
+  adult_tmof: {
+    exerciseIds: [
+      'langue_repos',
+      'claquement_langue',
+      'aspiration_langue',
+      'gargarisme',
+      'phonemes_kaga',
+      'nasale_consciente',
+    ],
+  },
+  adult_mixed: {
+    exerciseIds: [
+      'pause_decouverte',
+      'coherence_5_5',
+      'langue_repos',
+      'aspiration_langue',
+      'nasale_consciente',
+      'respiration_diaphragmatique',
+    ],
+  },
+};
