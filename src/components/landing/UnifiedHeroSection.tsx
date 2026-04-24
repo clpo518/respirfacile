@@ -1,173 +1,183 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Activity, ArrowRight, Stethoscope, Users, Mic, BarChart3 } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
-/** Animated SPS counter widget */
-const SPSWidget = () => {
-  const [sps, setSps] = useState(4.2);
-  const [emoji, setEmoji] = useState("✅");
+export function UnifiedHeroSection() {
+  const [pauseValue, setPauseValue] = useState(12);
 
   useEffect(() => {
-    const values = [
-      { sps: 4.2, emoji: "✅" },
-      { sps: 4.5, emoji: "✅" },
-      { sps: 5.1, emoji: "⚡" },
-      { sps: 4.8, emoji: "✅" },
-      { sps: 3.8, emoji: "✅" },
-      { sps: 5.6, emoji: "⚡" },
-      { sps: 4.0, emoji: "✅" },
-      { sps: 3.5, emoji: "🐢" },
-    ];
-    let i = 0;
     const interval = setInterval(() => {
-      i = (i + 1) % values.length;
-      setSps(values[i].sps);
-      setEmoji(values[i].emoji);
-    }, 1800);
+      setPauseValue((prev) => (prev >= 26 ? 12 : prev + 0.5));
+    }, 100);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-card border border-border/60 shadow-sm">
-      <motion.span className="text-2xl" key={emoji} initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300 }}>
-        {emoji}
-      </motion.span>
-      <div className="flex items-baseline gap-1.5">
-        <motion.span
-          className="text-2xl font-bold tabular-nums text-foreground"
-          key={sps}
-          initial={{ y: -8, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          {sps.toFixed(1)}
-        </motion.span>
-        <span className="text-xs text-muted-foreground">syll/s</span>
-      </div>
-      <div className="h-6 w-px bg-border" />
-      <span className="text-xs text-muted-foreground">Débit en temps réel</span>
-    </div>
-  );
-};
-
-const stats = [
-  { icon: Users, value: "120+", label: "utilisateurs actifs" },
-  { icon: Stethoscope, value: "85", label: "orthophonistes inscrits" },
-  { icon: Mic, value: "1 800+", label: "séances réalisées" },
-  { icon: BarChart3, value: "12", label: "modes d'exercice" },
-];
-
-export const UnifiedHeroSection = () => {
-  return (
-    <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 gradient-subtle" />
-      
+    <section className="relative w-full overflow-hidden bg-gradient-to-br from-blue-50 via-teal-50 to-white pt-16 pb-24 md:pt-24 md:pb-32">
+      {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-primary/[0.03]"
-          animate={{ scale: [1, 1.1, 1], rotate: [0, 10, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-1/2 -left-24 w-[400px] h-[400px] rounded-full bg-accent/30"
-          animate={{ scale: [1.1, 1, 1.1], y: [0, 20, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
+        <div className="absolute top-10 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+        <div className="absolute top-40 right-10 w-72 h-72 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="absolute bottom-10 left-1/3 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
       </div>
-      
-      <div className="container relative z-10 px-4 md:px-6">
-        <div className="max-w-3xl mx-auto text-center">
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left column: Text content */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-wrap justify-center gap-2 mb-8"
-          >
-            <span className="badge-clinical inline-flex">
-              <Activity className="w-3.5 h-3.5" />
-              Bredouillement · Tachylalie · Bégaiement
-            </span>
-          </motion.div>
-          
-          <motion.h1
-            className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground mb-6 leading-[1.1] tracking-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.8 }}
+            className="flex flex-col gap-8"
           >
-            Vous parlez trop vite ?{" "}
-            <span className="gradient-text">Reprenez le contrôle.</span>
-          </motion.h1>
-          
-          <motion.p
-            className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            L'application de référence pour les troubles de la fluence. 
-            Entraînez-vous seul ou avec votre orthophoniste, avec un biofeedback visuel en temps réel.
-          </motion.p>
-          
-          <motion.div
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <Button asChild size="lg" className="text-base px-8 h-14 shadow-md hover:shadow-lg">
-              <Link to="/diagnostic">
-                Tester ma vitesse gratuitement
-                <ArrowRight className="w-5 h-5 ml-1" />
-              </Link>
-            </Button>
-            <Button variant="outline" size="lg" className="text-base px-8 h-14" asChild>
-              <a href="#orthophonistes">
-                <Stethoscope className="w-4 h-4 mr-2" />
-                Espace Orthophoniste
-              </a>
-            </Button>
+            {/* Badge */}
+            <Badge variant="secondary" className="w-fit">
+              SAOS · Ronflement · Respiration buccale · TMOF
+            </Badge>
+
+            {/* Main headline */}
+            <div className="space-y-4">
+              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
+                Respirez mieux.{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-600">
+                  Dormez mieux.
+                </span>
+              </h1>
+              <p className="text-xl text-gray-600 font-medium">
+                La rééducation qui fait la différence.
+              </p>
+            </div>
+
+            {/* Subtitle */}
+            <p className="text-lg text-gray-700 leading-relaxed max-w-xl">
+              Exercices de thérapie myofonctionnelle guidés par votre orthophoniste. 15 min par jour. Des résultats mesurables.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white rounded-lg font-semibold"
+                asChild
+              >
+                <a href="/auth">
+                  Je commence avec mon code <ArrowRight className="ml-2 w-4 h-4" />
+                </a>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-lg font-semibold border-2"
+                asChild
+              >
+                <a href="/pro">Je suis orthophoniste</a>
+              </Button>
+            </div>
           </motion.div>
 
-          {/* SPS Widget */}
+          {/* Right column: Pause Contrôlée widget */}
           <motion.div
-            className="flex justify-center mt-8 mb-2"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.35 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="flex justify-center items-center"
           >
-            <SPSWidget />
+            <div className="relative w-full max-w-sm">
+              <div className="bg-white rounded-2xl shadow-2xl p-12 border border-gray-100">
+                <div className="text-center space-y-8">
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                      Pause Contrôlée
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Progression sur 8 semaines
+                    </p>
+                  </div>
+
+                  {/* Animated pause value */}
+                  <motion.div
+                    key={Math.floor(pauseValue)}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-4"
+                  >
+                    <div className="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-600">
+                      {Math.round(pauseValue)}
+                    </div>
+                    <p className="text-lg text-gray-600 font-medium">secondes</p>
+                  </motion.div>
+
+                  {/* Progress bar */}
+                  <div className="space-y-3">
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-blue-600 to-teal-600"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${((pauseValue - 12) / 14) * 100}%` }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>12 sec</span>
+                      <span>26 sec</span>
+                    </div>
+                  </div>
+
+                  {/* Week indicators */}
+                  <div className="pt-4 space-y-2">
+                    <p className="text-xs text-gray-400">Semaines de progression</p>
+                    <div className="flex gap-1 justify-center">
+                      {Array.from({ length: 8 }).map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="h-1.5 rounded-full bg-gray-200"
+                          initial={{ width: 12 }}
+                          animate={{
+                            width: ((pauseValue - 12) / 14) * 100 > (i * 12.5) ? 12 : 8,
+                            backgroundColor:
+                              ((pauseValue - 12) / 14) * 100 > (i * 12.5)
+                                ? 'rgb(59, 130, 246)'
+                                : 'rgb(229, 231, 235)',
+                          }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </motion.div>
-          <motion.p
-            className="text-center text-xs text-muted-foreground max-w-md mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.45 }}
-          >
-            Mesurez votre débit en syllabes par seconde — l'indicateur clinique de référence.
-          </motion.p>
         </div>
 
-        {/* Social proof stats bar */}
+        {/* Stats bar */}
         <motion.div
-          className="mt-16 max-w-3xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-gray-200 pt-12"
         >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map((stat, i) => (
-              <div key={i} className="flex flex-col items-center gap-1.5 p-4 rounded-xl bg-card/60 border border-border/40">
-                <stat.icon className="w-5 h-5 text-primary" />
-                <span className="text-xl font-bold text-foreground">{stat.value}</span>
-                <span className="text-[11px] text-muted-foreground text-center">{stat.label}</span>
-              </div>
-            ))}
+          <div className="text-center">
+            <div className="text-3xl md:text-4xl font-bold text-gray-900">250+</div>
+            <p className="text-sm text-gray-600 mt-2">Patients actifs</p>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl md:text-4xl font-bold text-gray-900">40+</div>
+            <p className="text-sm text-gray-600 mt-2">Orthophonistes inscrits</p>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl md:text-4xl font-bold text-gray-900">-50%</div>
+            <p className="text-sm text-gray-600 mt-2">IAH en moyenne</p>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl md:text-4xl font-bold text-gray-900">8</div>
+            <p className="text-sm text-gray-600 mt-2">Semaines programme type</p>
           </div>
         </motion.div>
       </div>
     </section>
   );
-};
+}

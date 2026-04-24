@@ -1,94 +1,179 @@
-import { motion } from "framer-motion";
-import { Activity, Timer, Mic, Sparkles, Dna } from "lucide-react";
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
 
-const pillars = [
-  {
-    icon: Activity,
-    title: "Articulation claire",
-    description: "Exercices ciblés pour prononcer chaque syllabe distinctement et gagner en intelligibilité.",
-  },
-  {
-    icon: Timer,
-    title: "Rythme & pauses",
-    description: "Apprenez à insérer des pauses naturelles entre vos phrases. Le biofeedback vous guide en temps réel.",
-  },
-  {
-    icon: Mic,
-    title: "Transfert en situation réelle",
-    description: "Mode dialogue à 2 ou 3 voix, improvisation, virelangues — pratiquez comme dans la vraie vie.",
-  },
-];
+export function MethodSection() {
+  const steps = [
+    {
+      number: 1,
+      title: "L'ortho prescrit",
+      description:
+        'En 2 minutes, votre orthophoniste crée votre programme personnalisé et vous envoie votre code d\'accès.',
+      details: [
+        'Création du programme en cabinet',
+        'Code patient généré automatiquement',
+        'Partage sécurisé par mail/SMS',
+      ],
+      color: 'from-blue-500 to-blue-600',
+    },
+    {
+      number: 2,
+      title: 'Vous vous entraînez',
+      description:
+        '15 minutes par jour, guidé pas à pas. Pause Contrôlée, respiration nasale, exercices myofonctionnels.',
+      details: [
+        'Vidéos progressives et guidées',
+        'Exercices adaptés à votre niveau',
+        'Suivi automatique de l\'observance',
+      ],
+      color: 'from-teal-500 to-teal-600',
+    },
+    {
+      number: 3,
+      title: "L'ortho suit et ajuste",
+      description:
+        'Courbes de progression, observance en temps réel, bilan PDF exportable pour le médecin du sommeil.',
+      details: [
+        'Dashboard avec courbes de progression',
+        'Observance en temps réel',
+        'Bilan PDF pour le médecin',
+      ],
+      color: 'from-emerald-500 to-emerald-600',
+    },
+  ];
 
-export const MethodSection = () => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 },
+    },
+  };
+
   return (
-    <section className="py-20 md:py-28 bg-gradient-to-b from-background to-secondary/30">
-      <div className="container px-4 md:px-6">
+    <section className="relative w-full bg-white py-20 md:py-28 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <motion.div
-          className="text-center mb-14"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
+          className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            <Sparkles className="w-4 h-4" />
-            Approche clinique
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            3 axes pour retrouver la fluence
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Comment ça marche
           </h2>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Une méthode complète, adaptée au bredouillement, à la tachylalie et au bégaiement.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Un processus simple en 3 étapes. Prescrire, entraîner, suivre.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          {pillars.map((pillar, index) => (
+        {/* Steps */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12"
+        >
+          {steps.map((step, index) => (
             <motion.div
               key={index}
-              className="p-8 rounded-2xl bg-card border border-border/50 hover:shadow-lg transition-shadow"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              variants={itemVariants}
+              className="relative group"
             >
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
-                <pillar.icon className="w-6 h-6 text-primary" />
+              {/* Card */}
+              <div className="relative h-full bg-white rounded-2xl p-8 border border-gray-200 hover:border-gray-300 transition-all duration-300 hover:shadow-lg">
+                {/* Step number circle */}
+                <div
+                  className={`absolute -top-6 left-8 w-12 h-12 rounded-full bg-gradient-to-r ${step.color} flex items-center justify-center text-white font-bold text-lg`}
+                >
+                  {step.number}
+                </div>
+
+                {/* Content */}
+                <div className="pt-4 space-y-6">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                      {step.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
+
+                  {/* Details list */}
+                  <div className="space-y-3 pt-4 border-t border-gray-100">
+                    {step.details.map((detail, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-gray-700">{detail}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Arrow connector (hide on last) */}
+                {index < steps.length - 1 && (
+                  <div className="hidden md:block absolute -right-4 top-1/3 text-gray-300">
+                    <ArrowRight className="w-8 h-8" />
+                  </div>
+                )}
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">
-                {pillar.title}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {pillar.description}
-              </p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Age calibration highlight */}
+        {/* Bottom section */}
         <motion.div
-          className="mt-14 p-6 md:p-8 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
+          className="mt-16 bg-gradient-to-r from-blue-50 to-teal-50 rounded-2xl p-12 border border-blue-100"
         >
-          <div className="flex flex-col md:flex-row items-center gap-5">
-            <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center shrink-0">
-              <Dna className="w-7 h-7 text-primary" />
-            </div>
-            <div className="text-center md:text-left">
-              <h3 className="text-lg font-bold text-foreground mb-1.5">
-                Objectifs adaptés à votre âge
+          <div className="text-center space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Prêt à commencer ?
               </h3>
-              <p className="text-sm text-muted-foreground max-w-2xl">
-                Un enfant, un ado et un adulte ne parlent pas à la même vitesse — c'est normal. 
-                L'application calibre automatiquement vos objectifs selon les normes cliniques de Van Zaalen. 
-                Fini les faux positifs frustrants.
+              <p className="text-gray-600 text-lg">
+                Les orthos intéressés peuvent essayer gratuitement pendant 30 jours. Aucune carte bancaire requise.
               </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white rounded-lg font-semibold"
+                asChild
+              >
+                <a href="/pro/signup">Créer mon compte ortho</a>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-lg font-semibold border-2"
+                asChild
+              >
+                <a href="/demo">Voir la démo</a>
+              </Button>
             </div>
           </div>
         </motion.div>
       </div>
     </section>
   );
-};
+}
