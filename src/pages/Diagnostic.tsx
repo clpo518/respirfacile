@@ -594,7 +594,7 @@ const Diagnostic = () => {
                         {/* CTAs */}
                         <div className="space-y-3 pt-2">
                           <Button
-                            onClick={() => navigate("/auth")}
+                            onClick={() => navigate("/auth?tab=signup")}
                             className="w-full"
                             size="lg"
                           >

@@ -51,7 +51,7 @@ export const FounderProSection = () => {
                 <div className="relative">
                   <img
                     src={founderImage}
-                    alt="Clément, fondateur de ParlerMoinsVite"
+                    alt="Clément, fondateur de RespirFacile"
                     className="w-full aspect-[4/5] object-cover rounded-2xl shadow-2xl border border-slate-700/50"
                   />
                   {/* Name overlay */}
@@ -94,7 +94,7 @@ export const FounderProSection = () => {
                 </p>
 
                 <p className="text-white font-medium">
-                  J'ai créé ParlerMoinsVite pour combler ce vide.
+                  J'ai créé RespirFacile pour combler ce vide.
                 </p>
 
                 <p>
@@ -125,7 +125,7 @@ export const FounderProSection = () => {
               {/* CTA */}
               <div className="pt-4">
                 <Button asChild size="lg" className="rounded-xl gap-2">
-                  <Link to="/auth">
+                  <Link to="/auth?tab=signup">
                     Créer mon compte Pro gratuit
                     <ArrowRight className="w-5 h-5" />
                   </Link>

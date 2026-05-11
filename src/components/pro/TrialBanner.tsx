@@ -21,7 +21,7 @@ const TrialBanner = ({ daysRemaining, activePatients = 0, totalSessions = 0 }: T
 
   const getMessage = () => {
     if (daysRemaining <= 3 && hasData) {
-      return `Fin d'essai — ${activePatients} patient${activePatients > 1 ? 's' : ''} et ${totalSessions} séance${totalSessions > 1 ? 's' : ''} seront perdus`;
+      return `Fin d'essai — vos ${activePatients} patient${activePatients > 1 ? 's' : ''} n'auront plus accès aux exercices`;
     }
     if (daysRemaining <= 3) {
       return "Fin d'essai — vos patients perdront l'accès aux exercices";
@@ -31,6 +31,9 @@ const TrialBanner = ({ daysRemaining, activePatients = 0, totalSessions = 0 }: T
     }
     if (isUrgent) {
       return "Votre essai gratuit touche à sa fin";
+    }
+    if (isModerate && hasData) {
+      return `Essai gratuit · ${activePatients} patient${activePatients > 1 ? 's' : ''}, ${totalSessions} séance${totalSessions > 1 ? 's' : ''} enregistrée${totalSessions > 1 ? 's' : ''}`;
     }
     if (isModerate) {
       return "Essai gratuit en cours";

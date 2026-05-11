@@ -1,16 +1,24 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, UserPlus, BookOpen, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { Check, UserPlus, BookOpen, Eye, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface OnboardingChecklistProps {
   hasPatients: boolean;
   hasAssignedExercise: boolean;
+  hasConsultedPatient: boolean;
   therapistCode: string | null;
+  firstPatientId?: string | null;
 }
 
-const OnboardingChecklist = ({ hasPatients, hasAssignedExercise, therapistCode }: OnboardingChecklistProps) => {
+const OnboardingChecklist = ({
+  hasPatients,
+  hasAssignedExercise,
+  hasConsultedPatient,
+  therapistCode,
+  firstPatientId,
+}: OnboardingChecklistProps) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
   const [dismissed, setDismissed] = useState(false);
@@ -22,22 +30,29 @@ const OnboardingChecklist = ({ hasPatients, hasAssignedExercise, therapistCode }
       description: `Partagez votre Code Pro ${therapistCode || ""} par email`,
       done: hasPatients,
       icon: UserPlus,
-      action: null,
+      action: null as (() => void) | null,
     },
     {
       id: "assign",
-      label: "Assigner un exercice",
-      description: "Prescrivez un exercice depuis la fiche patient",
+      label: "Prescrire un protocole",
+      description: "Assignez un profil clinique depuis la fiche patient",
       done: hasAssignedExercise,
       icon: BookOpen,
-      action: hasPatients ? () => navigate("/patient/list") : undefined,
+      action: hasPatients && firstPatientId ? () => navigate(`/patients/${firstPatientId}`) : null,
+    },
+    {
+      id: "consult",
+      label: "Consulter la fiche patient",
+      description: "Visualisez les séances et l'activité de votre patient",
+      done: hasConsultedPatient,
+      icon: Eye,
+      action: hasPatients && firstPatientId ? () => navigate(`/patients/${firstPatientId}`) : null,
     },
   ];
 
   const completedCount = steps.filter(s => s.done).length;
-  const allDone = completedCount === 2;
+  const allDone = completedCount === 3;
 
-  // Auto-dismiss once all done (with a delay for celebration)
   useEffect(() => {
     if (allDone) {
       const timer = setTimeout(() => setDismissed(true), 5000);
@@ -47,17 +62,17 @@ const OnboardingChecklist = ({ hasPatients, hasAssignedExercise, therapistCode }
 
   if (dismissed) return null;
 
-  const progressPercent = (completedCount / 2) * 100;
+  const progressPercent = (completedCount / 3) * 100;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mb-6"
+      className="mb-5"
     >
       <div className={`rounded-xl border overflow-hidden ${
-        allDone 
-          ? "border-green-500/30 bg-green-500/5" 
+        allDone
+          ? "border-green-500/30 bg-green-500/5"
           : "border-primary/20 bg-gradient-to-r from-primary/5 to-transparent"
       }`}>
         {/* Header */}
@@ -77,24 +92,27 @@ const OnboardingChecklist = ({ hasPatients, hasAssignedExercise, therapistCode }
             )}
             <div className="text-left">
               <p className="text-sm font-semibold">
-                {allDone ? "Bravo, vous êtes opérationnel ! 🎉" : "Premiers pas"}
+                {allDone ? "Bravo, vous êtes opérationnel !" : "Premiers pas"}
               </p>
               <p className="text-xs text-muted-foreground">
-                {allDone ? "Votre espace pro est configuré" : `${2 - completedCount} étape${2 - completedCount > 1 ? 's' : ''} restante${2 - completedCount > 1 ? 's' : ''}`}
+                {allDone
+                  ? "Votre espace pro est configuré"
+                  : `${3 - completedCount} étape${3 - completedCount > 1 ? "s" : ""} restante${3 - completedCount > 1 ? "s" : ""}`}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {/* Progress bar */}
             <div className="hidden sm:block w-24 h-1.5 bg-muted rounded-full overflow-hidden">
               <motion.div
-                className={`h-full rounded-full ${allDone ? 'bg-green-500' : 'bg-primary'}`}
+                className={`h-full rounded-full ${allDone ? "bg-green-500" : "bg-primary"}`}
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 0.5 }}
               />
             </div>
-            {isOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+            {isOpen
+              ? <ChevronUp className="w-4 h-4 text-muted-foreground" />
+              : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
           </div>
         </button>
 

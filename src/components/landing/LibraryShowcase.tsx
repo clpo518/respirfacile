@@ -151,7 +151,7 @@ export const LibraryShowcase = () => {
                   </p>
                 </div>
                 <Button asChild variant="outline" className="gap-2 shrink-0 border-primary/30 hover:bg-primary/10">
-                  <Link to="/auth">
+                  <Link to="/auth?tab=signup">
                     Essayer
                     <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -172,7 +172,7 @@ export const LibraryShowcase = () => {
             Nouveaux exercices ajoutés chaque mois pour maintenir la motivation.
           </p>
           <Button asChild size="lg" className="gap-2">
-            <Link to="/auth">
+            <Link to="/auth?tab=signup">
               Découvrir les exercices
               <ArrowRight className="w-4 h-4" />
             </Link>

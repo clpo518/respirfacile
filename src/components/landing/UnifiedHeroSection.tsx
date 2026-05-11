@@ -62,7 +62,7 @@ export function UnifiedHeroSection() {
                 className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white rounded-lg font-semibold"
                 asChild
               >
-                <a href="/auth">
+                <a href="/auth?tab=signup">
                   Je commence avec mon code <ArrowRight className="ml-2 w-4 h-4" />
                 </a>
               </Button>

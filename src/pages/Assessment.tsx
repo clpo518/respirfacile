@@ -227,7 +227,7 @@ const Assessment = () => {
                   <Button 
                     size="lg" 
                     className="w-full text-lg py-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25"
-                    onClick={() => navigate("/auth")}
+                    onClick={() => navigate("/auth?tab=signup")}
                   >
                     <Sparkles className="w-5 h-5 mr-2" />
                     Commencer mon programme d'entraînement

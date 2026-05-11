@@ -211,7 +211,7 @@ export const AugmentedPlaybackSection = () => {
                   ))}
                 </ul>
                 <Button asChild size="lg" className="gap-2">
-                  <Link to="/auth">
+                  <Link to="/auth?tab=signup">
                     Essayer gratuitement
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </Link>

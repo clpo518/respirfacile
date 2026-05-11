@@ -95,7 +95,7 @@ export const ExerciseDemoSection = () => {
                     Chaque personne reçoit <strong className="text-foreground">sa propre jauge</strong>. Idéal en séance ou en famille.
                   </p>
                   <a
-                    href="/auth"
+                    href="/auth?tab=signup"
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:bg-primary/90 transition-all shadow-md"
                   >
                     <MessageSquare className="w-4 h-4" />
