@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Wind } from 'lucide-react';
 
 export default function Pricing() {
+  const navigate = useNavigate();
   const [isAnnual, setIsAnnual] = useState(false);
   const plans = [
     {
@@ -86,8 +88,26 @@ export default function Pricing() {
   };
 
   return (
-    <main className="w-full bg-background">
-      {/* Header */}
+    <div className="min-h-screen bg-background">
+      {/* ── Navbar fixe ─────────────────────────── */}
+      <header className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
+        <div className="container px-4 md:px-6 h-16 flex items-center justify-between">
+          <button onClick={() => navigate('/')} className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
+              <Wind className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-display font-semibold text-foreground text-lg">RespirFacile</span>
+          </button>
+          <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
+            <button onClick={() => navigate('/')} className="hover:text-foreground transition-colors">Accueil</button>
+            <button onClick={() => navigate('/contact')} className="hover:text-foreground transition-colors">Contact</button>
+          </nav>
+          <button onClick={() => navigate('/auth')} className="btn-forest text-sm px-4 py-2">Connexion</button>
+        </div>
+      </header>
+
+    <main className="w-full bg-background pt-16">
+      {/* Hero tarifs */}
       <section className="relative w-full bg-gradient-to-br from-sand to-sand/60 py-20 md:py-28 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <motion.div
@@ -316,5 +336,6 @@ export default function Pricing() {
         </div>
       </section>
     </main>
+    </div>
   );
 }

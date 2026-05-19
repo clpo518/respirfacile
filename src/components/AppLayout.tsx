@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom"
-import { Activity, LayoutDashboard, Dumbbell, Settings, Users } from "lucide-react"
+import { Activity, LayoutDashboard, Dumbbell, Settings, Users, ExternalLink } from "lucide-react"
 import type { ReactNode } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 
@@ -72,7 +72,14 @@ export function AppLayout({ children }: AppLayoutProps) {
         </nav>
 
         {/* Footer */}
-        <div className="px-6 pb-6">
+        <div className="px-6 pb-6 space-y-3">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+          >
+            <ExternalLink className="w-3 h-3" />
+            Site public
+          </Link>
           <p className="text-[10px] text-muted-foreground/40">v1.0 · Fait en France</p>
         </div>
       </aside>

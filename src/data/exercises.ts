@@ -203,7 +203,7 @@ export const EXERCISES: Exercise[] = [
   {
     id: 'gargarisme',
     category: 'myofonctionnel',
-    name_fr: 'Gargarisme (voile du palais)',
+    name_fr: 'Gargarisme',
     duration_seconds: 90,
     difficulty: 1,
     description_fr: 'Renforce le voile du palais en vibration active — réduit le ronflement de façon mesurable.',
@@ -288,11 +288,11 @@ export const EXERCISES: Exercise[] = [
   {
     id: 'respiration_diaphragmatique',
     category: 'diaphragmatique',
-    name_fr: 'Respiration diaphragmatique',
+    name_fr: 'Respiration abdominale',
     duration_seconds: 300,
     difficulty: 1,
     description_fr:
-      'Respiration abdominale profonde — active le diaphragme, réduit la respiration thoracique superficielle.',
+      'Respiration profonde par le ventre — active le diaphragme, réduit la respiration thoracique superficielle.',
     instructions_fr: [
       'Allongez-vous ou asseyez-vous confortablement',
       'Posez une main sur le ventre, une sur la poitrine',
@@ -326,7 +326,7 @@ export const EXERCISE_FAMILIES = [
   },
   {
     id: 'myofonctionnel',
-    label: 'Myofonctionnel',
+    label: 'Muscles orofaciaux',
     icon: '👅',
     color: 'orange',
   },
@@ -338,7 +338,7 @@ export const EXERCISE_FAMILIES = [
   },
   {
     id: 'diaphragmatique',
-    label: 'Diaphragmatique',
+    label: 'Respiration abdominale',
     icon: '🫁',
     color: 'teal',
   },

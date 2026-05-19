@@ -59,8 +59,8 @@ const CAT_LABEL: Record<string, string> = {
   pause_controlee:     "Pause Contrôlée",
   coherence_cardiaque: "Cohérence Cardiaque",
   respiration_nasale:  "Respiration Nasale",
-  myofonctionnel:      "Myofonctionnel",
-  diaphragmatique:     "Diaphragmatique",
+  myofonctionnel:      "Muscles orofaciaux",
+  diaphragmatique:     "Respiration abdominale",
   relaxation:          "Relaxation",
 }
 
