@@ -19,7 +19,7 @@ const CATEGORIES: { id: ExerciseCategory | "all"; label: string; emoji: string; 
   { id: "respiration_nasale",  label: "Respiration Nasale", emoji: "👃", bg: "bg-sky-50",    chip: "bg-sky-100 text-sky-700" },
   { id: "myofonctionnel",   label: "Muscles orofaciaux", emoji: "👅", bg: "bg-violet-50",    chip: "bg-violet-100 text-violet-700" },
   { id: "diaphragmatique",  label: "Respiration abdominale", emoji: "🌬️", bg: "bg-orange-50", chip: "bg-orange-100 text-orange-700" },
-  // "relaxation" retiré du filtre — aucun exercice dans cette catégorie pour l'instant
+  { id: "relaxation",       label: "Relaxation",             emoji: "😌", bg: "bg-teal-50",   chip: "bg-teal-100 text-teal-700" },
 ]
 
 const Practice = () => {

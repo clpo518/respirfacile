@@ -309,6 +309,149 @@ export const EXERCISES: Exercise[] = [
     ],
     icon: '🫁',
   },
+
+  // Myofonctionnel — exercices complémentaires
+  {
+    id: 'protrusion_langue',
+    category: 'myofonctionnel',
+    name_fr: 'Protrusion de la langue',
+    duration_seconds: 120,
+    difficulty: 1,
+    description_fr:
+      'Étire et tonifie les muscles de la langue dans toutes les directions — améliore le tonus lingual global.',
+    instructions_fr: [
+      'Tirez la langue aussi loin que possible vers le bas (vers le menton)',
+      'Maintenez 5 secondes',
+      'Tirez-la vers la gauche — maintenez 5 secondes',
+      'Puis vers la droite — maintenez 5 secondes',
+      'Enfin vers le haut (vers le nez) — maintenez 5 secondes',
+      'Répétez 5 fois chaque direction',
+    ],
+    metrics_tracked: ['reps_completed'],
+    target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
+    icon: '👅',
+  },
+  {
+    id: 'son_ah_tenu',
+    category: 'myofonctionnel',
+    name_fr: 'Son "Ah" tenu',
+    duration_seconds: 90,
+    difficulty: 1,
+    description_fr:
+      'Vocalisation prolongée qui fait vibrer et renforce le voile du palais — réduit les vibrations du ronflement.',
+    instructions_fr: [
+      'Inspirez profondément par le nez',
+      'Produisez un son "Aaah" long et stable',
+      'Sentez la vibration au fond de la gorge et du palais',
+      'Tenez le son aussi longtemps que possible (objectif : 10 secondes)',
+      'Répétez 5 fois avec 15 secondes de repos entre chaque',
+    ],
+    metrics_tracked: ['hold_duration', 'reps_completed'],
+    target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
+    icon: '🗣️',
+    voice_exercise: true,
+  },
+  {
+    id: 'deglutition_correcte',
+    category: 'myofonctionnel',
+    name_fr: 'Déglutition correcte',
+    duration_seconds: 180,
+    difficulty: 2,
+    description_fr:
+      'Rééduque le schéma de déglutition — corrige la poussée linguale atypique qui aggrave les troubles respiratoires nocturnes.',
+    instructions_fr: [
+      'Placez la pointe de la langue contre le palais dur, juste derrière les incisives',
+      'Fermez les dents et les lèvres naturellement',
+      'Avalez de la salive sans pousser la langue entre les dents',
+      'Vérifiez : les joues ne doivent pas se contracter',
+      'Répétez 20 déglutitions conscientes',
+      'Idéal à pratiquer avant chaque repas',
+    ],
+    metrics_tracked: ['reps_completed'],
+    target_profile: ['adult_tmof', 'adult_mixed', 'adult_saos_mild'],
+    icon: '👅',
+  },
+
+  // Cohérence cardiaque — exercices complémentaires
+  {
+    id: 'box_breathing',
+    category: 'coherence_cardiaque',
+    name_fr: 'Respiration en carré',
+    duration_seconds: 300,
+    difficulty: 1,
+    description_fr:
+      'Technique utilisée par les forces spéciales — 4 temps égaux de 4 secondes. Calme rapidement le système nerveux autonome.',
+    instructions_fr: [
+      'Inspirez par le nez pendant 4 secondes',
+      'Retenez le souffle, poumons pleins, pendant 4 secondes',
+      'Expirez par la bouche pendant 4 secondes',
+      'Retenez à vide pendant 4 secondes',
+      'Répétez ce cycle pendant 5 minutes',
+    ],
+    metrics_tracked: ['cycles_completed'],
+    target_profile: [
+      'adult_saos_mild',
+      'adult_saos_severe',
+      'adult_tmof',
+      'adult_mixed',
+    ],
+    icon: '⬛',
+  },
+  {
+    id: 'respiration_478',
+    category: 'coherence_cardiaque',
+    name_fr: 'Respiration 4-7-8',
+    duration_seconds: 240,
+    difficulty: 2,
+    description_fr:
+      'Technique du Dr Andrew Weil — favorise un endormissement rapide. Idéal au coucher pour les patients SAOS léger à modéré.',
+    instructions_fr: [
+      'Placez la pointe de la langue contre le palais, derrière les incisives',
+      'Expirez complètement par la bouche',
+      'Inspirez silencieusement par le nez pendant 4 secondes',
+      'Retenez le souffle pendant 7 secondes',
+      'Expirez par la bouche avec un léger sifflement pendant 8 secondes',
+      'Répétez 4 cycles — ne pas dépasser 4 cycles au début',
+    ],
+    metrics_tracked: ['cycles_completed'],
+    target_profile: [
+      'adult_saos_mild',
+      'adult_saos_severe',
+      'adult_tmof',
+      'adult_mixed',
+    ],
+    icon: '🌙',
+  },
+
+  // Relaxation
+  {
+    id: 'scan_corporel',
+    category: 'relaxation',
+    name_fr: 'Scan corporel pré-sommeil',
+    duration_seconds: 600,
+    difficulty: 1,
+    description_fr:
+      'Relaxation progressive de Jacobson adaptée — relâche les tensions musculaires segmentaires qui maintiennent le système nerveux en alerte.',
+    instructions_fr: [
+      'Allongez-vous confortablement, yeux fermés',
+      'Respirez lentement par le nez — 3 cycles complets',
+      'Concentrez-vous sur vos pieds — relâchez toute tension',
+      'Remontez aux mollets et aux genoux — relâchez',
+      'Remontez aux cuisses et aux hanches — relâchez',
+      'Remontez au ventre et à la poitrine — respirez, relâchez',
+      'Remontez aux épaules, aux bras, aux mains — relâchez',
+      'Terminez par le visage : mâchoire, yeux, front — tout relâcher',
+      'Restez immobile, observez le silence intérieur pendant 1 minute',
+    ],
+    metrics_tracked: ['duration_completed'],
+    target_profile: [
+      'adult_saos_mild',
+      'adult_saos_severe',
+      'adult_tmof',
+      'adult_mixed',
+    ],
+    icon: '😌',
+  },
 ];
 
 export const EXERCISE_FAMILIES = [
@@ -340,6 +483,12 @@ export const EXERCISE_FAMILIES = [
     id: 'diaphragmatique',
     label: 'Respiration abdominale',
     icon: '🫁',
+    color: 'teal',
+  },
+  {
+    id: 'relaxation',
+    label: 'Relaxation',
+    icon: '😌',
     color: 'teal',
   },
 ];
@@ -389,7 +538,7 @@ export const EXERCISES_BY_CATEGORY: Record<ExerciseCategory, Exercise[]> = {
   respiration_nasale: EXERCISES.filter((e) => e.category === 'respiration_nasale'),
   myofonctionnel: EXERCISES.filter((e) => e.category === 'myofonctionnel'),
   diaphragmatique: EXERCISES.filter((e) => e.category === 'diaphragmatique'),
-  relaxation: [],
+  relaxation: EXERCISES.filter((e) => e.category === 'relaxation'),
 };
 
 // PROGRAM_TEMPLATES: used by usePatientProgram
@@ -398,18 +547,22 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
     exerciseIds: [
       'pause_decouverte',
       'coherence_5_5',
+      'box_breathing',
       'langue_repos',
       'nasale_consciente',
       'respiration_diaphragmatique',
+      'scan_corporel',
     ],
   },
   adult_saos_severe: {
     exerciseIds: [
       'coherence_5_5',
       'coherence_4_6',
+      'respiration_478',
       'langue_repos',
       'aspiration_langue',
       'respiration_diaphragmatique',
+      'scan_corporel',
     ],
   },
   adult_tmof: {
@@ -417,6 +570,9 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
       'langue_repos',
       'claquement_langue',
       'aspiration_langue',
+      'protrusion_langue',
+      'son_ah_tenu',
+      'deglutition_correcte',
       'gargarisme',
       'phonemes_kaga',
       'nasale_consciente',
@@ -426,10 +582,13 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
     exerciseIds: [
       'pause_decouverte',
       'coherence_5_5',
+      'box_breathing',
       'langue_repos',
+      'protrusion_langue',
       'aspiration_langue',
       'nasale_consciente',
       'respiration_diaphragmatique',
+      'scan_corporel',
     ],
   },
 };

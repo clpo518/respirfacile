@@ -870,6 +870,17 @@ function getBreathPhases(exercise: Exercise): BreathPhase[] {
   const cat = exercise.category
 
   if (cat === "coherence_cardiaque") {
+    if (exercise.id === "box_breathing") return [
+      { label: "Inspirez",  durationMs: 4000, scale: 1.18, instruction: "par le nez · 4 s",     ringColor: "#DC2626" },
+      { label: "Retenez",   durationMs: 4000, scale: 1.18, instruction: "poumons pleins · 4 s",  ringColor: "#B91C1C" },
+      { label: "Expirez",   durationMs: 4000, scale: 0.92, instruction: "par la bouche · 4 s",   ringColor: "#991B1B" },
+      { label: "Retenez",   durationMs: 4000, scale: 0.92, instruction: "poumons vides · 4 s",   ringColor: "#7F1D1D" },
+    ]
+    if (exercise.id === "respiration_478") return [
+      { label: "Inspirez",  durationMs: 4000, scale: 1.18, instruction: "par le nez · 4 s",     ringColor: "#DC2626" },
+      { label: "Retenez",   durationMs: 7000, scale: 1.18, instruction: "bloquez · 7 s",         ringColor: "#B91C1C" },
+      { label: "Expirez",   durationMs: 8000, scale: 0.92, instruction: "par la bouche · 8 s",   ringColor: "#991B1B" },
+    ]
     const is46 = exercise.id.includes("4_6")
     return [
       { label: "Inspirez",  durationMs: is46 ? 4000 : 5000, scale: 1.18, instruction: `par le nez · ${is46 ? 4 : 5} s`,  ringColor: "#DC2626" },
