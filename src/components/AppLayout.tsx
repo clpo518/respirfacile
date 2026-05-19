@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom"
-import { Activity, LayoutDashboard, Dumbbell, Settings, Users, ExternalLink } from "lucide-react"
+import { Activity, LayoutDashboard, Dumbbell, Settings, Users, ExternalLink, History } from "lucide-react"
 import type { ReactNode } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 
@@ -19,6 +19,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     : [
         { href: "/dashboard", icon: LayoutDashboard, label: "Accueil" },
         { href: "/practice",  icon: Dumbbell,         label: "Exercices" },
+        { href: "/history",   icon: History,           label: "Historique" },
         { href: "/settings",  icon: Settings,          label: "Profil" },
       ]
 

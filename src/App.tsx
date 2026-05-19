@@ -37,6 +37,7 @@ const ProSubscriptionManage = lazy(() => import("./pages/ProSubscriptionManage")
 // Patient
 const Dashboard     = lazy(() => import("./pages/Dashboard"));
 const Practice      = lazy(() => import("./pages/Practice"));
+const History       = lazy(() => import("./pages/History"));
 const SessionLive   = lazy(() => import("./pages/SessionLive"));
 const SessionDetail = lazy(() => import("./pages/SessionDetail"));
 const Settings      = lazy(() => import("./pages/Settings"));
@@ -92,6 +93,7 @@ const App = () => (
               {/* ── Patient ─────────────────────────────── */}
               <Route path="/dashboard"         element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/practice"          element={<ProtectedRoute><Practice /></ProtectedRoute>} />
+              <Route path="/history"           element={<ProtectedRoute><History /></ProtectedRoute>} />
               <Route path="/session-live"      element={<ProtectedRoute><SessionLive /></ProtectedRoute>} />
               <Route path="/session/:id"       element={<ProtectedRoute><SessionDetail /></ProtectedRoute>} />
               <Route path="/settings"          element={<ProtectedRoute><Settings /></ProtectedRoute>} />

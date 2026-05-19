@@ -117,6 +117,51 @@ const PatientDetail = () => {
     enabled: !!patientId,
   })
 
+  const handleExportPDF = () => {
+    const dateStr = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+    const rows = sessions.map(s => {
+      const ex = getExerciseById(s.exercise_id)
+      const d = new Date(s.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })
+      const dur = s.duration_seconds ? `${Math.floor(s.duration_seconds / 60)}m ${s.duration_seconds % 60}s` : "—"
+      return `<tr><td>${d}</td><td>${ex?.name_fr ?? s.exercise_id}</td><td>${dur}</td><td>${s.score != null ? s.score + "%" : "—"}</td></tr>`
+    }).join("")
+    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<title>Bilan — ${patient?.full_name ?? "Patient"}</title>
+<style>
+  body{font-family:Arial,sans-serif;max-width:680px;margin:32px auto;color:#1a1a1a;font-size:13px}
+  h1{color:#2D5A4F;font-size:22px;margin:0}
+  .logo{font-weight:bold;color:#2D5A4F;font-size:13px;margin-bottom:6px}
+  .header{border-bottom:2px solid #2D5A4F;padding-bottom:14px;margin-bottom:20px}
+  .stats{display:flex;gap:16px;margin:20px 0}
+  .stat{flex:1;text-align:center;background:#F5F0EB;border-radius:8px;padding:14px 8px}
+  .stat-v{font-size:28px;font-weight:bold;color:#2D5A4F}
+  .stat-l{font-size:11px;color:#666;margin-top:3px}
+  table{width:100%;border-collapse:collapse;margin-top:12px}
+  th{background:#2D5A4F;color:#fff;padding:9px 10px;text-align:left;font-size:11px}
+  td{padding:9px 10px;border-bottom:1px solid #eee;font-size:12px}
+  tr:nth-child(even){background:#fafafa}
+  .footer{margin-top:28px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:10px}
+  @media print{body{margin:16px}}
+</style></head><body>
+<div class="header">
+  <div class="logo">🌿 RespirFacile</div>
+  <h1>${patient?.full_name ?? "Patient"}</h1>
+  <p style="color:#666;margin:4px 0 0">Bilan du ${dateStr}${program ? ` · Programme semaine ${program.week_number}/8` : ""}</p>
+</div>
+<div class="stats">
+  <div class="stat"><div class="stat-v">${totalCount}</div><div class="stat-l">Séances totales</div></div>
+  <div class="stat"><div class="stat-v">${weekCount}</div><div class="stat-l">Cette semaine</div></div>
+  <div class="stat"><div class="stat-v">${program?.week_number ?? "—"}/8</div><div class="stat-l">Semaine programme</div></div>
+</div>
+<h2 style="font-size:15px;color:#2D5A4F">10 dernières séances</h2>
+<table><thead><tr><th>Date</th><th>Exercice</th><th>Durée</th><th>Score</th></tr></thead>
+<tbody>${rows || "<tr><td colspan='4' style='text-align:center;color:#999'>Aucune séance enregistrée</td></tr>"}</tbody></table>
+<div class="footer">Bilan généré par RespirFacile · contact@respirfacile.fr · Document médical confidentiel.</div>
+</body></html>`
+    const w = window.open("", "_blank")
+    if (w) { w.document.write(html); w.document.close(); w.focus(); setTimeout(() => w.print(), 400) }
+  }
+
   const initials = patient?.full_name
     ? patient.full_name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
     : "??"
@@ -173,7 +218,7 @@ const PatientDetail = () => {
                   <Send className="w-4 h-4" />
                   Prescrire
                 </Button>
-                <Button variant="outline" className="gap-2" onClick={() => alert("Export PDF — à implémenter")}>
+                <Button variant="outline" className="gap-2" onClick={handleExportPDF}>
                   <FileText className="w-4 h-4" />
                   Bilan PDF
                 </Button>

@@ -40,8 +40,8 @@ const CAT_LABEL: Record<string, string> = {
   pause_controlee:     "Pause Contrôlée",
   coherence_cardiaque: "Cohérence Cardiaque",
   respiration_nasale:  "Respiration Nasale",
-  myofonctionnel:      "Myofonctionnel",
-  diaphragmatique:     "Diaphragmatique",
+  myofonctionnel:      "Muscles orofaciaux",
+  diaphragmatique:     "Respiration abdominale",
   relaxation:          "Relaxation",
 }
 
@@ -225,13 +225,14 @@ const SessionLive = () => {
         }
       }
 
-      await saveSession.mutateAsync({
+      const saved = await saveSession.mutateAsync({
         exerciseId:       exercise.id,
         exerciseCategory: exercise.category,
         durationSeconds:  elapsed,
       })
-    } catch (e) { console.error(e) }
-    finally { setIsSaving(false); navigate("/dashboard") }
+      navigate(`/session/${saved.id}`)
+    } catch (e) { console.error(e); navigate("/dashboard") }
+    finally { setIsSaving(false) }
   }
 
   useEffect(() => () => stopTimers(), [])

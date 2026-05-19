@@ -17,8 +17,8 @@ const CATEGORIES: { id: ExerciseCategory | "all"; label: string; emoji: string; 
   { id: "pause_controlee",  label: "Pause Contrôlée",    emoji: "🫁", bg: "bg-emerald-50",    chip: "bg-emerald-100 text-emerald-700" },
   { id: "coherence_cardiaque", label: "Cohérence Cardiaque", emoji: "❤️", bg: "bg-red-50",   chip: "bg-red-100 text-red-700" },
   { id: "respiration_nasale",  label: "Respiration Nasale", emoji: "👃", bg: "bg-sky-50",    chip: "bg-sky-100 text-sky-700" },
-  { id: "myofonctionnel",   label: "Myofonctionnel",     emoji: "👅", bg: "bg-violet-50",    chip: "bg-violet-100 text-violet-700" },
-  { id: "diaphragmatique",  label: "Diaphragmatique",    emoji: "🌬️", bg: "bg-orange-50",   chip: "bg-orange-100 text-orange-700" },
+  { id: "myofonctionnel",   label: "Muscles orofaciaux", emoji: "👅", bg: "bg-violet-50",    chip: "bg-violet-100 text-violet-700" },
+  { id: "diaphragmatique",  label: "Respiration abdominale", emoji: "🌬️", bg: "bg-orange-50", chip: "bg-orange-100 text-orange-700" },
   // "relaxation" retiré du filtre — aucun exercice dans cette catégorie pour l'instant
 ]
 
