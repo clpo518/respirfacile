@@ -63,7 +63,7 @@ const PatientReferralCard = () => {
   const handleCopyLink = async () => {
     if (!stats?.referralCode) return;
 
-    const referralLink = `https://www.parlermoinsvite.fr/auth?tab=signup&ref=${stats.referralCode}`;
+    const referralLink = `https://www.respirfacile.fr/auth?tab=signup&ref=${stats.referralCode}`;
     const success = await copyToClipboard(referralLink);
     
     if (success) {
@@ -78,8 +78,8 @@ const PatientReferralCard = () => {
   const handleCopyMessage = async () => {
     if (!stats?.referralCode) return;
 
-    const referralLink = `https://www.parlermoinsvite.fr/auth?tab=signup&ref=${stats.referralCode}`;
-    const message = `Hey ! Je m'entraîne à parler plus lentement avec ParlerMoinsVite, et c'est vraiment bien fait 🎙️
+    const referralLink = `https://www.respirfacile.fr/auth?tab=signup&ref=${stats.referralCode}`;
+    const message = `Hey ! Je m'entraîne à parler plus lentement avec RespirFacile, et c'est vraiment bien fait 🎙️
 
 Si tu veux essayer, inscris-toi avec mon lien et on gagne chacun 1 mois gratuit quand tu t'abonnes 🎁
 

@@ -54,7 +54,7 @@ export function ReferralCompletedEmail(props: ReferralCompletedEmailProps) {
       </Button>
 
       <Text style={signatureText}>Merci pour votre confiance,</Text>
-      <Text style={signatureName}>Clément — ParlerMoinsVite</Text>
+      <Text style={signatureName}>Clément — RespirFacile</Text>
     </BaseLayout>
   )
 }

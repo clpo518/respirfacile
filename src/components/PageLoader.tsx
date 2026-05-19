@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 
 const tips = [
-  "Respirez… puis parlez 🌬️",
-  "Chaque syllabe compte 🎯",
-  "Doucement mais sûrement 🐢",
-  "Prenez votre temps ⏳",
-  "La fluidité vient avec la pratique ✨",
-  "Inspirez… expirez… parlez 🧘",
+  "Inspirez par le nez, expirez par la bouche 🌬️",
+  "La régularité fait la différence 🌱",
+  "Quelques minutes par jour, des nuits meilleures 🌙",
+  "La respiration nasale, votre premier allié 👃",
+  "Chaque exercice renforce votre musculature orofaciale 💪",
+  "Un souffle maîtrisé, un sommeil réparé ✨",
 ];
 
 const PageLoader = () => {
@@ -14,43 +14,27 @@ const PageLoader = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-6">
-      {/* Animated speech bubble */}
-      <div className="relative">
+      {/* Breathing animation */}
+      <div className="relative flex items-center justify-center">
+        {/* Outer ring — slow expand/contract like a breath */}
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="relative"
+          className="absolute rounded-full bg-primary/10"
+          animate={{ width: [64, 96, 64], height: [64, 96, 64], opacity: [0.4, 0.15, 0.4] }}
+          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+        />
+        {/* Inner circle */}
+        <motion.div
+          className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center"
+          animate={{ scale: [1, 1.15, 1] }}
+          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+          initial={{ scale: 0.85, opacity: 0 }}
+          whileInView={{ scale: 1, opacity: 1 }}
         >
-          {/* Bubble */}
           <motion.div
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center"
-          >
-            {/* Animated dots inside bubble */}
-            <div className="flex gap-1.5">
-              {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  className="w-2.5 h-2.5 rounded-full bg-primary/60"
-                  animate={{
-                    scale: [1, 1.4, 1],
-                    opacity: [0.4, 1, 0.4],
-                  }}
-                  transition={{
-                    duration: 1.2,
-                    repeat: Infinity,
-                    delay: i * 0.2,
-                    ease: "easeInOut",
-                  }}
-                />
-              ))}
-            </div>
-          </motion.div>
-          {/* Bubble tail */}
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-primary/10 rounded-full scale-75" />
-          <div className="absolute -bottom-4 left-1/2 -translate-x-[40%] w-2.5 h-2.5 bg-primary/10 rounded-full scale-50" />
+            className="w-7 h-7 rounded-full bg-primary/60"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+          />
         </motion.div>
       </div>
 

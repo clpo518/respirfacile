@@ -21,7 +21,7 @@ export function UnifiedFAQ() {
     {
       question: "L'app remplace-t-elle les séances en cabinet ?",
       answer:
-        "Non — elle les prolonge. L'ortho prescrit et ajuste en cabinet, l'app guide le patient entre les séances. C'est du renforcement quotidien qui rend les séances plus efficaces.",
+        "Non — elle les prolonge. L'orthophoniste prescrit et ajuste en cabinet, l'app guide le patient entre les séances. C'est du renforcement quotidien qui rend les séances plus efficaces.",
     },
     {
       question: 'Est-ce scientifiquement validé ?',
@@ -36,7 +36,7 @@ export function UnifiedFAQ() {
     {
       question: 'Puis-je l\'utiliser si je ne pratique pas encore la TMOF ?',
       answer:
-        'Oui. L\'app inclut des protocoles guidés et des ressources pédagogiques pour les orthos qui débutent. Des webinaires et un support personnalisé sont inclus dans tous les plans.',
+        'Oui. L\'app inclut des protocoles guidés et des ressources pédagogiques pour les orthophonistes qui débutent. Des webinaires et un support personnalisé sont inclus dans tous les plans.',
     },
   ];
 
@@ -61,7 +61,7 @@ export function UnifiedFAQ() {
   };
 
   return (
-    <section className="relative w-full bg-gray-50 py-20 md:py-28 px-4 sm:px-6 lg:px-8">
+    <section className="relative w-full bg-muted/40 py-20 md:py-28 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <motion.div
@@ -71,10 +71,10 @@ export function UnifiedFAQ() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
             Questions fréquentes
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-muted-foreground">
             Tout ce que vous devez savoir sur Respirfacile pour les orthophonistes
           </p>
         </motion.div>
@@ -91,12 +91,12 @@ export function UnifiedFAQ() {
               <motion.div key={index} variants={itemVariants}>
                 <AccordionItem
                   value={`item-${index}`}
-                  className="border border-gray-200 rounded-lg px-6 bg-white hover:border-gray-300 transition-colors duration-200"
+                  className="border border-border rounded-lg px-6 bg-card hover:border-forest/30 transition-colors duration-200"
                 >
-                  <AccordionTrigger className="text-left text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors py-4">
+                  <AccordionTrigger className="text-left text-lg font-semibold text-foreground hover:text-primary transition-colors py-4">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-700 leading-relaxed pb-4">
+                  <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -113,10 +113,10 @@ export function UnifiedFAQ() {
           viewport={{ once: true }}
           className="mt-16 text-center"
         >
-          <p className="text-gray-600 mb-4">Vous avez d'autres questions ?</p>
+          <p className="text-muted-foreground mb-4">Vous avez d'autres questions ?</p>
           <a
-            href="mailto:support@respirfacile.fr"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold"
+            href="mailto:contact@respirfacile.fr"
+            className="inline-flex items-center gap-2 text-primary hover:text-forest-light font-semibold"
           >
             Contactez-nous directement
             <span>→</span>

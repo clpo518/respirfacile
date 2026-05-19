@@ -31,10 +31,10 @@ export function RefundConfirmationEmail(props: RefundConfirmationEmailProps) {
       </Text>
 
       <Text style={paragraph}>
-        Nous espérons vous revoir bientôt sur Parler Moins Vite. Si vous avez des questions, écrivez-nous à contact@parlermoinsvite.fr
+        Nous espérons vous revoir bientôt sur RespirFacile. Si vous avez des questions, écrivez-nous à contact@respirfacile.fr
       </Text>
 
-      <Text style={paragraph}>Merci d'avoir utilisé Parler Moins Vite. 🙏</Text>
+      <Text style={paragraph}>Merci d'avoir utilisé RespirFacile. 🙏</Text>
     </BaseLayout>
   )
 }

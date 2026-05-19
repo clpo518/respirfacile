@@ -35,7 +35,7 @@ export const ExerciseDemoSection = () => {
             Voyez par vous-même
           </h2>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            3 de nos 12 modes d'exercice. Chacun cible un aspect différent de la fluence.
+            3 de nos 6 catégories d'exercice. Chaque séance cible un aspect de votre rééducation respiratoire.
           </p>
         </motion.div>
 
@@ -79,20 +79,20 @@ export const ExerciseDemoSection = () => {
                     <div className="flex flex-col items-center">
                       <div className="w-28 h-28 rounded-full border-4 border-emerald-500 bg-emerald-500/10 flex flex-col items-center justify-center">
                         <span className="text-3xl">✅</span>
-                        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">3.8 syll/s</span>
+                        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">6 cpm</span>
                       </div>
-                      <span className="text-xs text-muted-foreground mt-1.5">Vous</span>
+                      <span className="text-xs text-muted-foreground mt-1.5">Rythme cible</span>
                     </div>
                     <div className="flex flex-col items-center">
                       <div className="w-28 h-28 rounded-full border-4 border-orange-400 bg-orange-400/10 flex flex-col items-center justify-center">
                         <span className="text-3xl">⚡</span>
-                        <span className="text-xs font-bold text-orange-500 dark:text-orange-400 mt-0.5">5.2 syll/s</span>
+                        <span className="text-xs font-bold text-orange-500 dark:text-orange-400 mt-0.5">11 cpm</span>
                       </div>
-                      <span className="text-xs text-muted-foreground mt-1.5">Interlocuteur</span>
+                      <span className="text-xs text-muted-foreground mt-1.5">Rythme actuel</span>
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground text-center max-w-sm">
-                    Chaque personne reçoit <strong className="text-foreground">sa propre jauge</strong>. Idéal en séance ou en famille.
+                    Suivez votre <strong className="text-foreground">rythme respiratoire</strong> en temps réel. Idéal pour la cohérence cardiaque.
                   </p>
                   <a
                     href="/auth?tab=signup"

@@ -16,7 +16,7 @@ export function TherapistExpiringPatientEmail(props: TherapistExpiringPatientEma
   const { patientName = 'Bonjour', therapistName = 'votre orthophoniste', daysRemaining } = props
 
   return (
-    <BaseLayout preview={`Votre accès à Parler Moins Vite est en jeu`}>
+    <BaseLayout preview={`Votre accès à RespirFacile est en jeu`}>
       <Heading style={heading}>
         ⚠️ Votre accès se termine dans {daysRemaining} jour{daysRemaining > 1 ? 's' : ''}
       </Heading>
@@ -24,7 +24,7 @@ export function TherapistExpiringPatientEmail(props: TherapistExpiringPatientEma
       <Text style={paragraph}>Bonjour {patientName},</Text>
 
       <Text style={paragraph}>
-        L'abonnement de {therapistName} à Parler Moins Vite arrive à expiration dans {daysRemaining} jour{daysRemaining > 1 ? 's' : ''}.
+        L'abonnement de {therapistName} à RespirFacile arrive à expiration dans {daysRemaining} jour{daysRemaining > 1 ? 's' : ''}.
       </Text>
 
       <Text style={warningBox}>
@@ -40,7 +40,7 @@ export function TherapistExpiringPatientEmail(props: TherapistExpiringPatientEma
       </Text>
 
       <Text style={scriptBox}>
-        « Bonjour, je viens de recevoir un message de Parler Moins Vite indiquant que mon accès va bientôt expirer. Serait-il possible de renouveler votre abonnement pour que je puisse continuer mes exercices ? Merci ! »
+        « Bonjour, je viens de recevoir un message de RespirFacile indiquant que mon accès va bientôt expirer. Serait-il possible de renouveler votre abonnement pour que je puisse continuer mes exercices ? Merci ! »
       </Text>
 
       <Text style={reassuranceBox}>
@@ -55,12 +55,12 @@ export function TherapistExpiringPatientEmail(props: TherapistExpiringPatientEma
         Vous pouvez aussi passer en <strong>Mode Autonomie</strong> et continuer vos exercices de manière indépendante, avec 7 jours d'essai gratuit. Il vous suffit d'aller dans vos Réglages et de choisir « Passer en mode autonome ».
       </Text>
 
-      <Button style={autonomeButton} href="https://www.parlermoinsvite.fr/settings">
+      <Button style={autonomeButton} href="https://www.respirfacile.fr/settings">
         Continuer en Mode Autonomie →
       </Button>
 
       <Text style={smallText}>
-        Ce message est envoyé automatiquement pour vous permettre de continuer votre progression. Des questions ? Écrivez-nous à contact@parlermoinsvite.fr.
+        Ce message est envoyé automatiquement pour vous permettre de continuer votre progression. Des questions ? Écrivez-nous à contact@respirfacile.fr.
       </Text>
     </BaseLayout>
   )

@@ -44,7 +44,7 @@ export function TherapistCommentEmail(props: TherapistCommentEmailProps) {
       </Button>
 
       <Text style={signatureText}>À bientôt,</Text>
-      <Text style={signatureName}>L'équipe ParlerMoinsVite</Text>
+      <Text style={signatureName}>L'équipe RespirFacile</Text>
     </BaseLayout>
   )
 }

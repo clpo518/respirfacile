@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Play, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const DEMO_TEXT = "Le bredouillement se caractérise par un débit excessif et une articulation parfois imprécise.";
+const DEMO_TEXT = "Inspirez doucement par le nez pendant cinq secondes, puis expirez lentement par la bouche.";
 const WORDS = DEMO_TEXT.split(" ");
-const SPEED_MS = 460; // ~4.0 SPS (rythme modéré conseillé)
+const SPEED_MS = 520; // rythme lent et guidé
 
 export const KaraokeDemo = () => {
   const [currentWordIndex, setCurrentWordIndex] = useState(-1); // -1 = paused/not started

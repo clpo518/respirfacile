@@ -10,35 +10,35 @@ import {
 const faqs = [
   {
     question: "Est-ce que ça remplace un orthophoniste ?",
-    answer: "Non, ParlerMoinsVite est un outil complémentaire pour s'entraîner entre les séances. Il est idéalement recommandé et suivi par votre praticien. L'application ne pose pas de diagnostic et ne remplace pas un suivi professionnel."
+    answer: "Non, RespirFacile est un outil complémentaire pour s'entraîner entre les séances. Il est prescrit et suivi par votre orthophoniste. L'application ne pose pas de diagnostic et ne remplace pas un suivi professionnel."
   },
   {
-    question: "C'est quoi le bredouillement ?",
-    answer: "Le bredouillement (ou cluttering en anglais) est un trouble de la fluence caractérisé par un débit perçu comme trop rapide et/ou irrégulier, des télescopages de syllabes, et parfois des difficultés à organiser son discours. Contrairement au bégaiement, les personnes qui bredouillent n'en ont souvent pas conscience."
+    question: "C'est quoi le SAOS ?",
+    answer: "Le SAOS (Syndrome d'Apnées Obstructives du Sommeil) est un trouble respiratoire nocturne caractérisé par des pauses de la respiration pendant le sommeil. Il peut provoquer une fatigue chronique, des ronflements et une baisse de la qualité de vie. La rééducation myofonctionnelle — notamment des exercices bucco-faciaux et de respiration nasale — est une approche complémentaire efficace, souvent prescrite par les orthophonistes."
   },
   {
-    question: "L'application aide-t-elle aussi pour le bégaiement ?",
-    answer: "Oui ! Bien que conçue à l'origine pour le bredouillement, l'application est aussi utile pour travailler la fluence dans le cadre du bégaiement. Les exercices de contrôle du débit, de gestion du souffle et de transfert en dialogue aident à améliorer la fluidité de la parole, en complément d'un suivi orthophonique."
+    question: "À quoi servent les exercices myofonctionnels ?",
+    answer: "Les exercices myofonctionnels visent à renforcer les muscles de la langue, des lèvres et du voile du palais. Ils améliorent la respiration nasale, réduisent les ronflements et favorisent une meilleure posture linguale au repos. Prescrits par votre orthophoniste, ils complètent idéalement un traitement orthopédique ou une prise en charge SAOS."
   },
   {
-    question: "Pourquoi l'appli me demande mon âge ?",
-    answer: "Un enfant, un adolescent et un adulte ne parlent pas à la même vitesse — c'est naturel ! En connaissant votre âge, l'application adapte automatiquement votre objectif de vitesse pour qu'il soit réaliste et personnalisé. Cela évite les \"faux positifs\" frustrants où l'on vous dirait de ralentir alors que vous parlez à une vitesse normale pour votre âge."
+    question: "L'application convient-elle aux enfants ?",
+    answer: "Oui ! Les exercices peuvent être adaptés aux enfants dès 6 ans, notamment pour la rééducation de la déglutition atypique, la respiration nasale et les troubles myofonctionnels. Votre orthophoniste vous indiquera les exercices appropriés à l'âge et aux besoins de votre enfant."
   },
   {
     question: "Combien de temps faut-il s'entraîner ?",
-    answer: "5 à 10 minutes par jour suffisent pour observer des progrès. La régularité est plus importante que la durée. Nous recommandons des séances courtes mais quotidiennes."
+    answer: "5 à 10 minutes par jour suffisent pour observer des progrès. La régularité est plus importante que la durée. Votre orthophoniste vous indiquera la fréquence recommandée selon votre programme personnalisé."
   },
   {
     question: "L'application fonctionne-t-elle hors connexion ?",
-    answer: "Non, une connexion internet est nécessaire pour l'analyse vocale en temps réel et la sauvegarde de vos séances. Vos données sont stockées de manière sécurisée."
+    answer: "Non, une connexion internet est nécessaire pour accéder à vos exercices prescrits et sauvegarder vos séances. Vos données sont stockées de manière sécurisée sur des serveurs hébergés en Europe."
   },
   {
-    question: "Mes enregistrements sont-ils confidentiels ?",
-    answer: "Oui, absolument. Vos enregistrements sont chiffrés et accessibles uniquement par vous (et votre orthophoniste si vous le liez à votre compte). Nous ne les utilisons jamais à d'autres fins."
+    question: "Mes données sont-elles confidentielles ?",
+    answer: "Oui, absolument. Vos données de santé sont chiffrées et accessibles uniquement par vous et votre orthophoniste. Elles sont hébergées en France et ne sont jamais transmises à des tiers ni utilisées à des fins commerciales."
   },
   {
-    question: "Mon enfant ne sait pas lire, peut-il utiliser l'appli ?",
-    answer: "Oui ! Le mode Rébus utilise des images et des emojis pour guider la parole, sans besoin de lire. Idéal pour les enfants de 4 à 7 ans."
+    question: "Comment obtenir un accès à l'application ?",
+    answer: "L'accès à RespirFacile se fait via votre orthophoniste. Il ou elle vous remet un code personnel lors de votre suivi. Si votre orthophoniste ne connaît pas encore l'application, nous pouvons le contacter pour vous."
   },
 ];
 
@@ -61,7 +61,7 @@ export const AudienceSection = () => {
             Vous avez des questions ?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Tout ce que vous devez savoir sur ParlerMoinsVite et les troubles de la fluence.
+            Tout ce que vous devez savoir sur RespirFacile et la rééducation respiratoire.
           </p>
         </motion.div>
         

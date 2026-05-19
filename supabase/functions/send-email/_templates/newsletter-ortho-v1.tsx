@@ -17,18 +17,18 @@ export function NewsletterOrthoV1Email() {
   return (
     <Html>
       <Head />
-      <Preview>☕ Les coulisses de ParlerMoinsVite — Nouveautés, cafés et nuits blanches</Preview>
+      <Preview>☕ Les coulisses de RespirFacile — Nouveautés, cafés et nuits blanches</Preview>
       <Body style={main}>
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <Text style={logoText}>🎙️ Parler Moins Vite</Text>
+            <Text style={logoText}>🎙️ RespirFacile</Text>
             <Text style={editionText}>Newsletter #1 — Février 2026</Text>
           </Section>
 
           <Section style={content}>
             {/* Intro */}
-            <Heading as="h1" style={h1}>Les coulisses de ParlerMoinsVite ☕</Heading>
+            <Heading as="h1" style={h1}>Les coulisses de RespirFacile ☕</Heading>
 
             <Text style={text}>
               Bonjour,
@@ -48,7 +48,7 @@ export function NewsletterOrthoV1Email() {
             <Section style={founderSection}>
               <Img
                 src="https://lllzwnffmdicoqqxqmeh.supabase.co/storage/v1/object/public/email-assets/clement-founder.jpg?v=2"
-                alt="Clément, fondateur de ParlerMoinsVite"
+                alt="Clément, fondateur de RespirFacile"
                 width="120"
                 height="120"
                 style={founderImg}
@@ -66,7 +66,7 @@ export function NewsletterOrthoV1Email() {
             </Text>
 
             <Text style={text}>
-              Résultat : je passe mes soirées et mes week-ends à développer ParlerMoinsVite.
+              Résultat : je passe mes soirées et mes week-ends à développer RespirFacile.
               Juste moi, mon clavier, et beaucoup trop de café. ☕
             </Text>
 
@@ -138,7 +138,7 @@ export function NewsletterOrthoV1Email() {
 
             {/* CTA Button */}
             <Section style={ctaSection}>
-              <Link href="https://www.parlermoinsvite.fr/auth" style={ctaButton}>
+              <Link href="https://www.respirfacile.fr/auth" style={ctaButton}>
                 Découvrir les nouveautés →
               </Link>
             </Section>
@@ -185,7 +185,7 @@ export function NewsletterOrthoV1Email() {
                 📞 <strong>06 98 42 54 43</strong> (appel ou SMS)
               </Text>
               <Text style={contactText}>
-                📧 <Link href="mailto:contact@parlermoinsvite.fr" style={link}>contact@parlermoinsvite.fr</Link>
+                📧 <Link href="mailto:contact@respirfacile.fr" style={link}>contact@respirfacile.fr</Link>
               </Text>
               <Text style={contactText}>
                 📅 Envie d'une visio de 15 min ? Écrivez-moi, je suis toujours dispo.
@@ -207,7 +207,7 @@ export function NewsletterOrthoV1Email() {
 
             <Text style={signature}>
               Clément<br />
-              <em>Fondateur de ParlerMoinsVite — Ancien bredouilleur, toujours bavard 😄</em><br />
+              <em>Fondateur de RespirFacile — Ancien bredouilleur, toujours bavard 😄</em><br />
               <em>Annecy 🏔️</em>
             </Text>
           </Section>
@@ -215,10 +215,10 @@ export function NewsletterOrthoV1Email() {
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              © {new Date().getFullYear()} Parler Moins Vite. Tous droits réservés.
+              © {new Date().getFullYear()} RespirFacile. Tous droits réservés.
             </Text>
             <Text style={footerText}>
-              <Link href="https://www.parlermoinsvite.fr" style={footerLink}>www.parlermoinsvite.fr</Link>
+              <Link href="https://www.respirfacile.fr" style={footerLink}>www.respirfacile.fr</Link>
             </Text>
           </Section>
         </Container>

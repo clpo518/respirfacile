@@ -58,7 +58,7 @@ export function AdminWeeklyDigestEmail(props: AdminWeeklyDigestProps) {
       <Text style={dateRange}>Semaine du {weekStartDate} au {weekEndDate}</Text>
 
       <Text style={paragraph}>
-        Voici le résumé de la semaine pour Parler Moins Vite.
+        Voici le résumé de la semaine pour RespirFacile.
       </Text>
 
       <Text style={sectionTitle}>📥 Nouvelles inscriptions</Text>

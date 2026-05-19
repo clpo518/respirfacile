@@ -24,7 +24,7 @@ export function TrialExtendedEmail(props: TrialExtendedEmailProps) {
       <Text style={paragraph}>Bonjour {userName},</Text>
 
       <Text style={paragraph}>
-        Bonne nouvelle ! Nous avons prolongé votre accès gratuit à Parler Moins Vite.
+        Bonne nouvelle ! Nous avons prolongé votre accès gratuit à RespirFacile.
       </Text>
 
       <Text style={highlightBox}>
@@ -54,7 +54,7 @@ export function TrialExtendedEmail(props: TrialExtendedEmailProps) {
       </Text>
 
       <Text style={signatureText}>À bientôt,</Text>
-      <Text style={signatureName}>L'équipe Parler Moins Vite</Text>
+      <Text style={signatureName}>L'équipe RespirFacile</Text>
     </BaseLayout>
   )
 }

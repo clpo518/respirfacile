@@ -88,7 +88,7 @@ export function TrialBugApologyEmail({
 
       <Text style={signOff}>
         Merci pour votre patience et votre confiance,{'\n'}
-        L'équipe Parler Moins Vite
+        L'équipe RespirFacile
       </Text>
     </BaseLayout>
   )

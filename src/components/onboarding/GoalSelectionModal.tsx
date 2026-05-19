@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Gauge, Activity, Loader2 } from "lucide-react";
+import { Wind, Loader2 } from "lucide-react";
 
 interface GoalSelectionModalProps {
   open: boolean;
@@ -15,19 +15,19 @@ interface GoalSelectionModalProps {
 const goals = [
   {
     id: "speed" as const,
-    icon: Gauge,
-    emoji: "🏃",
-    title: "Parler moins vite",
-    description: "Je parle trop vite et je veux ralentir mon débit (bredouillement, tachylalie)",
+    icon: Wind,
+    emoji: "😴",
+    title: "Améliorer mon sommeil",
+    description: "J'ai des ronflements ou des troubles du sommeil (SAOS) et je veux travailler ma respiration nocturne",
     color: "border-primary/50 bg-primary/5 hover:bg-primary/10",
     activeColor: "border-primary bg-primary/15 ring-2 ring-primary/30",
   },
   {
     id: "fluency" as const,
-    emoji: "🌊",
-    icon: Activity,
-    title: "Améliorer ma fluence",
-    description: "Je veux travailler ma fluidité de parole (bégaiement, blocages, répétitions)",
+    emoji: "🌬️",
+    icon: Wind,
+    title: "Renforcer ma respiration",
+    description: "Je veux améliorer ma respiration nasale, ma posture linguale ou ma ventilation diaphragmatique",
     color: "border-accent/50 bg-accent/5 hover:bg-accent/10",
     activeColor: "border-accent bg-accent/15 ring-2 ring-accent/30",
   },
@@ -51,8 +51,8 @@ const GoalSelectionModal = ({ open, userId, onComplete }: GoalSelectionModalProp
 
       toast.success(
         selected === "speed"
-          ? "Parcours « Ralentir le débit » activé 🏃"
-          : "Parcours « Fluence » activé 🌊"
+          ? "Parcours « Sommeil & SAOS » activé 😴"
+          : "Parcours « Rééducation respiratoire » activé 🌬️"
       );
       onComplete(selected);
     } catch (err) {

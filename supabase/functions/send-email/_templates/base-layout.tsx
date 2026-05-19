@@ -24,7 +24,7 @@ export function BaseLayout({ preview, children }: BaseLayoutProps) {
       <Body style={main}>
         <Container style={container}>
           <Section style={header}>
-            <Text style={logoText}>Parler Moins Vite</Text>
+            <Text style={logoText}>RespirFacile</Text>
           </Section>
 
           <Section style={content}>
@@ -33,14 +33,14 @@ export function BaseLayout({ preview, children }: BaseLayoutProps) {
 
           <Section style={footer}>
             <Text style={footerText}>
-              © {new Date().getFullYear()} Parler Moins Vite. Tous droits réservés.
+              © {new Date().getFullYear()} RespirFacile. Tous droits réservés.
             </Text>
             <Text style={footerText}>
-              <Link href="https://www.parlermoinsvite.fr" style={footerLink}>www.parlermoinsvite.fr</Link>
+              <Link href="https://www.respirfacile.fr" style={footerLink}>www.respirfacile.fr</Link>
             </Text>
             <Text style={footerLinks}>
               Une question ? Écrivez-nous à{' '}
-              <Link href="mailto:contact@parlermoinsvite.fr" style={footerLink}>contact@parlermoinsvite.fr</Link>
+              <Link href="mailto:contact@respirfacile.fr" style={footerLink}>contact@respirfacile.fr</Link>
             </Text>
           </Section>
         </Container>
@@ -51,7 +51,7 @@ export function BaseLayout({ preview, children }: BaseLayoutProps) {
 
 export default BaseLayout
 
-// Design tokens from ParlerMoinsVite design system
+// Design tokens from RespirFacile design system
 // Primary: hsl(170, 45%, 41%) = #3a9e8e (soft teal)
 // Foreground: hsl(230, 18%, 22%) = #2e3346
 // Muted foreground: hsl(230, 10%, 48%) = #6e7282

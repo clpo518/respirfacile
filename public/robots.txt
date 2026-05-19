@@ -38,4 +38,4 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-Sitemap: https://www.parlermoinsvite.fr/sitemap.xml
+Sitemap: https://www.respirfacile.fr/sitemap.xml

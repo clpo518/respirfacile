@@ -1,813 +1,898 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { createCompatibleRecorder, createAudioBlob, getRecordingFileName } from "@/lib/audioCompat";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Gauge, Square, Play, Users, Save, TrendingDown, TrendingUp, Minus, FlaskConical } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Volume2 } from "lucide-react";
-import { ClinicalWaveform } from "@/components/clinical";
-import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
-import { useDeepgramSPS } from "@/hooks/useDeepgramSPS";
-import { calculateSafeMaxSPS, spsToWpm, getSPSZone } from "@/lib/spsUtils";
-import confetti from "canvas-confetti";
+import { useState, useEffect, useRef, useCallback } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
+import { usePatientProgram } from "@/hooks/usePatientProgram"
+import { getExerciseById } from "@/data/exercises"
+import { supabase } from "@/integrations/supabase/client"
+import { motion, AnimatePresence } from "framer-motion"
+import { ArrowLeft, Play, Pause, RotateCcw, Check, ChevronRight, Star, Mic, Square } from "lucide-react"
+import type { Exercise, ExerciseCategory } from "@/data/exercises"
+import { useVoiceRecorder, type UseVoiceRecorderReturn } from "@/hooks/useVoiceRecorder"
 
-type Duration = 60 | 120 | 300 | 600;
+// ─────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────
 
-const DURATION_OPTIONS: { value: Duration; label: string }[] = [
-  { value: 60, label: "1 min" },
-  { value: 120, label: "2 min" },
-  { value: 300, label: "5 min" },
-  { value: 600, label: "10 min" },
-];
+type SessionPhase = "intro" | "running" | "paused" | "done"
+type UXMode       = "breathing" | "guided"
 
-interface PatientOption {
-  id: string;
-  full_name: string | null;
+interface BreathPhase {
+  label:       string
+  durationMs:  number
+  scale:       number
+  instruction: string
+  ringColor:   string
 }
 
-/* ──── Target SPS options ──── */
-const TARGET_SPS_OPTIONS = [
-  { value: 0, label: "Aucune" },
-  { value: 1.0, label: "1.0 — Ultra-lent" },
-  { value: 2.0, label: "2.0 — Tortue" },
-  { value: 3.0, label: "3.0 — Lent" },
-  { value: 3.5, label: "3.5 — Posé" },
-  { value: 4.0, label: "4.0 — Moyen" },
-  { value: 4.5, label: "4.5 — Confortable" },
-  { value: 5.0, label: "5.0 — Rapide" },
-  { value: 6.0, label: "6.0 — Vitesse haute" },
-  { value: 7.0, label: "7.0 — Dynamique" },
-  { value: 8.0, label: "8.0 — Très rapide" },
-  { value: 9.0, label: "9.0 — Maximum" },
-];
+// ─────────────────────────────────────────────
+// Constantes par catégorie
+// ─────────────────────────────────────────────
 
-/* ──── Color helpers relative to target ──── */
-const getRelativeColor = (sps: number, target: number) => {
-  if (sps < 0.3) return "hsl(var(--muted-foreground))";
-  if (target === 0) {
-    // No target: absolute thresholds
-    if (sps <= 4.0) return "hsl(142, 76%, 45%)";
-    if (sps <= 5.5) return "hsl(38, 92%, 50%)";
-    return "hsl(0, 84%, 60%)";
-  }
-  const ratio = sps / target;
-  if (ratio <= 1.05) return "hsl(142, 76%, 45%)";  // At or below target
-  if (ratio <= 1.20) return "hsl(38, 92%, 50%)";   // Slightly above
-  return "hsl(0, 84%, 60%)";                        // Well above
-};
+// Ces catégories ont un cercle de respiration animé
+const BREATHING_CATEGORIES: ExerciseCategory[] = [
+  "coherence_cardiaque",
+  "respiration_nasale",
+  "diaphragmatique",
+  "relaxation",
+]
 
-const getRelativeEmoji = (sps: number, target: number) => {
-  if (sps < 0.3) return "🎤";
-  if (target === 0) {
-    if (sps <= 4.0) return "✅";
-    if (sps <= 5.5) return "⚡";
-    return "🔴";
-  }
-  const ratio = sps / target;
-  if (ratio <= 1.05) return "✅";
-  if (ratio <= 1.20) return "⚡";
-  return "🔴";
-};
+const CAT_LABEL: Record<string, string> = {
+  pause_controlee:     "Pause Contrôlée",
+  coherence_cardiaque: "Cohérence Cardiaque",
+  respiration_nasale:  "Respiration Nasale",
+  myofonctionnel:      "Myofonctionnel",
+  diaphragmatique:     "Diaphragmatique",
+  relaxation:          "Relaxation",
+}
 
-/* ──── Radial Gauge SVG ──── */
-const BilanRadialGauge = ({ avg, target }: { avg: number; target: number }) => {
-  const maxSps = 10;
-  const pct = Math.min(avg / maxSps, 1);
-  const radius = 80;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - pct * 0.75);
+// Couleurs par catégorie (thème clair)
+// Bénéfice clinique affiché dans le panneau latéral (intro) et sur le bilan
+const CAT_BENEFITS: Record<string, string> = {
+  pause_controlee:     "Améliore votre tolérance naturelle au CO₂ — le marqueur clé de la respiration nasale et de la réduction des apnées.",
+  coherence_cardiaque: "Synchronise rythme cardiaque et respiration. Réduit le cortisol, améliore la qualité du sommeil en 4 semaines.",
+  respiration_nasale:  "Réhabilite la respiration nasale exclusive : filtre l'air, réchauffe, réduit la résistance des voies aériennes supérieures.",
+  myofonctionnel:      "Renforce les muscles oropharyngés qui maintiennent les voies aériennes ouvertes pendant le sommeil.",
+  diaphragmatique:     "Active le diaphragme, améliore la ventilation alvéolaire et réduit la respiration thoracique superficielle.",
+  relaxation:          "Réduit l'activation du système nerveux sympathique pour favoriser un endormissement plus rapide.",
+}
 
-  const color = getRelativeColor(avg, target);
-  const emoji = avg === 0 ? "📊" : getRelativeEmoji(avg, target);
+// Message court affiché sur l'écran de fin
+const DONE_MESSAGES: Record<string, string> = {
+  pause_controlee:     "Votre tolérance CO₂ s'améliore à chaque séance.",
+  coherence_cardiaque: "Votre système nerveux s'est régulé. Votre sommeil en bénéficiera.",
+  respiration_nasale:  "Respirer par le nez devient plus naturel chaque jour.",
+  myofonctionnel:      "Vos muscles oropharyngés se renforcent progressivement.",
+  diaphragmatique:     "Votre diaphragme s'active et votre respiration se stabilise.",
+  relaxation:          "Votre corps a réduit son niveau de stress.",
+}
 
-  return (
-    <div className="relative w-52 h-52 flex items-center justify-center">
-      <svg viewBox="0 0 200 200" className="w-full h-full -rotate-[135deg]">
-        {/* Background arc */}
-        <circle cx="100" cy="100" r={radius} fill="none" stroke="hsl(var(--muted) / 0.5)" strokeWidth="12" strokeLinecap="round"
-          strokeDasharray={`${circumference * 0.75} ${circumference * 0.25}`} />
-        {/* Target marker */}
-        {target > 0 && (() => {
-          const targetPct = Math.min(target / maxSps, 1);
-          const targetAngle = targetPct * 270; // degrees in the 270° arc
-          const rad = (targetAngle * Math.PI) / 180;
-          const x = 100 + radius * Math.cos(rad);
-          const y = 100 + radius * Math.sin(rad);
-          return <circle cx={x} cy={y} r="4" fill="hsl(var(--foreground))" opacity="0.5" />;
-        })()}
-        {/* Value arc */}
-        <motion.circle cx="100" cy="100" r={radius} fill="none" stroke={color} strokeWidth="14" strokeLinecap="round"
-          strokeDasharray={`${circumference * 0.75} ${circumference * 0.25}`}
-          initial={{ strokeDashoffset: circumference * 0.75 }}
-          animate={{ strokeDashoffset }}
-          transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1], delay: 0.3 }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <motion.span className="text-4xl" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", delay: 0.6 }}>
-          {emoji}
-        </motion.span>
-        <motion.span className="text-3xl font-bold tabular-nums mt-1" style={{ color }}
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
-          {avg > 0 ? avg.toFixed(1) : "—"}
-        </motion.span>
-        <span className="text-xs text-muted-foreground">syll/s</span>
-        {target > 0 && avg > 0 && (
-          <motion.span className="text-[10px] text-muted-foreground mt-0.5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.0 }}>
-            cible : {target.toFixed(1)}
-          </motion.span>
-        )}
-      </div>
-    </div>
-  );
-};
+const CAT_COLORS: Record<string, { ring: string; bg: string; text: string }> = {
+  pause_controlee:     { ring: "#059669", bg: "#ECFDF5", text: "#065F46" },
+  coherence_cardiaque: { ring: "#DC2626", bg: "#FFF5F5", text: "#991B1B" },
+  respiration_nasale:  { ring: "#0284C7", bg: "#F0F9FF", text: "#0C4A6E" },
+  myofonctionnel:      { ring: "#7C3AED", bg: "#F5F3FF", text: "#4C1D95" },
+  diaphragmatique:     { ring: "#D97706", bg: "#FFFBEB", text: "#92400E" },
+  relaxation:          { ring: "#0D9488", bg: "#F0FDFA", text: "#134E4A" },
+}
 
-/* ──── Verdict Card ──── */
-const BilanVerdict = ({ avg, target }: { avg: number; target: number }) => {
-  const { title, description, emoji, bgClass } = useMemo(() => {
-    if (avg === 0) return { title: "Séance trop courte", description: "Pas assez de parole détectée.", emoji: "⏸️", bgClass: "bg-muted/50" };
-    
-    if (target > 0) {
-      const ratio = avg / target;
-      if (ratio <= 0.90) return { title: "En dessous de la cible", description: `Débit moyen de ${avg.toFixed(1)} syll/s pour une cible à ${target.toFixed(1)}. Vous pouvez viser un peu plus haut.`, emoji: "🐢", bgClass: "bg-emerald-50 dark:bg-emerald-950/20" };
-      if (ratio <= 1.05) return { title: "Objectif atteint ! 🎯", description: `Débit moyen de ${avg.toFixed(1)} syll/s — pile dans la cible à ${target.toFixed(1)}. Bravo !`, emoji: "✨", bgClass: "bg-green-50 dark:bg-green-950/20" };
-      if (ratio <= 1.20) return { title: "Légèrement au-dessus", description: `Débit moyen de ${avg.toFixed(1)} syll/s pour une cible à ${target.toFixed(1)}. Pensez aux pauses.`, emoji: "⚡", bgClass: "bg-orange-50 dark:bg-orange-950/20" };
-      return { title: "Au-dessus de la cible", description: `Débit moyen de ${avg.toFixed(1)} syll/s — la cible est à ${target.toFixed(1)}. Travaillez les pauses respiratoires.`, emoji: "🌬️", bgClass: "bg-red-50 dark:bg-red-950/20" };
-    }
-    
-    if (avg <= 3.5) return { title: "Rythme très posé", description: "Excellent contrôle du débit — idéal pour le travail articulatoire.", emoji: "🐢", bgClass: "bg-emerald-50 dark:bg-emerald-950/20" };
-    if (avg <= 5.0) return { title: "Rythme normo-fluent", description: "Le débit est confortable et naturel. Bravo !", emoji: "✨", bgClass: "bg-green-50 dark:bg-green-950/20" };
-    if (avg <= 6.0) return { title: "Débit légèrement rapide", description: "Quelques accélérations détectées. Pensez aux pauses inter-phrases.", emoji: "⚡", bgClass: "bg-orange-50 dark:bg-orange-950/20" };
-    return { title: "Débit élevé", description: "Le rythme est rapide. Travaillez les pauses respiratoires.", emoji: "🌬️", bgClass: "bg-red-50 dark:bg-red-950/20" };
-  }, [avg, target]);
-
-  return (
-    <Card className={`${bgClass} border-0 shadow-sm`}>
-      <CardContent className="p-4 flex items-start gap-3">
-        <span className="text-2xl mt-0.5">{emoji}</span>
-        <div>
-          <p className="font-display font-bold text-sm">{title}</p>
-          <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-/* ──── Stability Indicator ──── */
-const BilanStability = ({ avg, max, min }: { avg: number; max: number; min: number }) => {
-  if (avg === 0) return null;
-  const range = max - min;
-  const variance = avg > 0 ? ((max - avg) / avg) * 100 : 0;
-
-  const { label, description, emoji, barColor } = useMemo(() => {
-    if (variance < 20) return { label: "Très stable", description: `Seulement ${range.toFixed(1)} syll/s d'écart — excellent contrôle.`, emoji: "🎯", barColor: "bg-emerald-500" };
-    if (variance < 40) return { label: "Stable", description: `${range.toFixed(1)} syll/s d'écart — quelques variations normales.`, emoji: "📈", barColor: "bg-primary" };
-    return { label: "Variable", description: `${range.toFixed(1)} syll/s d'écart — les pauses respiratoires peuvent aider.`, emoji: "🌬️", barColor: "bg-orange-500" };
-  }, [variance, range]);
-
-  const stabilityPct = Math.max(0, Math.min(100, 100 - variance));
-
-  return (
-    <Card className="border-0 shadow-sm bg-muted/30">
-      <CardContent className="p-4 space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span>{emoji}</span>
-            <p className="text-sm font-medium">{label}</p>
-          </div>
-          <p className="text-xs text-muted-foreground">{Math.round(stabilityPct)}%</p>
-        </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <motion.div className={`h-full rounded-full ${barColor}`}
-            initial={{ width: 0 }} animate={{ width: `${stabilityPct}%` }}
-            transition={{ duration: 0.8, delay: 1.5, ease: "easeOut" }}
-          />
-        </div>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </CardContent>
-    </Card>
-  );
-};
+// ─────────────────────────────────────────────
+// SessionLive — mode Duolingo, thème clair
+// ─────────────────────────────────────────────
 
 const SessionLive = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const deepgram = useDeepgramSPS();
+  const navigate       = useNavigate()
+  const [searchParams] = useSearchParams()
+  const { user }       = useAuth()
+  const { saveSession } = usePatientProgram()
 
-  const preselectedPatient = searchParams.get("patient");
+  const exerciseId = searchParams.get("exercise") ?? ""
+  const exercise   = getExerciseById(exerciseId)
 
-  const [patients, setPatients] = useState<PatientOption[]>([]);
-  const [selectedPatientId, setSelectedPatientId] = useState<string>(preselectedPatient || "none");
-  const [duration, setDuration] = useState<Duration>(120);
-  const [targetSps, setTargetSps] = useState(0);
-  const [speakerCount, setSpeakerCount] = useState<number>(0); // 0 = auto
-  const [isRecording, setIsRecording] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(0);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [saving, setSaving] = useState(false);
-  const [sessionSpsHistory, setSessionSpsHistory] = useState<{timestamp: number; sps: number}[]>([]);
-  const [showBilan, setShowBilan] = useState(false);
-  const [bilanData, setBilanData] = useState<{ avg: number; max: number; min: number; duration: number } | null>(null);
-  const [clinicalNote, setClinicalNote] = useState("");
-  const [savingNote, setSavingNote] = useState(false);
-  const [loadingPatients, setLoadingPatients] = useState(true);
-  const [bilanAudioUrl, setBilanAudioUrl] = useState<string | null>(null);
+  const [phase,              setPhase]             = useState<SessionPhase>("intro")
+  const [elapsed,            setElapsed]           = useState(0)
+  const [breathPhaseIdx,     setBreathPhaseIdx]    = useState(0)
+  const [breathPhaseElapsed, setBreathPhaseElapsed]= useState(0)
+  const [cycleCount,         setCycleCount]        = useState(0)
+  const [stepIndex,          setStepIndex]         = useState(0)
+  const [isSaving,           setIsSaving]          = useState(false)
+  const [therapistName,      setTherapistName]     = useState<string | null>(null)
+  const [voiceUploaded,      setVoiceUploaded]     = useState(false)
 
-  const streamRef = useRef<MediaStream | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const samplerRef = useRef<NodeJS.Timeout | null>(null);
-  const startTimeRef = useRef<number | null>(null);
-  const lastSampledVersionRef = useRef(0);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+  const voiceRecorder = useVoiceRecorder()
 
-  // Fetch patients
+  const timerRef        = useRef<ReturnType<typeof setInterval> | null>(null)
+  const breathTimerRef  = useRef<ReturnType<typeof setInterval> | null>(null)
+  const startTimeRef    = useRef<number>(0)
+  const breathIdxRef    = useRef(0)
+
+  useEffect(() => { if (!exercise) navigate("/dashboard") }, [exercise, navigate])
+
+  // Nom du praticien pour l'écran de fin
   useEffect(() => {
-    if (!user) return;
+    if (!user) return
     supabase
-      .from("profiles")
-      .select("id, full_name")
-      .eq("linked_therapist_id", user.id)
-      .eq("is_archived", false)
+      .from("therapist_patients")
+      .select("profiles!therapist_patients_therapist_id_fkey(full_name)")
+      .eq("patient_id", user.id)
+      .eq("is_active", true)
+      .maybeSingle()
       .then(({ data }) => {
-        if (data) setPatients(data);
-        setLoadingPatients(false);
-      });
-  }, [user]);
+        const name = (data as any)?.profiles?.full_name
+        if (name) setTherapistName(name)
+      })
+  }, [user])
 
-  // Sample SPS only when a NEW packet is computed
-  useEffect(() => {
-    if (isRecording) {
-      samplerRef.current = setInterval(() => {
-        if (deepgram.packetVersion > lastSampledVersionRef.current && deepgram.packetSPS > 0) {
-          lastSampledVersionRef.current = deepgram.packetVersion;
-          const elapsed = startTimeRef.current ? Math.round((Date.now() - startTimeRef.current) / 1000) : 0;
-          setSessionSpsHistory(prev => [...prev, { timestamp: elapsed, sps: deepgram.packetSPS }]);
+  if (!exercise) return null
+
+  const uxMode         = getUXMode(exercise)
+  const breathPhases   = getBreathPhases(exercise)
+  const totalDuration  = exercise.duration_seconds
+  const steps          = exercise.instructions_fr   // données réelles de l'exercice
+  const colors         = CAT_COLORS[exercise.category] ?? CAT_COLORS.relaxation
+  const currentBP      = breathPhases[breathPhaseIdx % breathPhases.length]
+
+  // ── Timers ──────────────────────────────────
+  const stopTimers = useCallback(() => {
+    if (timerRef.current)       clearInterval(timerRef.current)
+    if (breathTimerRef.current) clearInterval(breathTimerRef.current)
+  }, [])
+
+  const startMainTimer = useCallback(() => {
+    startTimeRef.current = Date.now() - elapsed * 1000
+    timerRef.current = setInterval(() => {
+      const t = Math.floor((Date.now() - startTimeRef.current) / 1000)
+      setElapsed(t)
+      if (t >= totalDuration) {
+        clearInterval(timerRef.current!)
+        clearInterval(breathTimerRef.current!)
+        setPhase("done")
+      }
+    }, 250)
+  }, [elapsed, totalDuration])
+
+  const startBreathTimer = useCallback(() => {
+    let phaseMs = 0
+    breathTimerRef.current = setInterval(() => {
+      phaseMs += 100
+      const cur = breathPhases[breathIdxRef.current % breathPhases.length].durationMs
+      setBreathPhaseElapsed(phaseMs)
+      if (phaseMs >= cur) {
+        phaseMs = 0
+        setBreathPhaseElapsed(0)
+        breathIdxRef.current += 1
+        setBreathPhaseIdx(breathIdxRef.current)
+        // Un cycle complet = on a traversé tous les phases
+        if (breathIdxRef.current % breathPhases.length === 0) {
+          setCycleCount(c => c + 1)
         }
-      }, 500);
+      }
+    }, 100)
+  }, [breathPhases])
+
+  // ── Contrôles ───────────────────────────────
+  const handleStart = () => {
+    setPhase("running")
+    startMainTimer()
+    if (uxMode === "breathing") startBreathTimer()
+  }
+  const handlePause = () => { setPhase("paused"); stopTimers() }
+  const handleResume = () => {
+    setPhase("running")
+    startMainTimer()
+    if (uxMode === "breathing") startBreathTimer()
+  }
+  const handleRestart = () => {
+    stopTimers()
+    setPhase("intro"); setElapsed(0); setStepIndex(0)
+    breathIdxRef.current = 0; setBreathPhaseIdx(0); setBreathPhaseElapsed(0); setCycleCount(0)
+  }
+  const handleNextStep = () => {
+    if (stepIndex < steps.length - 1) {
+      setStepIndex(i => i + 1)
     } else {
-      if (samplerRef.current) clearInterval(samplerRef.current);
+      stopTimers()
+      setPhase("done")
     }
-    return () => { if (samplerRef.current) clearInterval(samplerRef.current); };
-  }, [isRecording, deepgram.packetVersion, deepgram.packetSPS]);
-
-  // Auto-stop
-  useEffect(() => {
-    if (isRecording && remainingTime <= 0 && elapsedTime > 0) {
-      stopRecording();
-    }
-  }, [remainingTime]);
-
-  const isNoPatient = selectedPatientId === "none";
-
-  const startRecording = async () => {
+  }
+  const handleComplete = async () => {
+    setIsSaving(true)
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          autoGainControl: true,
-          noiseSuppression: true,
-          echoCancellation: false, // can degrade speech recognition
-        }
-      });
-      streamRef.current = stream;
-
-      try { await deepgram.start(stream, { detectFillers: true, maxSpeakers: speakerCount || undefined }); } catch {
-        toast.info("Enregistrement sans analyse en temps réel.", { duration: 3000 });
-      }
-
-      // Start MediaRecorder for audio capture
-      const mediaRecorder = createCompatibleRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunksRef.current.push(e.data);
-      };
-      // Safari MP4 doesn't support timeslice — chunks can't be concatenated into valid MP4
-      const isMp4 = mediaRecorder.mimeType?.includes("mp4") || mediaRecorder.mimeType?.includes("aac");
-      mediaRecorder.start(isMp4 ? undefined : 1000);
-
-      startTimeRef.current = Date.now();
-      setRemainingTime(duration);
-      setElapsedTime(0);
-      setSessionSpsHistory([{ timestamp: 0, sps: 0 }]); // Anchor curve at t=0
-      lastSampledVersionRef.current = 0;
-
-      timerRef.current = setInterval(() => {
-        if (startTimeRef.current) {
-          const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
-          setElapsedTime(elapsed);
-          setRemainingTime(Math.max(duration - elapsed, 0));
-        }
-      }, 1000);
-
-      setIsRecording(true);
-    } catch {
-      toast.error("Impossible d'accéder au microphone");
-    }
-  };
-
-  const stopRecording = async () => {
-    setSaving(true);
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (samplerRef.current) clearInterval(samplerRef.current);
-    deepgram.stop();
-
-    // Stop MediaRecorder and wait for final chunks
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      mediaRecorderRef.current.stop();
-    }
-    await new Promise(r => setTimeout(r, 500));
-
-    streamRef.current?.getTracks().forEach(t => t.stop());
-
-    const spsValues = sessionSpsHistory.map(p => p.sps);
-    const validSps = spsValues.filter(s => s >= 1.0);
-    const avg = validSps.length > 0 ? Math.round((validSps.reduce((a, b) => a + b, 0) / validSps.length) * 10) / 10 : 0;
-    const rawMax = calculateSafeMaxSPS(validSps);
-    const max = Math.max(rawMax, avg); // Ensure max >= avg
-    const min = validSps.length > 0 ? Math.round(Math.min(...validSps) * 10) / 10 : 0;
-
-    try {
-      let recordingPath: string | null = null;
-
-      // Create audio blob for immediate playback
-      const audioBlob = createAudioBlob(audioChunksRef.current);
-      if (audioBlob.size > 0) {
-        // Always create a local URL for immediate replay
-        if (bilanAudioUrl) URL.revokeObjectURL(bilanAudioUrl);
-        setBilanAudioUrl(URL.createObjectURL(audioBlob));
-      }
-
-      // Upload audio recording only when a patient is selected
-      if (audioBlob.size > 0 && !isNoPatient) {
-        const fileName = getRecordingFileName(selectedPatientId);
-        const { error: uploadError } = await supabase.storage.from("recordings").upload(fileName, audioBlob);
-        if (uploadError) {
-          console.error("Audio upload error:", uploadError);
-          toast.error("L'enregistrement audio n'a pas pu être sauvegardé. L'audio reste disponible en réécoute immédiate ci-dessous.");
-        } else {
-          recordingPath = fileName;
+      // Upload voice recording first (if captured for a vocal exercise)
+      if (exercise.voice_exercise && voiceRecorder.audioBlob && user && !voiceUploaded) {
+        try {
+          const ext      = voiceRecorder.audioBlob.type.includes('ogg') ? 'ogg'
+                         : voiceRecorder.audioBlob.type.includes('mp4') ? 'm4a' : 'webm'
+          const path     = `${user.id}/${exercise.id}/${Date.now()}.${ext}`
+          const { error: upErr } = await supabase.storage
+            .from('voice-sessions')
+            .upload(path, voiceRecorder.audioBlob, {
+              contentType: voiceRecorder.audioBlob.type,
+              upsert: false,
+            })
+          if (!upErr) {
+            await (supabase as any)
+              .from('voice_recordings')
+              .insert({
+                user_id:          user.id,
+                exercise_id:      exercise.id,
+                storage_path:     path,
+                duration_seconds: voiceRecorder.durationSeconds,
+              })
+            setVoiceUploaded(true)
+          }
+        } catch (uploadErr) {
+          console.error('Voice upload failed:', uploadErr)
         }
       }
 
-      if (!isNoPatient) {
-        const wpmData = sessionSpsHistory.map((point) => ({ timestamp: point.timestamp, wpm: spsToWpm(point.sps) }));
+      await saveSession.mutateAsync({
+        exerciseId:       exercise.id,
+        exerciseCategory: exercise.category,
+        durationSeconds:  elapsed,
+      })
+    } catch (e) { console.error(e) }
+    finally { setIsSaving(false); navigate("/dashboard") }
+  }
 
-        await supabase.from("sessions").insert([{
-          user_id: selectedPatientId,
-          duration_seconds: elapsedTime,
-          avg_wpm: spsToWpm(avg),
-          max_wpm: spsToWpm(max),
-          target_wpm: 0,
-          exercise_type: 'live_session',
-          recording_url: recordingPath,
-          wpm_data: wpmData as unknown as ReturnType<typeof JSON.parse>,
-          word_timestamps: deepgram.getWordTimestamps() as unknown as ReturnType<typeof JSON.parse>,
-        }]);
-      }
+  useEffect(() => () => stopTimers(), [])
 
-      setBilanData({ avg, max, min, duration: elapsedTime });
-      setShowBilan(true);
-      setIsRecording(false);
-      setSaving(false);
-    } catch {
-      toast.error("Erreur lors de la sauvegarde");
-      setSaving(false);
-    }
-  };
-
-  const handleSaveNote = async () => {
-    if (!clinicalNote.trim() || !user || isNoPatient) return;
-    setSavingNote(true);
-    try {
-      await supabase.from("clinical_notes").insert({
-        patient_id: selectedPatientId,
-        therapist_id: user.id,
-        content: clinicalNote.trim(),
-      });
-      toast.success("Note clinique enregistrée");
-      setClinicalNote("");
-    } catch {
-      toast.error("Erreur lors de l'enregistrement");
-    } finally {
-      setSavingNote(false);
-    }
-  };
-
-  const handleNewSession = () => {
-    setShowBilan(false);
-    setBilanData(null);
-    setElapsedTime(0);
-    setRemainingTime(0);
-    deepgram.reset();
-    setSessionSpsHistory([]);
-    lastSampledVersionRef.current = 0;
-    setClinicalNote("");
-    if (bilanAudioUrl) {
-      URL.revokeObjectURL(bilanAudioUrl);
-      setBilanAudioUrl(null);
-    }
-  };
-
-  const formatTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
-
-  // Gauge color — relative to target
-  const gaugeColor = useMemo(() => getRelativeColor(deepgram.packetSPS, targetSps), [deepgram.packetSPS, targetSps]);
-  const gaugeEmoji = useMemo(() => getRelativeEmoji(deepgram.packetSPS, targetSps), [deepgram.packetSPS, targetSps]);
-
-  // Diarization: per-speaker gauges
-  const speakerIds = Object.keys(deepgram.speakerSPS).map(Number);
-  const hasMultipleSpeakers = speakerIds.length > 1;
-
-  const selectedPatientName = isNoPatient ? "Sans patient" : (patients.find(p => p.id === selectedPatientId)?.full_name || "Patient");
+  // ── Derived ──────────────────────────────────
+  const progress      = Math.min(1, elapsed / totalDuration)
+  const breathProgress= breathPhaseElapsed / currentBP.durationMs
+  const circleScale   = phase === "running" ? lerp(1, currentBP.scale, breathProgress) : 1
+  const remaining     = Math.max(0, totalDuration - elapsed)
+  const remainingStr  = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, "0")}`
+  const totalCycles   = Math.ceil(totalDuration * 1000 / breathPhases.reduce((s, p) => s + p.durationMs, 0))
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary via-background to-accent/30 flex flex-col">
-      {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-5 h-5" /><span className="hidden sm:inline">Retour</span>
-          </button>
-          <div className="flex items-center gap-2">
-            <Gauge className="w-5 h-5 text-primary" />
-            <span className="font-display font-bold text-sm sm:text-base">Débitmètre en séance</span>
-          </div>
-          <div className="w-20" />
+    <div className="min-h-screen flex flex-col" style={{ background: "#F5F0EB" }}>
+
+      {/* ── Header ─────────────────────────────── */}
+      <header className="sticky top-0 z-20 px-5 pt-5 pb-4 flex items-center gap-3 lg:px-10 bg-white/80 backdrop-blur-md border-b border-black/5">
+        <button
+          onClick={() => { stopTimers(); navigate(-1) }}
+          className="p-2 rounded-xl hover:bg-black/5 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5 text-foreground/60" />
+        </button>
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: colors.ring }}>
+            {CAT_LABEL[exercise.category]}
+          </p>
+          <h1 className="font-display text-base text-foreground leading-tight truncate">{exercise.name_fr}</h1>
         </div>
+        {(phase === "running" || phase === "paused") && (
+          <span className="text-sm font-mono tabular-nums bg-white px-3 py-1 rounded-full border border-border text-muted-foreground shrink-0">
+            {remainingStr}
+          </span>
+        )}
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-6 max-w-lg flex flex-col items-center justify-center">
-        <AnimatePresence mode="wait">
-          {showBilan && bilanData ? (
-            /* ──── Bilan Wahou ──── */
-            <motion.div key="bilan" className="w-full space-y-5" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
-              
-              {/* Radial Gauge Hero */}
-              <div className="flex flex-col items-center pt-2">
-                <BilanRadialGauge avg={bilanData.avg} target={targetSps} />
-                <motion.p 
-                  className="text-sm text-muted-foreground mt-2"
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-                >
-                  {selectedPatientName} • {formatTime(bilanData.duration)}
-                </motion.p>
-              </div>
+      {/* ── Barre de progression ───────────────── */}
+      {(phase === "running" || phase === "paused") && (
+        <div className="h-1 bg-black/5">
+          <motion.div
+            className="h-full"
+            style={{ background: colors.ring }}
+            animate={{ width: `${progress * 100}%` }}
+            transition={{ duration: 0.4 }}
+          />
+        </div>
+      )}
 
-              {/* Verdict */}
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0 }}
+      {/* ── Layout principal ─────────────────── */}
+      <div className="flex-1 flex flex-col lg:flex-row">
+
+        {/* ── Zone centrale ─────────────────── */}
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 lg:py-0">
+
+          <AnimatePresence mode="wait">
+
+            {/* ══ INTRO ══ */}
+            {phase === "intro" && (
+              <motion.div key="intro"
+                initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -24 }}
+                className="w-full max-w-md space-y-4"
               >
-                <BilanVerdict avg={bilanData.avg} target={targetSps} />
-              </motion.div>
-
-              {/* Min / Max cards */}
-              <motion.div 
-                className="grid grid-cols-2 gap-3"
-                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}
-              >
-                <Card className="border-emerald-200/50 dark:border-emerald-900/30 bg-gradient-to-br from-emerald-50/50 to-background dark:from-emerald-950/20">
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
-                      <TrendingDown className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    <div>
-                      <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Min</p>
-                      <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{bilanData.min} <span className="text-xs font-normal text-muted-foreground">syll/s</span></p>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className="border-red-200/50 dark:border-red-900/30 bg-gradient-to-br from-red-50/50 to-background dark:from-red-950/20">
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-red-500 dark:text-red-400" />
-                    </div>
-                    <div>
-                      <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Max</p>
-                      <p className="text-xl font-bold text-red-500 dark:text-red-400">{bilanData.max} <span className="text-xs font-normal text-muted-foreground">syll/s</span></p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-
-              {/* Stabilité */}
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }}
-              >
-                <BilanStability avg={bilanData.avg} max={bilanData.max} min={bilanData.min} />
-              </motion.div>
-
-              {/* Audio replay with clinical waveform */}
-              {bilanAudioUrl && (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }}>
-                  <ClinicalWaveform
-                    audioUrl={bilanAudioUrl}
-                    wpmData={sessionSpsHistory.map(p => ({ timestamp: p.timestamp, wpm: spsToWpm(p.sps) }))}
-                    targetSps={targetSps || 4}
-                  />
-                </motion.div>
-              )}
-
-              {/* Note clinique — only when a patient is selected */}
-              {!isNoPatient && (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.6 }}>
-                  <Card>
-                    <CardContent className="p-4 space-y-3">
-                      <p className="text-sm font-medium">📝 Ajouter une note clinique</p>
-                      <Textarea
-                        placeholder="Observations de la séance..."
-                        value={clinicalNote}
-                        onChange={e => setClinicalNote(e.target.value)}
-                        rows={3}
-                      />
-                      <Button onClick={handleSaveNote} disabled={!clinicalNote.trim() || savingNote} size="sm" className="gap-2">
-                        <Save className="w-4 h-4" />
-                        {savingNote ? "Enregistrement..." : "Enregistrer la note"}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
-              {isNoPatient && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.6 }}>
-                  <p className="text-xs text-center text-muted-foreground">Cette mesure n'a pas été sauvegardée (aucun patient sélectionné).</p>
-                </motion.div>
-              )}
-
-              <motion.div 
-                className="flex gap-3"
-                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8 }}
-              >
-                <Button variant="outline" className="flex-1 gap-2" onClick={handleNewSession}>
-                  Nouvelle mesure
-                </Button>
-                {!isNoPatient && (
-                  <Button className="flex-1 gap-2" onClick={() => navigate(`/patient/${selectedPatientId}`)}>
-                    Voir le dossier
-                  </Button>
-                )}
-              </motion.div>
-            </motion.div>
-          ) : !isRecording ? (
-            /* ──── Setup ──── */
-            <motion.div key="setup" className="w-full space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <div className="text-center">
-                <div className="text-5xl mb-3">🎯</div>
-                <h1 className="text-2xl font-display font-bold mb-2">Débitmètre en séance</h1>
-                <p className="text-muted-foreground text-sm">
-                  Mesurez le débit de votre patient en direct, pendant la consultation.
-                </p>
-              </div>
-
-              {/* Patient Selector */}
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Users className="w-4 h-4 text-primary" />
-                    <h3 className="text-sm font-bold">Patient</h3>
+                {/* Carte exercice */}
+                <div className="bg-white rounded-3xl p-8 shadow-md border border-black/5 text-center space-y-4">
+                  <div
+                    className="w-24 h-24 rounded-2xl flex items-center justify-center text-5xl mx-auto"
+                    style={{ background: colors.bg }}
+                  >
+                    {exercise.icon}
                   </div>
-                  {loadingPatients ? (
-                    <p className="text-sm text-muted-foreground">Chargement...</p>
-                  ) : (
+                  <div>
+                    <h2 className="font-display text-2xl text-foreground leading-tight">{exercise.name_fr}</h2>
+                    <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{exercise.description_fr}</p>
+                  </div>
+                  <div className="flex items-center justify-center gap-3 pt-2 flex-wrap">
+                    <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full">
+                      ⏱ {formatDuration(totalDuration)}
+                    </span>
+                    <span className="text-xs font-medium px-3 py-1.5 rounded-full"
+                      style={{ background: colors.bg, color: colors.text }}>
+                      {steps.length} étapes guidées
+                    </span>
+                    {uxMode === "breathing" && (
+                      <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full">
+                        ~{totalCycles} cycles
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Aperçu des étapes */}
+                <div className="bg-white rounded-2xl p-5 border border-black/5 shadow-sm space-y-3">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Programme de la séance
+                  </p>
+                  {steps.map((step, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5"
+                        style={{ background: colors.bg, color: colors.ring }}>
+                        {i + 1}
+                      </span>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{step}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTA démarrer */}
+                <button onClick={handleStart}
+                  className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-white font-semibold text-base shadow-lg transition-all active:scale-[0.98]"
+                  style={{ background: "linear-gradient(135deg, #2D5A4F 0%, #1E3D35 100%)" }}
+                >
+                  <Play className="w-5 h-5 fill-white" />
+                  Commencer la séance
+                </button>
+              </motion.div>
+            )}
+
+            {/* ══ MODE RESPIRATION — running/paused ══ */}
+            {phase !== "intro" && phase !== "done" && uxMode === "breathing" && (
+              <motion.div key="breathing"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center gap-7 w-full max-w-sm"
+              >
+                {/* Label phase + instruction */}
+                <AnimatePresence mode="wait">
+                  <motion.div key={`lbl-${breathPhaseIdx % breathPhases.length}-${phase}`}
+                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                    className="text-center min-h-[64px] flex flex-col items-center justify-center"
+                  >
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] mb-1" style={{ color: colors.ring }}>
+                      {phase === "paused" ? "En pause" : currentBP.label}
+                    </p>
+                    <p className="font-display text-xl text-foreground leading-snug whitespace-pre-line">
+                      {phase === "paused" ? "Reprenez quand vous êtes prêt" : currentBP.instruction}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* Cercle de respiration — GRAND et évident */}
+                <div className="relative flex items-center justify-center">
+                  {/* Anneaux ripple */}
+                  {phase === "running" && (
                     <>
-                      <Select value={selectedPatientId} onValueChange={setSelectedPatientId}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner un patient" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Sans patient (non sauvegardé)</SelectItem>
-                          {patients.map(p => (
-                            <SelectItem key={p.id} value={p.id}>
-                              {p.full_name || "Patient sans nom"}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {isNoPatient && (
-                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 flex items-center gap-1">
-                          ⚠️ La mesure ne sera pas sauvegardée sans patient sélectionné.
-                        </p>
-                      )}
+                      <div className="absolute w-72 h-72 rounded-full animate-ripple pointer-events-none"
+                        style={{ border: `2px solid ${colors.ring}28` }} />
+                      <div className="absolute w-72 h-72 rounded-full animate-ripple pointer-events-none"
+                        style={{ border: `1px solid ${colors.ring}18`, animationDelay: "1.1s" }} />
                     </>
                   )}
-                </CardContent>
-              </Card>
 
-              {/* Duration */}
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-lg">⏱️</span>
-                    <h3 className="text-sm font-bold">Durée</h3>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    {DURATION_OPTIONS.map(opt => (
-                      <button
-                        key={opt.value}
-                        onClick={() => setDuration(opt.value)}
-                        className={`p-3 rounded-lg border-2 transition-all text-center ${
-                          duration === opt.value
-                            ? "border-primary bg-primary/10 shadow-md"
-                            : "border-border hover:border-primary/50"
-                        }`}
-                      >
-                        <div className={`text-sm font-bold ${duration === opt.value ? "text-primary" : ""}`}>
-                          {opt.label}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                  <motion.div
+                    className="w-56 h-56 rounded-full flex items-center justify-center select-none"
+                    animate={{ scale: circleScale }}
+                    transition={{ duration: currentBP.durationMs / 1000, ease: "easeInOut" }}
+                    style={{
+                      background: `radial-gradient(circle at 38% 32%, ${colors.bg}, white 70%)`,
+                      border: `4px solid ${colors.ring}55`,
+                      boxShadow: phase === "running"
+                        ? `0 0 80px -10px ${colors.ring}30, 0 24px 64px -20px ${colors.ring}25`
+                        : "0 20px 60px -20px rgba(0,0,0,0.07)",
+                    }}
+                    onClick={phase === "running" ? handlePause : phase === "paused" ? handleResume : undefined}
+                  >
+                    <AnimatePresence mode="wait">
+                      {phase === "paused" ? (
+                        <motion.span key="paused" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-5xl">⏸</motion.span>
+                      ) : (
+                        <motion.p key={`icon-${breathPhaseIdx % breathPhases.length}`}
+                          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                          className="text-5xl"
+                        >
+                          {exercise.icon}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </div>
 
-              {/* Target SPS */}
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-lg">🎯</span>
-                    <h3 className="text-sm font-bold">Vitesse cible</h3>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {TARGET_SPS_OPTIONS.map(opt => (
-                      <button
-                        key={opt.value}
-                        onClick={() => setTargetSps(opt.value)}
-                        className={`p-3 rounded-lg border-2 transition-all text-center ${
-                          targetSps === opt.value
-                            ? "border-primary bg-primary/10 shadow-md"
-                            : "border-border hover:border-primary/50"
-                        }`}
-                      >
-                        <div className={`text-sm font-bold ${targetSps === opt.value ? "text-primary" : ""}`}>
-                          {opt.value === 0 ? "—" : opt.value.toFixed(1)}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground">
-                          {opt.value === 0 ? "Aucune" : opt.label.split(" — ")[1]}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Les couleurs de la jauge s'adapteront à cette cible.
-                  </p>
-                </CardContent>
-              </Card>
+                {/* Compteur de cycles */}
+                {phase === "running" && totalCycles > 1 && (
+                  <motion.p key={cycleCount}
+                    initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                    className="text-xs font-semibold tabular-nums"
+                    style={{ color: colors.ring }}
+                  >
+                    Cycle {cycleCount + 1} / {totalCycles}
+                  </motion.p>
+                )}
 
-              {/* Speaker count selector */}
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Users className="w-4 h-4 text-primary" />
-                    <h3 className="text-sm font-bold">Nombre d'interlocuteurs</h3>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[
-                      { value: 0, label: "Auto", desc: "Détection auto" },
-                      { value: 1, label: "1", desc: "Seul" },
-                      { value: 2, label: "2", desc: "Duo" },
-                      { value: 3, label: "3", desc: "Trio" },
-                    ].map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() => setSpeakerCount(opt.value)}
-                        className={`p-2 rounded-lg border-2 transition-all text-center ${
-                          speakerCount === opt.value
-                            ? "border-primary bg-primary/10 shadow-md"
-                            : "border-border hover:border-primary/50"
-                        }`}
-                      >
-                        <div className={`text-sm font-bold ${speakerCount === opt.value ? "text-primary" : ""}`}>
-                          {opt.label}
-                        </div>
-                        <div className="text-[9px] text-muted-foreground">{opt.desc}</div>
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Fixer le nombre évite les faux interlocuteurs causés par le bruit ambiant.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <div className="flex justify-center pt-2">
-                <Button
-                  size="lg"
-                  onClick={startRecording}
-                  disabled={false}
-                  className="h-16 px-10 rounded-2xl text-lg gap-3 shadow-lg shadow-primary/25"
-                >
-                  <Play className="w-6 h-6" />
-                  Lancer la mesure
-                </Button>
-              </div>
-            </motion.div>
-          ) : (
-            /* ──── Recording: BIG GAUGE ──── */
-            <motion.div
-              key="recording"
-              className="w-full flex flex-col items-center justify-center gap-6 flex-1"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              {/* Patient name */}
-              <p className="text-sm text-muted-foreground">{selectedPatientName}</p>
-
-              {/* Countdown */}
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-1">Temps restant</p>
-                <p className="text-4xl font-mono font-bold tabular-nums">{formatTime(remainingTime)}</p>
-              </div>
-
-              {/* BIG Gauge — dual when multiple speakers */}
-              {hasMultipleSpeakers ? (
-                <div className="flex flex-col items-center gap-3">
-                  <div className="flex items-center justify-center gap-4 flex-wrap">
-                    {speakerIds.map((sid, idx) => {
-                      const sps = deepgram.speakerSPS[sid] || 0;
-                      const color = getRelativeColor(sps, targetSps);
-                      const emoji = getRelativeEmoji(sps, targetSps);
-                      const size = speakerIds.length <= 2 ? "w-40 h-40" : "w-32 h-32";
-                      const emojiSize = speakerIds.length <= 2 ? "text-4xl" : "text-3xl";
-                      return (
-                        <div key={sid} className="flex flex-col items-center">
-                          <div
-                            className={`flex flex-col items-center justify-center ${size} rounded-full border-4 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]`}
-                            style={{ borderColor: color, backgroundColor: `${color}15` }}
-                          >
-                            <span className={emojiSize}>{emoji}</span>
-                            <span className="text-xl font-bold tabular-nums mt-1" style={{ color }}>
-                              {sps > 0.3 ? sps.toFixed(1) : "—"}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground">syll/s</span>
-                          </div>
-                          <span className="text-xs font-medium text-muted-foreground mt-2">
-                            Personne {idx + 1}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <Badge variant="outline" className="gap-1.5 text-xs">
-                    <FlaskConical className="w-3 h-3" />
-                    Diarisation expérimentale
-                  </Badge>
-                  {targetSps > 0 && (
-                    <span className="text-[10px] text-muted-foreground">cible : {targetSps.toFixed(1)} syll/s</span>
+                {/* Contrôles */}
+                <div className="flex gap-3 w-full">
+                  <button onClick={handleRestart}
+                    className="p-3.5 rounded-xl bg-white border border-black/8 hover:bg-black/3 transition-colors">
+                    <RotateCcw className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  {phase === "running" ? (
+                    <button onClick={handlePause}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white border border-black/8 text-sm font-medium text-foreground">
+                      <Pause className="w-4 h-4" /> Pause
+                    </button>
+                  ) : (
+                    <button onClick={handleResume}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold"
+                      style={{ background: colors.ring }}>
+                      <Play className="w-4 h-4 fill-white" /> Reprendre
+                    </button>
                   )}
                 </div>
-              ) : (
-                <div
-                  className="flex flex-col items-center justify-center w-56 h-56 rounded-full border-4 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                  style={{ borderColor: gaugeColor }}
-                >
-                  <motion.span
-                    className="text-6xl"
-                    key={gaugeEmoji}
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                  >
-                    {gaugeEmoji}
-                  </motion.span>
-                  <motion.span
-                    className="text-3xl font-bold tabular-nums mt-1"
-                    style={{ color: gaugeColor }}
-                  >
-                    {deepgram.packetSPS > 0.3 ? deepgram.packetSPS.toFixed(1) : "—"}
-                  </motion.span>
-                  <span className="text-xs text-muted-foreground">syll/s</span>
-                  {targetSps > 0 && (
-                    <span className="text-[10px] text-muted-foreground mt-0.5">cible : {targetSps.toFixed(1)}</span>
-                  )}
-                </div>
-              )}
+              </motion.div>
+            )}
 
-              {/* Stop */}
-              <Button
-                size="lg"
-                variant="destructive"
-                onClick={stopRecording}
-                disabled={saving}
-                className="h-14 px-8 rounded-2xl text-lg gap-2"
+            {/* ══ MODE GUIDÉ — running/paused ══ */}
+            {phase !== "intro" && phase !== "done" && uxMode === "guided" && (
+              <motion.div key="guided"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center gap-6 w-full max-w-md"
               >
-                <Square className="w-5 h-5" />
-                {saving ? "Sauvegarde..." : "Arrêter"}
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-    </div>
-  );
-};
+                {/* Barre de progression Duolingo (dots) */}
+                <div className="flex gap-1.5 items-center">
+                  {steps.map((_, i) => (
+                    <div key={i}
+                      className="h-2 rounded-full transition-all duration-300"
+                      style={{
+                        width: i === stepIndex ? 28 : 8,
+                        background: i <= stepIndex ? colors.ring : "#e5e7eb",
+                        opacity: i > stepIndex ? 0.4 : 1,
+                      }}
+                    />
+                  ))}
+                </div>
 
-export default SessionLive;
+                {/* Icône */}
+                <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl"
+                  style={{ background: colors.bg }}>
+                  {exercise.icon}
+                </div>
+
+                {/* Étape courante — carte large */}
+                <AnimatePresence mode="wait">
+                  <motion.div key={`step-${stepIndex}`}
+                    initial={{ opacity: 0, y: 20, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -20, scale: 0.97 }}
+                    className="w-full bg-white rounded-3xl p-8 border border-black/5 shadow-md text-center space-y-3"
+                  >
+                    <p className="text-xs font-bold uppercase tracking-widest" style={{ color: colors.ring }}>
+                      Étape {stepIndex + 1} sur {steps.length}
+                    </p>
+                    <p className="font-display text-xl text-foreground leading-snug">
+                      {steps[stepIndex]}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+
+                {/* CTA Étape suivante / Terminer */}
+                <button onClick={handleNextStep}
+                  className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-[0.98] shadow-md"
+                  style={{ background: `linear-gradient(135deg, ${colors.ring} 0%, ${colors.ring}cc 100%)` }}
+                >
+                  {stepIndex < steps.length - 1 ? (
+                    <><ChevronRight className="w-5 h-5" />Étape suivante</>
+                  ) : (
+                    <><Check className="w-5 h-5" />Terminer l'exercice</>
+                  )}
+                </button>
+
+                {/* Pause / restart */}
+                <div className="flex gap-3 w-full">
+                  <button onClick={handleRestart}
+                    className="p-3.5 rounded-xl bg-white border border-black/8 hover:bg-black/3 transition-colors">
+                    <RotateCcw className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  {phase === "running" ? (
+                    <button onClick={handlePause}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white border border-black/8 text-sm font-medium text-foreground">
+                      <Pause className="w-3.5 h-3.5" /> Pause
+                    </button>
+                  ) : (
+                    <button onClick={handleResume}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold"
+                      style={{ background: colors.ring }}>
+                      <Play className="w-3.5 h-3.5 fill-white" /> Reprendre
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* ══ DONE — écran de félicitations ══ */}
+            {phase === "done" && (
+              <motion.div key="done"
+                initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+                className="w-full max-w-md space-y-4"
+              >
+                <div className="bg-white rounded-3xl p-8 border border-black/5 shadow-md text-center space-y-5">
+                  {/* Emoji trophée animé */}
+                  <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", delay: 0.15 }}
+                    className="text-6xl">🌿</motion.div>
+
+                  <div>
+                    <h2 className="font-display text-2xl text-foreground">Bravo !</h2>
+                    <p className="text-muted-foreground text-sm mt-1">
+                      {exercise.name_fr} · séance terminée
+                    </p>
+                    <p className="text-xs text-muted-foreground/70 mt-2 italic leading-relaxed max-w-xs mx-auto">
+                      {DONE_MESSAGES[exercise.category]}
+                    </p>
+                  </div>
+
+                  {/* Étoiles Duolingo */}
+                  <div className="flex justify-center gap-2">
+                    {[0, 1, 2].map(i => (
+                      <motion.div key={i}
+                        initial={{ scale: 0 }} animate={{ scale: 1 }}
+                        transition={{ delay: 0.3 + i * 0.12, type: "spring" }}>
+                        <Star className="w-8 h-8 fill-amber-400 text-amber-400" />
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Stats */}
+                  <div className="flex items-stretch gap-3 pt-1">
+                    <div className="flex-1 rounded-2xl p-3 text-center" style={{ background: colors.bg }}>
+                      <p className="font-display text-xl font-bold" style={{ color: colors.text }}>
+                        {formatDuration(elapsed)}
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: colors.text + "99" }}>pratiqué</p>
+                    </div>
+                    <div className="flex-1 rounded-2xl p-3 text-center" style={{ background: colors.bg }}>
+                      <p className="font-display text-xl font-bold" style={{ color: colors.text }}>
+                        {steps.length}
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: colors.text + "99" }}>étapes</p>
+                    </div>
+                    {uxMode === "breathing" && cycleCount > 0 && (
+                      <div className="flex-1 rounded-2xl p-3 text-center" style={{ background: colors.bg }}>
+                        <p className="font-display text-xl font-bold" style={{ color: colors.text }}>
+                          {cycleCount}
+                        </p>
+                        <p className="text-xs mt-0.5" style={{ color: colors.text + "99" }}>cycles</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Enregistrement vocal */}
+                  {exercise.voice_exercise && (
+                    <VoiceCapture recorder={voiceRecorder} uploaded={voiceUploaded} />
+                  )}
+
+                  {/* Connexion praticien */}
+                  {therapistName && (
+                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                      className="flex items-center gap-3 px-4 py-3 rounded-2xl text-left"
+                      style={{ background: "#2D5A4F12", border: "1px solid #2D5A4F20" }}>
+                      <span className="text-2xl shrink-0">🩺</span>
+                      <p className="text-xs leading-relaxed text-forest">
+                        <span className="font-semibold">{therapistName}</span> voit votre progression
+                        en temps réel. Chaque séance compte.
+                      </p>
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Boutons done */}
+                <div className="flex gap-3">
+                  <button onClick={handleRestart}
+                    className="p-3.5 rounded-xl bg-white border border-black/8 hover:bg-black/3 transition-colors">
+                    <RotateCcw className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  <button onClick={handleComplete} disabled={isSaving}
+                    className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-white font-semibold text-base transition-all disabled:opacity-50 active:scale-[0.98] shadow-lg"
+                    style={{ background: "linear-gradient(135deg, #2D5A4F 0%, #1E3D35 100%)" }}
+                  >
+                    <Check className="w-5 h-5" />
+                    {isSaving ? "Enregistrement…" : "Valider la séance"}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+          </AnimatePresence>
+        </div>
+
+        {/* ── Panneau droit desktop ─────────── */}
+        <aside className="hidden lg:flex flex-col w-96 bg-white border-l border-black/6">
+          <div className="flex-1 overflow-y-auto p-7 space-y-7">
+
+            {/* Intro : description + bénéfice clinique */}
+            {phase === "intro" && (
+              <>
+                <div className="space-y-2">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Description</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{exercise.description_fr}</p>
+                </div>
+                <div className="rounded-2xl p-4" style={{ background: colors.bg }}>
+                  <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: colors.ring }}>
+                    Bénéfice clinique
+                  </p>
+                  <p className="text-sm leading-relaxed" style={{ color: colors.text }}>
+                    {CAT_BENEFITS[exercise.category]}
+                  </p>
+                </div>
+                <div className="space-y-1.5 text-xs text-muted-foreground">
+                  <p>⏱ Durée : {formatDuration(totalDuration)}</p>
+                  <p>📋 {steps.length} étapes guidées</p>
+                  {uxMode === "breathing" && <p>🔄 ~{totalCycles} cycles</p>}
+                </div>
+              </>
+            )}
+
+            {/* En séance : liste des étapes avec suivi */}
+            {phase !== "intro" && phase !== "done" && (
+              <div className="space-y-1">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                  {uxMode === "guided"
+                    ? `Étapes · ${stepIndex + 1} / ${steps.length}`
+                    : `Instructions · ${steps.length} étapes`
+                  }
+                </p>
+                {steps.map((step, i) => {
+                  const isActive = uxMode === "guided" && i === stepIndex && phase !== "intro"
+                  const isDone   = uxMode === "guided" && i < stepIndex
+                  return (
+                    <div key={i} className={`flex items-start gap-3 px-3 py-3 rounded-xl transition-all ${
+                      isActive ? "border border-black/8" : ""
+                    }`}
+                      style={isActive ? { background: colors.bg } : {}}>
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold"
+                        style={{
+                          background: isDone ? colors.ring : isActive ? colors.ring + "25" : "#f3f4f6",
+                          color: isDone ? "white" : isActive ? colors.ring : "#9ca3af",
+                        }}>
+                        {isDone ? "✓" : i + 1}
+                      </div>
+                      <p className={`text-sm leading-relaxed ${
+                        isActive ? "text-foreground font-medium"
+                          : isDone ? "text-muted-foreground/60 line-through"
+                          : "text-muted-foreground"
+                      }`}>
+                        {step}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* Stats fin */}
+            {phase === "done" && (
+              <div className="space-y-3">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Résultats</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-xl p-3 text-center" style={{ background: colors.bg }}>
+                    <p className="font-display text-lg font-bold" style={{ color: colors.text }}>{formatDuration(elapsed)}</p>
+                    <p className="text-[10px] text-muted-foreground">durée</p>
+                  </div>
+                  <div className="rounded-xl p-3 text-center" style={{ background: colors.bg }}>
+                    <p className="font-display text-lg font-bold" style={{ color: colors.text }}>{steps.length}</p>
+                    <p className="text-[10px] text-muted-foreground">étapes</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Contrôles desktop */}
+          <div className="p-5 border-t border-black/6 space-y-2">
+            {phase === "intro" && (
+              <p className="text-xs text-center text-muted-foreground py-1">
+                Lancez la séance depuis le panneau principal
+              </p>
+            )}
+            {phase === "running" && uxMode === "guided" && (
+              <button onClick={handleNextStep}
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-white font-semibold"
+                style={{ background: `linear-gradient(135deg, ${colors.ring} 0%, ${colors.ring}cc 100%)` }}>
+                {stepIndex < steps.length - 1
+                  ? <><ChevronRight className="w-4 h-4" />Étape suivante</>
+                  : <><Check className="w-4 h-4" />Terminer l'exercice</>
+                }
+              </button>
+            )}
+            {phase === "running" && uxMode === "breathing" && (
+              <button onClick={handlePause}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-muted/50 border border-black/8 text-sm font-medium text-foreground">
+                <Pause className="w-4 h-4" /> Pause
+              </button>
+            )}
+            {phase === "paused" && (
+              <div className="flex gap-2">
+                <button onClick={handleRestart} className="p-3.5 rounded-xl border border-black/8 hover:bg-black/3 transition-colors">
+                  <RotateCcw className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <button onClick={handleResume}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold"
+                  style={{ background: colors.ring }}>
+                  <Play className="w-4 h-4 fill-white" /> Reprendre
+                </button>
+              </div>
+            )}
+            {phase === "done" && (
+              <div className="flex gap-2">
+                <button onClick={handleRestart} className="p-3.5 rounded-xl border border-black/8 hover:bg-black/3 transition-colors">
+                  <RotateCcw className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <button onClick={handleComplete} disabled={isSaving}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold disabled:opacity-50"
+                  style={{ background: "linear-gradient(135deg, #2D5A4F 0%, #1E3D35 100%)" }}>
+                  <Check className="w-4 h-4" />
+                  {isSaving ? "Enregistrement…" : "Valider"}
+                </button>
+              </div>
+            )}
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────
+// VoiceCapture — widget enregistrement séance
+// ─────────────────────────────────────────────
+
+function VoiceCapture({ recorder, uploaded }: { recorder: UseVoiceRecorderReturn; uploaded: boolean }) {
+  const { state, audioUrl, durationSeconds, start, stop, reset, error } = recorder
+
+  const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`
+
+  if (uploaded) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-emerald-50 border border-emerald-100"
+      >
+        <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+        <p className="text-xs text-emerald-700 font-medium">
+          Prise vocale envoyée à votre praticien ✓
+        </p>
+      </motion.div>
+    )
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+      className="rounded-2xl bg-violet-50 border border-violet-100 p-4 space-y-3"
+    >
+      {/* Titre */}
+      <div className="flex items-center gap-2">
+        <Mic className="w-3.5 h-3.5 text-violet-600" />
+        <p className="text-xs font-semibold text-violet-700">Prise vocale</p>
+        <span className="ml-auto text-[10px] text-violet-400">pour votre praticien</span>
+      </div>
+
+      {/* Idle */}
+      {state === "idle" && (
+        <button
+          onClick={start}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold transition-colors"
+        >
+          <Mic className="w-3.5 h-3.5" />
+          Enregistrer ma prise
+        </button>
+      )}
+
+      {/* Recording */}
+      {state === "recording" && (
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-red-600">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+            {fmt(durationSeconds)}
+          </span>
+          <span className="text-[10px] text-violet-400 flex-1">max 60 s</span>
+          <button
+            onClick={stop}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 text-xs font-semibold transition-colors"
+          >
+            <Square className="w-3 h-3 fill-red-700" />
+            Arrêter
+          </button>
+        </div>
+      )}
+
+      {/* Recorded */}
+      {state === "recorded" && audioUrl && (
+        <div className="space-y-2">
+          <audio
+            src={audioUrl}
+            controls
+            className="w-full h-9 rounded-lg"
+            style={{ accentColor: "#7C3AED" }}
+          />
+          <div className="flex items-center justify-between">
+            <button
+              onClick={reset}
+              className="text-[10px] text-violet-500 hover:text-violet-700 transition-colors underline underline-offset-2"
+            >
+              Recommencer
+            </button>
+            <span className="text-[10px] text-violet-400">{durationSeconds}s · sera envoyé à la validation</span>
+          </div>
+        </div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <p className="text-[10px] text-red-600 leading-relaxed">{error}</p>
+      )}
+    </motion.div>
+  )
+}
+
+// ─────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────
+
+function getUXMode(exercise: Exercise): UXMode {
+  return BREATHING_CATEGORIES.includes(exercise.category) ? "breathing" : "guided"
+}
+
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * Math.min(1, Math.max(0, t))
+}
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return m > 0 ? `${m}m${s > 0 ? ` ${s}s` : ""}` : `${s}s`
+}
+
+function getBreathPhases(exercise: Exercise): BreathPhase[] {
+  const cat = exercise.category
+
+  if (cat === "coherence_cardiaque") {
+    const is46 = exercise.id.includes("4_6")
+    return [
+      { label: "Inspirez",  durationMs: is46 ? 4000 : 5000, scale: 1.18, instruction: `par le nez · ${is46 ? 4 : 5} s`,  ringColor: "#DC2626" },
+      { label: "Expirez",   durationMs: is46 ? 6000 : 5000, scale: 0.92, instruction: `par le nez · ${is46 ? 6 : 5} s`,  ringColor: "#991B1B" },
+    ]
+  }
+
+  if (cat === "respiration_nasale") return [
+    { label: "Inspirez nasale",  durationMs: 4000, scale: 1.14, instruction: "par le nez · 4 s",           ringColor: "#0284C7" },
+    { label: "Expirez",          durationMs: 6000, scale: 0.92, instruction: "doucement par le nez · 6 s", ringColor: "#0369A1" },
+  ]
+
+  if (cat === "diaphragmatique") return [
+    { label: "Gonflez le ventre",  durationMs: 4000, scale: 1.2,  instruction: "inspirez, ventre dehors · 4 s",  ringColor: "#D97706" },
+    { label: "Retenez légèrement", durationMs: 2000, scale: 1.2,  instruction: "légère pause · 2 s",             ringColor: "#B45309" },
+    { label: "Videz le ventre",    durationMs: 6000, scale: 0.9,  instruction: "expirez, ventre rentre · 6 s",   ringColor: "#92400E" },
+  ]
+
+  // relaxation / défaut
+  return [
+    { label: "Inspirez",  durationMs: 4000, scale: 1.15, instruction: "profondément · 4 s",  ringColor: "#0D9488" },
+    { label: "Retenez",   durationMs: 2000, scale: 1.15, instruction: "doucement · 2 s",      ringColor: "#0F766E" },
+    { label: "Expirez",   durationMs: 6000, scale: 0.92, instruction: "lentement · 6 s",      ringColor: "#134E4A" },
+  ]
+}
+
+export default SessionLive

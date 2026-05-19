@@ -28,8 +28,8 @@ export const Navbar = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       if (user) {
-        const { data } = await supabase.from("profiles").select("is_therapist").eq("id", user.id).single();
-        if (data) setIsTherapist(data.is_therapist || false);
+        const { data } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+        if (data) setIsTherapist(data.role === "therapist" || data.role === "kine");
       } else {
         setIsTherapist(false);
       }
@@ -39,7 +39,7 @@ export const Navbar = () => {
 
   const getLogoDestination = () => {
     if (!user) return "/";
-    return isTherapist ? "/patient/list" : "/dashboard";
+    return isTherapist ? "/patients" : "/dashboard";
   };
 
   const logoDestination = getLogoDestination();
@@ -47,7 +47,6 @@ export const Navbar = () => {
   const navLinks = [
     { href: "/#patients", label: "Patients" },
     { href: "/#orthophonistes", label: "Orthophonistes" },
-    { href: "/diagnostic", label: "Test vocal" },
     { href: "/pricing", label: "Tarifs" },
     { href: "/about", label: "À propos" },
   ];
@@ -79,8 +78,8 @@ export const Navbar = () => {
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center transition-transform duration-200 group-hover:scale-105">
               <Activity className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-lg font-semibold text-foreground hidden sm:block">
-              ParlerMoinsVite
+            <span className="font-display text-lg font-semibold text-foreground hidden sm:block">
+              RespirFacile
             </span>
           </Link>
           
@@ -138,7 +137,7 @@ export const Navbar = () => {
                     <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
                       <Activity className="w-4 h-4 text-primary-foreground" />
                     </div>
-                    ParlerMoinsVite
+                    RespirFacile
                   </Link>
                 </SheetTitle>
               </SheetHeader>

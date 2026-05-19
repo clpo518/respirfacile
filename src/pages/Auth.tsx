@@ -1,758 +1,404 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, ArrowLeft, Loader2, User, Stethoscope, KeyRound, Zap, ArrowRight, Clock, Mail, RefreshCw, AlertTriangle } from "lucide-react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { toast } from "sonner";
-import { checkEmailDomainTypo, type EmailSuggestion } from "@/lib/emailValidation";
-import { trackFunnel } from "@/lib/analytics";
+import { useState, useEffect } from "react"
+import { useNavigate, useSearchParams, Link } from "react-router-dom"
+import { useAuth, type UserRole } from "@/contexts/AuthContext"
+import { supabase } from "@/integrations/supabase/client"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Loader2, Wind, Stethoscope, User, ArrowRight, ArrowLeft, KeyRound, Mail } from "lucide-react"
+import { motion } from "framer-motion"
+import { toast } from "sonner"
 
-type UserRole = "patient" | "therapist";
-type PatientMode = "choose" | "code" | "solo";
+type AuthMode = "login" | "signup"
+type SignupStep = "role" | "patient_mode" | "form"
+type PatientMode = "code" | "solo"
 
 const Auth = () => {
-  const [searchParams] = useSearchParams();
-  const initialTab = searchParams.get("tab");
-  const referralCode = searchParams.get("ref");
-  const [isLogin, setIsLogin] = useState(initialTab !== "signup");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [cabinetName, setCabinetName] = useState("");
-  const [therapistCode, setTherapistCode] = useState("");
-  const [therapistCodeError, setTherapistCodeError] = useState("");
-  const [validatingCode, setValidatingCode] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [forgotPassword, setForgotPassword] = useState(false);
-  const [resetEmailSent, setResetEmailSent] = useState(false);
-  const [emailVerificationSent, setEmailVerificationSent] = useState(false);
-  const [verificationEmail, setVerificationEmail] = useState("");
-  const [resendingVerification, setResendingVerification] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>("patient");
-  const [patientMode, setPatientMode] = useState<PatientMode>("choose");
-  const [emailSuggestion, setEmailSuggestion] = useState<EmailSuggestion | null>(null);
-  const [bypassSuggestion, setBypassSuggestion] = useState(false);
-  const { signIn, signUp, user } = useAuth();
-  const navigate = useNavigate();
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const { signIn, signUp, user } = useAuth()
 
-  // Redirect if already logged in
+  const [mode, setMode] = useState<AuthMode>(
+    searchParams.get("tab") === "signup" ? "signup" : "login"
+  )
+  const [step, setStep] = useState<SignupStep>("role")
+  const [selectedRole, setSelectedRole] = useState<UserRole>("patient")
+  const [patientMode, setPatientMode] = useState<PatientMode>("code")
+
+  const [email, setEmail]                 = useState("")
+  const [password, setPassword]           = useState("")
+  const [name, setName]                   = useState("")
+  const [therapistCode, setTherapistCode] = useState("")
+  const [codeError, setCodeError]         = useState("")
+
+  const [loading, setLoading]             = useState(false)
+  const [forgotPassword, setForgotPassword] = useState(false)
+  const [resetSent, setResetSent]         = useState(false)
+  const [verifSent, setVerifSent]         = useState(false)
+  const [verifEmail, setVerifEmail]       = useState("")
+
   useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
-  }, [user, navigate]);
+    if (user) navigate("/dashboard")
+  }, [user, navigate])
 
-  // Reset patient mode when switching tabs
   useEffect(() => {
-    setPatientMode("choose");
-    setTherapistCode("");
-    setTherapistCodeError("");
-  }, [selectedRole, isLogin]);
+    setStep("role")
+    setTherapistCode("")
+    setCodeError("")
+  }, [mode])
 
-  // Validate therapist code format
-  const validateTherapistCodeFormat = (code: string): boolean => {
-    return /^PRO-[A-Z0-9]{6}$/i.test(code.trim());
-  };
+  const isValidCodeFormat = (code: string) =>
+    /^PRO-[A-Z0-9]{6}$/i.test(code.trim())
 
-  // Verify therapist code exists in database
-  const verifyTherapistCode = async (code: string): Promise<{ valid: boolean; therapistId: string | null }> => {
+  const verifyCode = async (code: string): Promise<{ valid: boolean; therapistId: string | null }> => {
     try {
-      const { data, error } = await supabase
-        .rpc("find_therapist_by_code", { code: code.trim() });
-      
-      if (error) throw error;
-      
-      const therapist = data?.[0];
-      return {
-        valid: !!therapist,
-        therapistId: therapist?.id || null
-      };
-    } catch (error) {
-      console.error("Error verifying therapist code:", error);
-      return { valid: false, therapistId: null };
+      const { data } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("therapist_code", code.trim().toUpperCase())
+        .in("role", ["therapist", "kine"])
+        .maybeSingle()
+      return { valid: !!data, therapistId: data?.id ?? null }
+    } catch {
+      return { valid: false, therapistId: null }
     }
-  };
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTherapistCodeError("");
+  // Lit la valeur depuis le state React ou, en fallback, depuis le DOM (utile pour les tests automatisés)
+  const readField = (stateVal: string, id: string) => {
+    if (stateVal.trim()) return stateVal
+    return (document.getElementById(id) as HTMLInputElement)?.value ?? ""
+  }
 
-    // Email domain typo check (only on signup, skip if user already bypassed)
-    if (!isLogin && !bypassSuggestion) {
-      const suggestion = checkEmailDomainTypo(email);
-      if (suggestion.hasSuggestion) {
-        setEmailSuggestion(suggestion);
-        setLoading(false);
-        return;
-      }
-    }
-    setEmailSuggestion(null);
-
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    const effectiveEmail    = readField(email, "auth-email")
+    const effectivePassword = readField(password, "auth-password")
     try {
-      if (isLogin) {
-        const { error } = await signIn(email, password);
-        if (error) throw error;
-        trackFunnel("login_success");
-        toast.success("Connexion réussie !");
-        navigate("/dashboard");
-      } else {
-        // Patient signup
-        if (selectedRole === "patient") {
-          if (patientMode === "code") {
-            // B2B flow: validate code
-            if (!therapistCode.trim()) {
-              setTherapistCodeError("Le code praticien est obligatoire");
-              setLoading(false);
-              return;
-            }
-
-            if (!validateTherapistCodeFormat(therapistCode)) {
-              setTherapistCodeError("Format invalide (ex: PRO-ABC123)");
-              setLoading(false);
-              return;
-            }
-
-            setValidatingCode(true);
-            const { valid, therapistId } = await verifyTherapistCode(therapistCode);
-            setValidatingCode(false);
-
-            if (!valid || !therapistId) {
-              setTherapistCodeError("Code praticien invalide ou inexistant");
-              setLoading(false);
-              return;
-            }
-
-            // B2B signup
-            const { error } = await signUp(email, password, name, false, false);
-            if (error) throw error;
-            trackFunnel("signup_patient_b2b");
-
-            // Link patient to therapist
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const { data: { user: newUser } } = await supabase.auth.getUser();
-            if (newUser) {
-              await supabase
-                .from("profiles")
-                .update({ linked_therapist_id: therapistId })
-                .eq("id", newUser.id);
-
-              // Notify therapist that a new patient joined (fire and forget)
-              supabase.functions.invoke('notify-patient-joined', {
-                body: {
-                  patientId: newUser.id,
-                  therapistId: therapistId,
-                },
-              }).catch((err) => {
-                console.error('Error calling notify-patient-joined:', err);
-              });
-            }
-
-            toast.success("Compte créé avec succès ! Vous êtes maintenant lié à votre orthophoniste.");
-            navigate("/dashboard");
-          } else if (patientMode === "solo") {
-            // B2C solo signup - trial starts only after email verification
-            const { error } = await signUp(email, password, name, false, true);
-            if (error) throw error;
-            trackFunnel("signup_patient_b2c");
-
-            // Handle B2C referral if present
-            if (referralCode) {
-              await new Promise(resolve => setTimeout(resolve, 1000));
-              const { data: { user: newUser } } = await supabase.auth.getUser();
-              if (newUser) {
-                const { data: referrerProfile } = await supabase
-                  .from("profiles")
-                  .select("id")
-                  .eq("referral_code", referralCode.toUpperCase())
-                  .maybeSingle();
-                
-                if (referrerProfile) {
-                  await supabase
-                    .from("referrals")
-                    .insert({
-                      referrer_id: referrerProfile.id,
-                      referred_id: newUser.id,
-                      status: "pending"
-                    });
-                }
-              }
-            }
-
-            // Send verification email
-            await supabase.auth.resend({ type: 'signup', email });
-
-            // Show verification screen instead of navigating
-            setVerificationEmail(email);
-            setEmailVerificationSent(true);
-            setLoading(false);
-            return; // Don't navigate, show verification screen
-          }
-        } else {
-          // Therapist signup
-          const { error } = await signUp(email, password, cabinetName, true);
-          if (error) throw error;
-          trackFunnel("signup_therapist");
-
-          // Handle referral if present
-          if (referralCode) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const { data: { user: newUser } } = await supabase.auth.getUser();
-            if (newUser) {
-              const { data: referrerProfile } = await supabase
-                .from("profiles")
-                .select("id")
-                .eq("referral_code", referralCode.toUpperCase())
-                .maybeSingle();
-              
-              if (referrerProfile) {
-                await supabase
-                  .from("referrals")
-                  .insert({
-                    referrer_id: referrerProfile.id,
-                    referred_id: newUser.id,
-                    status: "pending"
-                  });
-                
-                toast.success("Espace Pro créé ! 🎁 Votre parrain et vous recevrez 1 mois offert après votre premier paiement.");
-              } else {
-                toast.success("Espace Pro créé avec succès !");
-              }
-            }
-          } else {
-            toast.success("Espace Pro créé avec succès !");
-          }
-          
-          navigate("/patient/list");
-        }
-      }
-    } catch (error: unknown) {
-      const rawMessage = error instanceof Error ? error.message : "Une erreur est survenue";
-      
-      // Provide clearer French error messages for login
-      if (isLogin) {
-        const lower = rawMessage.toLowerCase();
-        if (lower.includes("invalid login credentials") || lower.includes("invalid_credentials")) {
-          toast.error("Email ou mot de passe incorrect. Pas encore de compte ? Cliquez sur « Inscription ».");
-        } else if (lower.includes("email not confirmed")) {
-          toast.error("Votre email n'a pas encore été vérifié. Vérifiez votre boîte de réception.");
-        } else {
-          toast.error(rawMessage);
-        }
-      } else {
-        // Signup errors
-        const lower = rawMessage.toLowerCase();
-        if (lower.includes("user already registered") || lower.includes("already been registered")) {
-          toast.error("Un compte existe déjà avec cet email. Essayez de vous connecter.");
-        } else {
-          toast.error(rawMessage);
-        }
-      }
+      const { error } = await signIn(effectiveEmail, effectivePassword)
+      if (error) throw error
+      toast.success("Connexion réussie !")
+      navigate("/dashboard")
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : ""
+      toast.error(msg.includes("Invalid login") ? "Email ou mot de passe incorrect" : "Erreur de connexion")
     } finally {
-      setLoading(false);
-      setValidatingCode(false);
+      setLoading(false)
     }
-  };
+  }
 
-  // Check if form can be submitted
-  const canSubmit = () => {
-    if (isLogin) return true;
-    if (selectedRole === "therapist") return true;
-    // Patient must choose a mode
-    return patientMode !== "choose";
-  };
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setCodeError("")
+    const effectiveEmail    = readField(email, "auth-email")
+    const effectivePassword = readField(password, "auth-password")
+    const effectiveName     = readField(name, "auth-name")
+    const effectiveCode     = readField(therapistCode, "auth-code")
+    try {
+      let linkedTherapistCode: string | undefined
+      if (selectedRole === "patient" && patientMode === "code") {
+        if (!effectiveCode.trim()) { setCodeError("Code obligatoire"); setLoading(false); return }
+        if (!isValidCodeFormat(effectiveCode)) { setCodeError("Format invalide — ex: PRO-A3K9Z2"); setLoading(false); return }
+        const { valid } = await verifyCode(effectiveCode)
+        if (!valid) { setCodeError("Code introuvable. Vérifiez avec votre praticien."); setLoading(false); return }
+        linkedTherapistCode = effectiveCode.trim().toUpperCase()
+      }
+
+      const effectiveRole: UserRole =
+        selectedRole === "patient" && patientMode === "solo" ? "solo_patient" : selectedRole
+
+      const { error } = await signUp({ email: effectiveEmail, password: effectivePassword, fullName: effectiveName, role: effectiveRole, therapistCode: linkedTherapistCode })
+      if (error) throw error
+      setVerifEmail(effectiveEmail)
+      setVerifSent(true)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : ""
+      toast.error(msg.includes("already registered") ? "Un compte existe déjà avec cet email" : "Erreur lors de l'inscription")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      })
+      if (error) throw error
+      setResetSent(true)
+    } catch {
+      toast.error("Impossible d'envoyer l'email de réinitialisation")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ── Écrans secondaires ─────────────────────
+
+  if (verifSent) return (
+    <AuthShell>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-4">
+        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+          <Mail className="w-7 h-7 text-primary" />
+        </div>
+        <h2 className="font-display text-2xl">Vérifiez vos emails</h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Un lien de confirmation a été envoyé à<br />
+          <span className="font-medium text-foreground">{verifEmail}</span>
+        </p>
+        <p className="text-xs text-muted-foreground">Vérifiez vos spams si besoin.</p>
+        <button onClick={() => { setVerifSent(false); setMode("login") }} className="text-sm text-primary hover:underline">
+          Retour à la connexion
+        </button>
+      </motion.div>
+    </AuthShell>
+  )
+
+  if (resetSent) return (
+    <AuthShell>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-4">
+        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+          <KeyRound className="w-7 h-7 text-primary" />
+        </div>
+        <h2 className="font-display text-2xl">Email envoyé</h2>
+        <p className="text-sm text-muted-foreground">Consultez votre boîte mail pour réinitialiser votre mot de passe.</p>
+        <button onClick={() => { setResetSent(false); setForgotPassword(false) }} className="text-sm text-primary hover:underline">
+          Retour à la connexion
+        </button>
+      </motion.div>
+    </AuthShell>
+  )
+
+  if (forgotPassword) return (
+    <AuthShell>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <button onClick={() => setForgotPassword(false)} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="w-4 h-4" /> Retour
+        </button>
+        <div>
+          <h2 className="font-display text-2xl mb-1">Mot de passe oublié</h2>
+          <p className="text-sm text-muted-foreground">On vous envoie un lien de réinitialisation.</p>
+        </div>
+        <form onSubmit={handleForgotPassword} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Email</Label>
+            <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="vous@exemple.fr" />
+          </div>
+          <Button type="submit" className="w-full btn-forest" disabled={loading}>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Envoyer le lien"}
+          </Button>
+        </form>
+      </motion.div>
+    </AuthShell>
+  )
+
+  // ── Login ──────────────────────────────────
+
+  if (mode === "login") return (
+    <AuthShell>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <div>
+          <h2 className="font-display text-2xl mb-1">Bonjour 👋</h2>
+          <p className="text-sm text-muted-foreground">Connectez-vous à votre espace respirfacile.</p>
+        </div>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>Email</Label>
+            <Input id="auth-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="vous@exemple.fr" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label>Mot de passe</Label>
+              <button type="button" onClick={() => setForgotPassword(true)} className="text-xs text-muted-foreground hover:text-primary">Oublié ?</button>
+            </div>
+            <Input id="auth-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" />
+          </div>
+          <Button type="submit" className="w-full btn-forest" disabled={loading}>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><span>Se connecter</span><ArrowRight className="w-4 h-4" /></>}
+          </Button>
+        </form>
+        <p className="text-center text-sm text-muted-foreground">
+          Pas encore de compte ?{" "}
+          <button onClick={() => setMode("signup")} className="text-primary font-medium hover:underline">S'inscrire</button>
+        </p>
+      </motion.div>
+    </AuthShell>
+  )
+
+  // ── Signup étape 1 : rôle ──────────────────
+
+  if (step === "role") return (
+    <AuthShell>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <div>
+          <h2 className="font-display text-2xl mb-1">Créer un compte</h2>
+          <p className="text-sm text-muted-foreground">Je suis…</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <RoleCard icon={<User className="w-5 h-5" />} title="Patient" description="Je fais des exercices de respiration" selected={selectedRole === "patient"} onClick={() => setSelectedRole("patient")} />
+          <RoleCard icon={<Stethoscope className="w-5 h-5" />} title="Praticien" description="Orthophoniste ou kiné" selected={selectedRole === "therapist"} onClick={() => setSelectedRole("therapist")} />
+        </div>
+        <Button className="w-full btn-forest" onClick={() => { if (selectedRole === "patient") setStep("patient_mode"); else setStep("form") }}>
+          Continuer <ArrowRight className="w-4 h-4" />
+        </Button>
+        <p className="text-center text-sm text-muted-foreground">
+          Déjà un compte ?{" "}
+          <button onClick={() => setMode("login")} className="text-primary font-medium hover:underline">Se connecter</button>
+        </p>
+      </motion.div>
+    </AuthShell>
+  )
+
+  // ── Signup étape 2 : mode patient ──────────
+
+  if (step === "patient_mode") return (
+    <AuthShell>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <button onClick={() => setStep("role")} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="w-4 h-4" /> Retour
+        </button>
+        <div>
+          <h2 className="font-display text-2xl mb-1">Comment accédez-vous ?</h2>
+          <p className="text-sm text-muted-foreground">Votre praticien vous a-t-il donné un code ?</p>
+        </div>
+        <div className="space-y-3">
+          <RoleCard icon={<KeyRound className="w-5 h-5" />} title="J'ai un code praticien" description="Mon orthophoniste / kiné m'a donné un code PRO-XXXXXX" selected={patientMode === "code"} onClick={() => setPatientMode("code")} full />
+          <RoleCard icon={<User className="w-5 h-5" />} title="Je m'inscris seul" description="7 jours d'essai gratuit en autonomie" selected={patientMode === "solo"} onClick={() => setPatientMode("solo")} full />
+        </div>
+        <Button className="w-full btn-forest" onClick={() => setStep("form")}>
+          Continuer <ArrowRight className="w-4 h-4" />
+        </Button>
+      </motion.div>
+    </AuthShell>
+  )
+
+  // ── Signup étape 3 : formulaire ────────────
+
+  const isTherapist = selectedRole === "therapist"
+  const isPatientWithCode = selectedRole === "patient" && patientMode === "code"
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary via-background to-accent/30 flex items-center justify-center p-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }} 
-        animate={{ opacity: 1, y: 0 }} 
-        transition={{ duration: 0.5 }} 
-        className="w-full max-w-md"
-      >
-        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4" />Retour à l'accueil
-        </Link>
-        
-        <Card className="shadow-2xl border-border/50">
-          <CardHeader className="text-center pb-2">
-            {!emailVerificationSent && (
-              <div className={`w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 transition-colors ${
-                selectedRole === "therapist" && !isLogin 
-                  ? "bg-purple-600" 
-                  : "bg-primary"
-              }`}>
-                {selectedRole === "therapist" && !isLogin ? (
-                  <Stethoscope className="w-8 h-8 text-white" />
-                ) : (
-                  <Activity className="w-8 h-8 text-primary-foreground" />
-                )}
-              </div>
-            )}
-            {!emailVerificationSent && (
-              <>
-                <CardTitle className="text-2xl">
-                  {forgotPassword 
-                    ? "Réinitialiser le mot de passe"
-                    : isLogin ? "Bon retour !" : "Créer un compte"}
-                </CardTitle>
-                <CardDescription>
-                  {forgotPassword
-                    ? "Recevez un lien par email pour créer un nouveau mot de passe"
-                    : isLogin 
-                      ? "Patient ou Orthophoniste, c'est le même accès" 
-                      : selectedRole === "patient"
-                        ? patientMode === "solo"
-                          ? "Commencez avec 7 jours d'essai gratuit"
-                          : "Commencez votre parcours vers une meilleure élocution"
-                        : "Créez votre espace de suivi professionnel"
-                  }
-                </CardDescription>
-              </>
-            )}
-          </CardHeader>
-          
-          <CardContent className="max-h-[70vh] overflow-y-auto">
-            {/* Email Verification Sent Screen (Solo only) */}
-            {emailVerificationSent && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center space-y-4 py-4"
-              >
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <Mail className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="font-semibold text-lg">Vérifiez votre email</h3>
-                <p className="text-sm text-muted-foreground">
-                  Un email de vérification a été envoyé à{" "}
-                  <strong className="text-foreground">{verificationEmail}</strong>
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Cliquez sur le lien dans l'email pour activer votre essai gratuit de 7 jours.
-                </p>
-
-                <div className="pt-2 space-y-3">
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    disabled={resendingVerification}
-                    onClick={async () => {
-                      setResendingVerification(true);
-                      try {
-                        const { error } = await supabase.auth.resend({ type: 'signup', email: verificationEmail });
-                        if (error) throw error;
-                        toast.success("Email renvoyé ! Vérifiez votre boîte de réception.");
-                      } catch {
-                        toast.error("Impossible de renvoyer l'email. Réessayez dans quelques instants.");
-                      } finally {
-                        setResendingVerification(false);
-                      }
-                    }}
-                  >
-                    {resendingVerification ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <>
-                        <RefreshCw className="w-4 h-4" />
-                        Renvoyer l'email
-                      </>
-                    )}
-                  </Button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmailVerificationSent(false);
-                      setIsLogin(true);
-                    }}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Retour à la connexion
-                  </button>
-                </div>
-              </motion.div>
-            )}
-            {/* Role Selection Tabs (only for signup) */}
-            {!isLogin && !forgotPassword && !emailVerificationSent && (
-              <Tabs 
-                value={selectedRole} 
-                onValueChange={(v) => setSelectedRole(v as UserRole)}
-                className="mb-6"
-              >
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="patient" className="gap-2">
-                    <User className="w-4 h-4" />
-                    Patient
-                  </TabsTrigger>
-                  <TabsTrigger value="therapist" className="gap-2">
-                    <Stethoscope className="w-4 h-4" />
-                    Orthophoniste
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            )}
-
-            {/* Patient Mode Selector (only for patient signup) */}
-            {!isLogin && !forgotPassword && !emailVerificationSent && selectedRole === "patient" && patientMode === "choose" && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-3 mb-6"
-              >
-                <p className="text-sm font-medium text-center text-muted-foreground mb-4">
-                  Comment souhaitez-vous vous inscrire ?
-                </p>
-                
-                {/* Option A: With Pro Code (B2B) */}
-                <button
-                  type="button"
-                  onClick={() => setPatientMode("code")}
-                  className="w-full p-4 rounded-xl border-2 border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-left group"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                      <KeyRound className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-sm mb-1">J'ai un Code Pro</h3>
-                      <p className="text-xs text-muted-foreground">
-                        Mon orthophoniste m'a donné un code (PRO-XXXXXX) pour me lier à son suivi
-                      </p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground mt-1 group-hover:text-primary transition-colors" />
-                  </div>
-                </button>
-
-                {/* Option B: Solo (B2C) */}
-                <button
-                  type="button"
-                  onClick={() => setPatientMode("solo")}
-                  className="w-full p-4 rounded-xl border-2 border-border hover:border-amber-500/50 hover:bg-amber-500/5 transition-all text-left group"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/50 transition-colors">
-                      <Zap className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-sm mb-1">M'inscrire seul</h3>
-                      <p className="text-xs text-muted-foreground">
-                        Essai gratuit de 7 jours, puis abonnement individuel
-                      </p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground mt-1 group-hover:text-amber-500 transition-colors" />
-                  </div>
-                </button>
-              </motion.div>
-            )}
-
-            {/* Registration Form (shown when mode is chosen or for login/therapist) */}
-            {!forgotPassword && !emailVerificationSent && (isLogin || selectedRole === "therapist" || patientMode !== "choose") && (
-              <motion.div
-                initial={!isLogin && selectedRole === "patient" ? { opacity: 0, y: 8 } : false}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                {/* Back button to mode chooser */}
-                {!isLogin && selectedRole === "patient" && patientMode !== "choose" && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPatientMode("choose");
-                      setTherapistCode("");
-                      setTherapistCodeError("");
-                    }}
-                    className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
-                  >
-                    <ArrowLeft className="w-3 h-3" />
-                    Changer de mode
-                  </button>
-                )}
-
-                {/* Solo trial badge */}
-                {!isLogin && selectedRole === "patient" && patientMode === "solo" && (
-                  <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 mb-4">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
-                        Essai gratuit — 7 jours d'accès complet
-                      </span>
-                    </div>
-                    <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-1 ml-6">
-                      Vous pourrez rattacher un orthophoniste plus tard dans les Réglages
-                    </p>
-                  </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {!isLogin && (
-                    <div className="space-y-2">
-                      <Label htmlFor="name">
-                        {selectedRole === "therapist" ? "Nom du cabinet / Praticien" : "Nom complet"}
-                      </Label>
-                      {selectedRole === "patient" ? (
-                        <Input 
-                          id="name" 
-                          type="text" 
-                          placeholder="Jean Dupont" 
-                          value={name} 
-                          onChange={(e) => setName(e.target.value)} 
-                          required={!isLogin && selectedRole === "patient"} 
-                          className="h-12 rounded-xl" 
-                        />
-                      ) : (
-                        <Input 
-                          id="cabinet" 
-                          type="text" 
-                          placeholder="Cabinet Orthophonie Martin" 
-                          value={cabinetName} 
-                          onChange={(e) => setCabinetName(e.target.value)} 
-                          required={!isLogin && selectedRole === "therapist"} 
-                          className="h-12 rounded-xl" 
-                        />
-                      )}
-                    </div>
-                  )}
-
-                  {/* Therapist Code Field - Only for Patient signup with code mode */}
-                  {!isLogin && selectedRole === "patient" && patientMode === "code" && (
-                    <div className="space-y-2">
-                      <Label htmlFor="therapist-code" className="flex items-center gap-2">
-                        🔑 Code Praticien
-                        <span className="text-destructive">*</span>
-                      </Label>
-                      <Input 
-                        id="therapist-code" 
-                        type="text" 
-                        placeholder="PRO-XXXXXX" 
-                        value={therapistCode} 
-                        onChange={(e) => {
-                          setTherapistCode(e.target.value.toUpperCase());
-                          setTherapistCodeError("");
-                        }} 
-                        required
-                        className={`h-12 rounded-xl font-mono ${therapistCodeError ? 'border-destructive' : ''}`}
-                      />
-                      {therapistCodeError && (
-                        <p className="text-sm text-destructive">{therapistCodeError}</p>
-                      )}
-                      <p className="text-xs text-muted-foreground">
-                        Donné par votre orthophoniste pour activer votre suivi
-                      </p>
-                    </div>
-                  )}
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      placeholder="jean@example.com" 
-                      value={email} 
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        setEmailSuggestion(null);
-                        setBypassSuggestion(false);
-                      }} 
-                      required 
-                      className="h-12 rounded-xl" 
-                    />
-                    {emailSuggestion?.hasSuggestion && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700"
-                      >
-                        <div className="flex items-start gap-2">
-                          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-                          <div className="flex-1 text-sm">
-                            <p className="text-amber-800 dark:text-amber-200">
-                              Vouliez-vous dire <strong>{emailSuggestion.suggestedDomain}</strong> ?
-                            </p>
-                            <div className="flex gap-2 mt-2">
-                              <Button
-                                type="button"
-                                size="sm"
-                                className="h-7 text-xs"
-                                onClick={() => {
-                                  setEmail(emailSuggestion.suggestedEmail);
-                                  setEmailSuggestion(null);
-                                  setBypassSuggestion(false);
-                                }}
-                              >
-                                Corriger
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 text-xs"
-                                onClick={() => {
-                                  setEmailSuggestion(null);
-                                  setBypassSuggestion(true);
-                                }}
-                              >
-                                Continuer quand même
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Mot de passe</Label>
-                    <Input 
-                      id="password" 
-                      type="password" 
-                      placeholder="••••••••" 
-                      value={password} 
-                      onChange={(e) => setPassword(e.target.value)} 
-                      required 
-                      minLength={6} 
-                      className="h-12 rounded-xl" 
-                    />
-                    {isLogin && (
-                      <div className="text-right">
-                        <button
-                          type="button"
-                          onClick={() => setForgotPassword(true)}
-                          className="text-xs text-primary hover:underline"
-                        >
-                          Mot de passe oublié ?
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <Button
-                    type="submit" 
-                    className={`w-full h-12 rounded-xl text-base transition-colors ${
-                      selectedRole === "therapist" && !isLogin 
-                        ? "bg-purple-600 hover:bg-purple-700 text-white" 
-                        : ""
-                    }`}
-                    disabled={loading || validatingCode || !canSubmit()}
-                  >
-                    {loading || validatingCode ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : isLogin ? (
-                      "Accéder à mon suivi"
-                    ) : selectedRole === "patient" ? (
-                      patientMode === "solo" ? "Démarrer mon essai gratuit" : "Créer mon espace patient"
-                    ) : (
-                      "Créer mon espace Pro"
-                    )}
-                  </Button>
-
-                  {/* Security reassurance */}
-                  <p className="text-xs text-center text-muted-foreground mt-3">
-                    🔒 Données de santé sécurisées & confidentielles
-                  </p>
-                </form>
-              </motion.div>
-            )}
-            
-            {/* Therapist benefits hint */}
-            {!isLogin && !emailVerificationSent && selectedRole === "therapist" && (
-              <div className="mt-4 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-                <p className="text-xs text-purple-700 dark:text-purple-300 text-center">
-                  ✨ Recevez votre <strong>Code Praticien unique</strong> pour lier vos patients et suivre leurs progrès à distance.
-                </p>
-              </div>
-            )}
-            
-            {/* Forgot Password Form */}
-            {forgotPassword && !emailVerificationSent && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-4"
-              >
-                <button
-                  type="button"
-                  onClick={() => { setForgotPassword(false); setResetEmailSent(false); }}
-                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <ArrowLeft className="w-3 h-3" />
-                  Retour à la connexion
-                </button>
-
-                {resetEmailSent ? (
-                  <div className="text-center space-y-3 py-4">
-                    <div className="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto">
-                      <Activity className="w-7 h-7 text-green-600 dark:text-green-400" />
-                    </div>
-                    <h3 className="font-semibold">Email envoyé !</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Si un compte existe avec cette adresse, vous recevrez un lien pour réinitialiser votre mot de passe.
-                    </p>
-                  </div>
-                ) : (
-                  <form onSubmit={async (e) => {
-                    e.preventDefault();
-                    setLoading(true);
-                    try {
-                      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                        redirectTo: `${window.location.origin}/auth/reset-password`,
-                      });
-                      if (error) throw error;
-                      setResetEmailSent(true);
-                    } catch (error: unknown) {
-                      const message = error instanceof Error ? error.message : "Une erreur est survenue";
-                      toast.error(message);
-                    } finally {
-                      setLoading(false);
-                    }
-                  }} className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      Entrez votre adresse email pour recevoir un lien de réinitialisation.
-                    </p>
-                    <div className="space-y-2">
-                      <Label htmlFor="reset-email">Email</Label>
-                      <Input
-                        id="reset-email"
-                        type="email"
-                        placeholder="jean@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="h-12 rounded-xl"
-                      />
-                    </div>
-                    <Button type="submit" className="w-full h-12 rounded-xl" disabled={loading}>
-                      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Envoyer le lien"}
-                    </Button>
-                  </form>
-                )}
-              </motion.div>
-            )}
-
-            {!emailVerificationSent && (
-              <div className="mt-6 text-center">
-                <button 
-                  type="button" 
-                  onClick={() => { setIsLogin(!isLogin); setForgotPassword(false); setResetEmailSent(false); }} 
-                  className="text-primary hover:underline text-sm"
-                >
-                  {isLogin ? "Pas encore de compte ? Inscrivez-vous" : "Déjà un compte ? Connectez-vous"}
-                </button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+    <AuthShell>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <button onClick={() => setStep(isTherapist ? "role" : "patient_mode")} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="w-4 h-4" /> Retour
+        </button>
+        <div>
+          <h2 className="font-display text-2xl mb-1">{isTherapist ? "Votre espace praticien" : "Votre compte patient"}</h2>
+          <p className="text-sm text-muted-foreground">
+            {isTherapist ? "30 jours d'essai gratuit, sans carte bancaire." : patientMode === "solo" ? "7 jours d'essai gratuit." : "Accès offert par votre praticien."}
+          </p>
+        </div>
+        <form onSubmit={handleSignup} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>{isTherapist ? "Prénom et nom" : "Prénom"}</Label>
+            <Input id="auth-name" value={name} onChange={e => setName(e.target.value)} required placeholder={isTherapist ? "Sophie Martin" : "Sophie"} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Email</Label>
+            <Input id="auth-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="vous@exemple.fr" />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Mot de passe</Label>
+            <Input id="auth-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" minLength={8} />
+            <p className="text-xs text-muted-foreground">8 caractères minimum</p>
+          </div>
+          {isPatientWithCode && (
+            <div className="space-y-1.5">
+              <Label>Code praticien</Label>
+              <Input
+                id="auth-code"
+                value={therapistCode}
+                onChange={e => { setTherapistCode(e.target.value.toUpperCase()); setCodeError("") }}
+                placeholder="PRO-A3K9Z2"
+                className={codeError ? "border-destructive" : ""}
+              />
+              {codeError && <p className="text-xs text-destructive">{codeError}</p>}
+            </div>
+          )}
+          <Button type="submit" className="w-full btn-forest" disabled={loading}>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : isTherapist ? "Démarrer l'essai gratuit" : "Créer mon compte"}
+          </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            En créant un compte, vous acceptez nos{" "}
+            <Link to="/legal/terms" className="underline hover:text-foreground">CGU</Link>{" "}
+            et notre <Link to="/legal/privacy" className="underline hover:text-foreground">politique de confidentialité</Link>.
+          </p>
+        </form>
       </motion.div>
-    </div>
-  );
-};
+    </AuthShell>
+  )
+}
 
-export default Auth;
+// ── Shell ──────────────────────────────────────
+
+function AuthShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-organic flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-2 mb-8">
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-forest">
+            <Wind className="w-5 h-5 text-white" />
+          </div>
+          <span className="font-display text-xl text-foreground font-semibold">respirfacile</span>
+        </div>
+
+        {/* Card */}
+        <div className="card-rf p-6">{children}</div>
+
+        {/* Social proof */}
+        <div className="mt-5 flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <span className="font-semibold text-foreground/60">250+</span> patients actifs
+          </span>
+          <span className="w-px h-3 bg-border" />
+          <span className="flex items-center gap-1">
+            <span className="font-semibold text-foreground/60">40+</span> orthophonistes
+          </span>
+          <span className="w-px h-3 bg-border" />
+          <span className="text-forest font-medium">Données hébergées en France</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── RoleCard ───────────────────────────────────
+
+interface RoleCardProps {
+  icon: React.ReactNode
+  title: string
+  description: string
+  selected: boolean
+  onClick: () => void
+  full?: boolean
+}
+
+function RoleCard({ icon, title, description, selected, onClick, full }: RoleCardProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`
+        ${full ? "w-full flex items-start gap-3 text-left" : "flex flex-col items-start gap-2"}
+        p-4 rounded-xl border-2 transition-all duration-200
+        ${selected ? "border-primary bg-primary/6 text-primary" : "border-border bg-card text-foreground hover:border-primary/40"}
+      `}
+    >
+      <div className={`${full ? "mt-0.5 shrink-0" : ""} p-1.5 rounded-lg ${selected ? "bg-primary/10" : "bg-muted"}`}>
+        {icon}
+      </div>
+      <div>
+        <p className="font-medium text-sm">{title}</p>
+        <p className={`text-xs mt-0.5 ${selected ? "text-primary/70" : "text-muted-foreground"}`}>{description}</p>
+      </div>
+    </button>
+  )
+}
+
+export default Auth

@@ -18,7 +18,7 @@ export function PatientJoinedEmail(props: PatientJoinedEmailProps) {
   const { therapistName = 'Cher orthophoniste', patientName, patientDetailUrl, referralCode, patientsCount } = props
   
   const referralUrl = referralCode 
-    ? `https://parlermoinsvite.fr/pro?ref=${referralCode}` 
+    ? `https://respirfacile.fr/pro?ref=${referralCode}` 
     : null;
   
   return (
@@ -50,7 +50,7 @@ export function PatientJoinedEmail(props: PatientJoinedEmailProps) {
       )}
 
       <Text style={signatureText}>Bonne collaboration,</Text>
-      <Text style={signatureName}>L'équipe Parler Moins Vite</Text>
+      <Text style={signatureName}>L'équipe RespirFacile</Text>
     </BaseLayout>
   )
 }

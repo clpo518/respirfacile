@@ -18,7 +18,7 @@ export function WrappedInviteEmail() {
       <Text style={greeting}>Bonjour 👋</Text>
 
       <Text style={paragraph}>
-        Votre <strong>bilan annuel Parler Moins Vite</strong> est prêt !
+        Votre <strong>bilan annuel RespirFacile</strong> est prêt !
       </Text>
 
       <Text style={paragraph}>
@@ -28,7 +28,7 @@ export function WrappedInviteEmail() {
 
       <Section style={buttonContainer}>
         <Button
-          href="https://parlermoinsvite.lovable.app/wrapped/2025"
+          href="https://respirfacile.fr/wrapped/2025"
           style={button}
         >
           Découvrir mon bilan 2025

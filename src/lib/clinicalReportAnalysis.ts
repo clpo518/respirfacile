@@ -152,16 +152,16 @@ function generateMainDiagnosis(avgSPS: number, readingStats: ExerciseStats, impr
   if (avgSPS < 3.5) {
     parts.push("Débit articulatoire contrôlé, inférieur à la norme conversationnelle.");
   } else if (avgSPS <= 5.5) {
-    parts.push("Débit articulatoire normo-fluent, dans les limites de la norme conversationnelle française (3.5-5.5 syll/s).");
+    parts.push("Score optimal, dans les limites de la cible thérapeutique (3.5-5.5 pts).");
   } else if (avgSPS <= 6.5) {
-    parts.push("Débit spontané rapide (> 5.5 syll/s), caractéristique d'une tendance à l'accélération.");
+    parts.push("Score élevé (> 5.5 pts), tendance à l'accélération.");
   } else {
-    parts.push("Débit spontané caractéristique d'un bredouillement/tachylalie (> 6.5 syll/s).");
+    parts.push("Score très élevé (> 6.5 pts), nécessite un travail de régulation.");
   }
-  
+
   // Add range information if available
   if (improvisationStats.count > 0) {
-    parts.push(`En parole spontanée : moyenne de ${improvisationStats.avg.toFixed(2)} syll/s, fluctuant entre ${improvisationStats.min.toFixed(2)} et ${improvisationStats.max.toFixed(2)}.`);
+    parts.push(`En séance spontanée : moyenne de ${improvisationStats.avg.toFixed(2)} pts, fluctuant entre ${improvisationStats.min.toFixed(2)} et ${improvisationStats.max.toFixed(2)}.`);
   }
   
   if (readingStats.count > 0 && improvisationStats.count > 0) {
@@ -196,11 +196,11 @@ function generateFluencyInterpretation(fluencyRatio: number, avgSPS: number, var
   
   // Add variability interpretation
   if (variabilityScore > 1.0) {
-    parts.push(`Instabilité marquée du débit (écart-type = ${variabilityScore.toFixed(2)} syll/s).`);
+    parts.push(`Instabilité marquée du débit (écart-type = ${variabilityScore.toFixed(2)} pts).`);
   } else if (variabilityScore > 0.5) {
-    parts.push(`Variabilité modérée du débit (écart-type = ${variabilityScore.toFixed(2)} syll/s).`);
+    parts.push(`Variabilité modérée du débit (écart-type = ${variabilityScore.toFixed(2)} pts).`);
   } else if (variabilityScore > 0) {
-    parts.push(`Bonne stabilité du débit (écart-type = ${variabilityScore.toFixed(2)} syll/s).`);
+    parts.push(`Bonne stabilité du débit (écart-type = ${variabilityScore.toFixed(2)} pts).`);
   }
   
   return parts.join(" ");
@@ -435,9 +435,9 @@ export function getSPSColor(sps: number): "green" | "orange" | "red" | "gray" {
 export function getSPSInterpretation(sps: number): string {
   if (sps === 0) return "—";
   if (sps < 3.5) return "Lent (contrôlé)";
-  if (sps <= 5.5) return "Normo-fluent";
-  if (sps <= 6.5) return "Rapide";
-  return "Tachylalie";
+  if (sps <= 5.5) return "Score optimal";
+  if (sps <= 6.5) return "Score élevé";
+  return "Score très élevé";
 }
 
 /**
@@ -522,8 +522,8 @@ export function generateTextReport(analysis: ClinicalAnalysis, therapistName?: s
   }
 
   lines.push("");
-  lines.push(`  Vitesse d'articulation*    ${analysis.articulatoryRate.toFixed(2)} syll/s   (norme : 5.0 – 6.5)`);
-  lines.push("  * Estimée selon Van Zaalen (débit hors pauses)");
+  lines.push(`  Score moyen de séance*    ${analysis.articulatoryRate.toFixed(2)} pts   (cible : ≤ 5.0)`);
+  lines.push("  * Estimé hors pauses et transitions");
   lines.push("");
 
   // Section 4: Regularity Analysis
@@ -580,7 +580,7 @@ export function generateTextReport(analysis: ClinicalAnalysis, therapistName?: s
   lines.push("  la mesure du débit articulatoire. Il ne se");
   lines.push("  substitue pas au diagnostic clinique.");
   lines.push("");
-  lines.push("  Généré via ParlerMoinsVite.fr");
+  lines.push("  Généré via respirfacile.fr");
   lines.push("");
   lines.push(doubleDivider);
 

@@ -4,7 +4,7 @@ import { Cookie, Shield, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 
-const COOKIE_CONSENT_KEY = "pmv_cookie_consent";
+const COOKIE_CONSENT_KEY = "rf_cookie_consent";
 const CONSENT_EXPIRY_DAYS = 30;
 
 const CookieConsent = () => {
@@ -77,8 +77,8 @@ const CookieConsent = () => {
                     Cookies & Confidentialité
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Nous utilisons des cookies pour assurer le bon fonctionnement du site et analyser 
-                    votre progression. <strong className="text-foreground">Vos données vocales restent strictement privées</strong> et 
+                    Nous utilisons des cookies pour assurer le bon fonctionnement du site et analyser
+                    votre progression. <strong className="text-foreground">Vos données respiratoires restent strictement privées</strong> et
                     ne sont jamais partagées à des fins publicitaires.{" "}
                     <Link to="/legal/privacy" className="text-primary hover:underline">
                       En savoir plus

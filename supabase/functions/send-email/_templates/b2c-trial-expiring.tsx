@@ -24,7 +24,7 @@ export function B2CTrialExpiringEmail(props: B2CTrialExpiringEmailProps) {
       <Text style={paragraph}>Bonjour {patientName},</Text>
 
       <Text style={paragraph}>
-        Votre essai gratuit de 7 jours sur Parler Moins Vite touche à sa fin.
+        Votre essai gratuit de 7 jours sur RespirFacile touche à sa fin.
         {daysRemaining <= 1
           ? " C'est votre dernier jour pour profiter de toutes les fonctionnalités."
           : ` Il vous reste ${daysRemaining} jours pour continuer à vous entraîner sans interruption.`
@@ -52,7 +52,7 @@ export function B2CTrialExpiringEmail(props: B2CTrialExpiringEmailProps) {
       </Text>
 
       <Text style={signatureText}>À vos côtés,</Text>
-      <Text style={signatureName}>L'équipe Parler Moins Vite</Text>
+      <Text style={signatureName}>L'équipe RespirFacile</Text>
     </BaseLayout>
   )
 }

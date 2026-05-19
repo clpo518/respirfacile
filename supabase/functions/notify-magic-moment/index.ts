@@ -57,8 +57,8 @@ Deno.serve(async (req) => {
           data: {
             therapistName,
             patientName: patientName || "Votre patient",
-            patientDetailUrl: `https://www.parlermoinsvite.fr/patient/${patientId}`,
-            dashboardUrl: "https://www.parlermoinsvite.fr/patient/list",
+            patientDetailUrl: `https://www.respirfacile.fr/patients/${patientId}`,
+            dashboardUrl: "https://www.respirfacile.fr/patients",
           },
         }),
       }

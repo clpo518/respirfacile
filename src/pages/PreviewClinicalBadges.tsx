@@ -44,7 +44,7 @@ export default function PreviewClinicalBadges() {
                       className="flex items-center gap-3 p-3.5 rounded-xl border border-border bg-card"
                     >
                       <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center shrink-0 text-2xl">
-                        {ex.family_icon}
+                        {ex.icon}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">

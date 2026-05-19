@@ -48,7 +48,7 @@ export function WeeklyReportEmail(props: WeeklyReportEmailProps) {
       <Text style={paragraph}>Bonjour {userName},</Text>
 
       <Text style={paragraph}>
-        Voici le récapitulatif de votre semaine d'entraînement sur Parler Moins Vite !
+        Voici le récapitulatif de votre semaine d'entraînement sur RespirFacile !
       </Text>
 
       <Section style={statsSection}>

@@ -20,7 +20,7 @@ export function PaymentFailedEmail(props: PaymentFailedEmailProps) {
       <Text style={paragraph}>Bonjour {userName},</Text>
 
       <Text style={paragraph}>
-        Nous n'avons pas pu traiter votre dernier paiement pour votre abonnement Parler Moins Vite.
+        Nous n'avons pas pu traiter votre dernier paiement pour votre abonnement RespirFacile.
       </Text>
 
       <Text style={paragraph}>
@@ -32,7 +32,7 @@ export function PaymentFailedEmail(props: PaymentFailedEmailProps) {
       </Button>
 
       <Text style={smallText}>
-        Si vous pensez qu'il s'agit d'une erreur, contactez-nous à contact@parlermoinsvite.fr
+        Si vous pensez qu'il s'agit d'une erreur, contactez-nous à contact@respirfacile.fr
       </Text>
     </BaseLayout>
   )

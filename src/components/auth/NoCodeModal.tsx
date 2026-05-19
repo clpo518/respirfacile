@@ -16,12 +16,12 @@ interface NoCodeModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const SUPPORT_EMAIL = "contact@parlermoinsvite.fr";
+const SUPPORT_EMAIL = "contact@respirfacile.fr";
 
 // Template for option A: Ortho doesn't know the app - we contact them
 const CONTACT_ORTHO_TEMPLATE = `Bonjour,
 
-Je souhaite utiliser l'application ParlerMoinsVite pour m'entraîner.
+Je souhaite utiliser l'application RespirFacile pour m'entraîner.
 
 Mon orthophoniste ne connaît pas encore l'application. Voici ses coordonnées pour que vous puissiez le/la contacter :
 
@@ -37,7 +37,7 @@ Merci de votre aide !`;
 // Template for option B: Solo training request
 const SOLO_TEMPLATE = `Bonjour,
 
-Je souhaite utiliser ParlerMoinsVite pour m'entraîner à contrôler mon débit de parole, sans suivi orthophonique pour le moment.
+Je souhaite utiliser RespirFacile pour pratiquer des exercices respiratoires, sans suivi orthophonique pour le moment.
 
 Pouvez-vous me renseigner sur les options d'accès individuel ?
 
@@ -62,7 +62,7 @@ const NoCodeModal = ({ open, onOpenChange }: NoCodeModalProps) => {
   };
 
   const handleMailtoOrtho = () => {
-    const subject = encodeURIComponent("Contacter mon orthophoniste - ParlerMoinsVite");
+    const subject = encodeURIComponent("Contacter mon orthophoniste - RespirFacile");
     const body = encodeURIComponent(CONTACT_ORTHO_TEMPLATE);
     window.open(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`, "_blank");
   };
@@ -79,7 +79,7 @@ const NoCodeModal = ({ open, onOpenChange }: NoCodeModalProps) => {
   };
 
   const handleMailtoSolo = () => {
-    const subject = encodeURIComponent("Demande d'accès individuel - ParlerMoinsVite");
+    const subject = encodeURIComponent("Demande d'accès individuel - RespirFacile");
     const body = encodeURIComponent(SOLO_TEMPLATE);
     window.open(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`, "_blank");
   };

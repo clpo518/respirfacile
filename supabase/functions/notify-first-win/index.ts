@@ -108,7 +108,7 @@ serve(async (req) => {
     // Send the first win email
     const emailResult = await sendEmail("first_win", authUser.user.email, {
       userName: profile?.full_name || authUser.user.email.split("@")[0],
-      dashboardUrl: "https://www.parlermoinsvite.fr/dashboard",
+      dashboardUrl: "https://www.respirfacile.fr/dashboard",
     });
 
     if (!emailResult.success) {

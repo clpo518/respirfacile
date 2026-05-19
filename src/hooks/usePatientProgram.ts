@@ -107,8 +107,7 @@ export function usePatientProgram() {
     const template = PROGRAM_TEMPLATES[profileType]
     if (!template) return []
 
-    const weekKey = `week_${Math.min(program.week_number, 4)}` as keyof typeof template
-    const exerciseIds: string[] = template[weekKey] ?? template.week_1
+    const exerciseIds: string[] = template.exerciseIds ?? []
 
     // Exercices déjà faits aujourd'hui
     const today = new Date()

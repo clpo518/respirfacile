@@ -24,7 +24,7 @@ export function SlideIntro({ name, year }: { name: string; year: number }) {
       >
         Votre année
         <br />
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300">PMV {year}</span>
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300">RespirFacile {year}</span>
       </motion.h1>
       <motion.p
         initial={{ opacity: 0 }}
@@ -87,7 +87,7 @@ export function SlideProgress({ avgSpsFirst, avgSpsLast }: { avgSpsFirst: number
           <p className="text-xs text-emerald-300/50 font-normal mt-1">maintenant</p>
         </div>
       </div>
-      <p className="text-sm text-white/40 mt-1">syll/sec</p>
+      <p className="text-sm text-white/40 mt-1">score respiratoire</p>
       {improved ? (
         <motion.p
           initial={{ opacity: 0, y: 10 }}
@@ -95,7 +95,7 @@ export function SlideProgress({ avgSpsFirst, avgSpsLast }: { avgSpsFirst: number
           transition={{ delay: 0.8 }}
           className="text-emerald-300 text-lg font-medium mt-4"
         >
-          Vous avez ralenti de {diff} syll/sec.
+          Votre score s'est amélioré de {diff} pts.
           <br />
           <span className="text-emerald-200/70 text-base">C'est exactement le but du jeu 🎯</span>
         </motion.p>
@@ -113,7 +113,7 @@ export function SlideProgress({ avgSpsFirst, avgSpsLast }: { avgSpsFirst: number
 const exerciseLabels: Record<string, { label: string; emoji: string; funFact: string }> = {
   reading: { label: "Lecture", emoji: "📖", funFact: "Le grand classique. Simple, efficace, redoutable." },
   slow_reading: { label: "Lecture lente", emoji: "🐢", funFact: "Mode tortue activé. La lenteur est un super-pouvoir." },
-  articulation: { label: "Articulation", emoji: "🗣️", funFact: "Chaque syllabe compte. Vous le savez mieux que personne." },
+  articulation: { label: "Régularité", emoji: "🫁", funFact: "Chaque séance compte. Vous le savez mieux que personne." },
   improvisation: { label: "Improvisation", emoji: "🎤", funFact: "Parler sans filet, mais avec contrôle. Chapeau." },
   dialogue: { label: "Dialogue", emoji: "💬", funFact: "La vraie vie, en mode entraînement." },
   rebus: { label: "Rébus", emoji: "🧩", funFact: "Le cerveau qui joue et la bouche qui suit." },
@@ -199,7 +199,7 @@ export function SlideWords({ totalWords, totalSyllables }: { totalWords: number;
           <div className="text-3xl font-bold text-blue-300/80">
             {totalSyllables >= 1000 ? formatBigNumber(totalSyllables) : <CountUp end={totalSyllables} />}
           </div>
-          <p className="text-white/40 text-sm">syllabes articulées</p>
+          <p className="text-white/40 text-sm">cycles respiratoires</p>
         </div>
       </div>
       <p className="text-white/40 text-sm mt-4 italic">{wordComparison}</p>
@@ -306,7 +306,7 @@ export function SlideTherapistIntro({ name, year }: { name: string; year: number
       <h1 className="text-3xl font-bold leading-tight">
         Votre année
         <br />
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300">PMV Pro {year}</span>
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 to-emerald-300">RespirFacile Pro {year}</span>
       </h1>
       <p className="text-white/60 text-lg">
         {name}, on a fait les comptes.
@@ -407,8 +407,8 @@ export function SlideTherapistFun({ totalSyllables }: { totalSyllables: number }
     : totalSyllables > 500000
       ? "L'équivalent du texte de 3 Harry Potter lus à voix haute. 🧙"
       : totalSyllables > 100000
-        ? "Presque autant de syllabes que dans le code civil. Mais en plus utile. ⚖️"
-        : "Chaque syllabe articulée est un pas vers la fluence. 🚶";
+        ? "Presque autant de cycles que dans un marathon de yoga. Mais en plus utile. ⚖️"
+        : "Chaque séance complétée est un pas vers une meilleure respiration. 🚶";
 
   return (
     <SlideLayout gradient="from-[#0c4a6e] via-[#0369a1] to-[#0c4a6e]">
@@ -422,17 +422,17 @@ export function SlideTherapistFun({ totalSyllables }: { totalSyllables: number }
       </motion.div>
       <p className="text-white/60 text-sm uppercase tracking-widest">Stat inutile (mais vraie)</p>
       <p className="text-2xl font-bold text-sky-100">
-        Vos patients ont articulé
+        Vos patients ont complété
       </p>
       <div className="text-5xl font-black text-sky-200">
         {millions >= 1 ? (
           <><CountUp end={millions} decimals={1} /> millions</>
         ) : (
-          <><CountUp end={totalSyllables} /> <span className="text-2xl">syllabes</span></>
+          <><CountUp end={totalSyllables} /> <span className="text-2xl">cycles</span></>
         )}
       </div>
       <p className="text-white/40 text-sm mt-3 italic">{funComparison}</p>
-      <p className="text-white/20 text-xs mt-2">* Calcul approximatif. Aucune syllabe n'a été maltraitée.</p>
+      <p className="text-white/20 text-xs mt-2">* Calcul approximatif. Aucun cycle n'a été maltraité.</p>
     </SlideLayout>
   );
 }
@@ -449,7 +449,7 @@ export function SlideTherapistThanks({ year }: { year: number }) {
       </motion.div>
       <h2 className="text-2xl font-bold">Merci pour tout 💚</h2>
       <p className="text-white/60 text-base leading-relaxed">
-        PMV existe parce que des orthophonistes comme vous y croient.
+        RespirFacile existe parce que des orthophonistes comme vous y croient.
         <br />
         Vos patients progressent, et vous y êtes pour beaucoup.
       </p>

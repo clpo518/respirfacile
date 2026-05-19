@@ -49,14 +49,14 @@ export function PatientArchivedEmail({
       )}
 
       <Text style={paragraph}>
-        Une question ? Écrivez-nous à contact@parlermoinsvite.fr, nous sommes là pour vous aider.
+        Une question ? Écrivez-nous à contact@respirfacile.fr, nous sommes là pour vous aider.
       </Text>
 
       <Text style={signoff}>
         À très bientôt,
       </Text>
       <Text style={signatureName}>
-        L'équipe Parler Moins Vite
+        L'équipe RespirFacile
       </Text>
     </BaseLayout>
   )

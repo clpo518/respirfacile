@@ -235,11 +235,11 @@ export function generateCoachFeedback(
   if (targetSps && avgSps > 0) {
     const diff = Math.round((avgSps - targetSps) * 10) / 10;
     if (Math.abs(diff) <= 0.3) {
-      verdictDescription = `Objectif atteint ! Vous visiez ${targetSps} syll/sec et avez fait ${avgSps} syll/sec. ${baseVerdict.description}`;
+      verdictDescription = `Objectif atteint ! Vous visiez ${targetSps} pts et vous avez fait ${avgSps} pts. ${baseVerdict.description}`;
     } else if (diff < 0) {
-      verdictDescription = `Vous êtes ${Math.abs(diff)} syll/sec sous votre cible de ${targetSps} syll/sec. ${baseVerdict.description}`;
+      verdictDescription = `Vous êtes ${Math.abs(diff)} pts sous votre cible de ${targetSps} pts. ${baseVerdict.description}`;
     } else {
-      verdictDescription = `Vous êtes ${diff} syll/sec au-dessus de votre cible de ${targetSps} syll/sec. Essayez de ralentir davantage.`;
+      verdictDescription = `Vous êtes ${diff} pts au-dessus de votre cible de ${targetSps} pts. Essayez de ralentir davantage.`;
     }
   }
 

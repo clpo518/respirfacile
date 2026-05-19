@@ -41,10 +41,10 @@ export const MetricTooltip = ({ children, content, className = "" }: MetricToolt
 
 // Pre-defined tooltips for common metrics
 export const METRIC_TOOLTIPS = {
-  SPS: "Syllabes par seconde — Calculé par paquets de 5 syllabes sur le temps de parole réel (silences exclus). Cible thérapeutique : 3.5-5.5 SPS",
-  AVG_SPS: "Vitesse moyenne de la session en Syllabes Par Seconde, calculée par paquets de 5 syllabes. ≤5.0 = optimal, 5-6 = rapide, >6.5 = tachylalie",
-  MAX_SPS: "Accélération max atteinte pendant la session. Un écart important avec la moyenne peut indiquer des accélérations involontaires (typique du bredouillement)",
-  FLUENCY_RATIO: "Pourcentage du temps passé à parler vs en silence. > 80% = excellent, 60-80% = normal, < 60% = à surveiller",
-  FILLERS: "Disfluences : 'euh', 'du coup', 'en fait' (mots d'appui) détectés automatiquement pendant la session",
-  SYLLABLES: "Nombre total de syllabes prononcées, calculé avec un algorithme optimisé pour le français (gestion des 'e' muets)",
+  SPS: "Score de séance — Mesure la qualité et la régularité respiratoire sur l'ensemble de l'exercice. Cible thérapeutique : ≤ 4.5 pts",
+  AVG_SPS: "Score moyen de la séance, calculé sur l'ensemble des cycles respiratoires. ≤4.5 = optimal, 4.5-6 = à améliorer, >6 = à travailler",
+  MAX_SPS: "Score maximal atteint pendant la séance. Un écart important avec la moyenne peut indiquer une irrégularité respiratoire à travailler",
+  FLUENCY_RATIO: "Pourcentage de la séance réalisée en continuité. > 80% = excellent, 60-80% = normal, < 60% = à surveiller",
+  FILLERS: "Mots d'appui : 'euh', 'du coup', 'en fait' détectés automatiquement pendant la session",
+  SYLLABLES: "Nombre total de cycles respiratoires complétés pendant la séance",
 } as const;

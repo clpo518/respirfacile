@@ -30,7 +30,7 @@ export function ReferralAppliedEmail(props: ReferralAppliedEmailProps) {
         <Text style={paragraph}>Bonjour {userName},</Text>
 
         <Text style={celebrationBox}>
-          🎁 <strong>{referrerName}</strong> vient d'entrer votre code parrain sur ParlerMoinsVite !
+          🎁 <strong>{referrerName}</strong> vient d'entrer votre code parrain sur RespirFacile !
         </Text>
 
         <Text style={paragraph}>
@@ -55,7 +55,7 @@ export function ReferralAppliedEmail(props: ReferralAppliedEmailProps) {
         </Button>
 
         <Text style={signatureText}>À bientôt,</Text>
-        <Text style={signatureName}>Clément — ParlerMoinsVite</Text>
+        <Text style={signatureName}>Clément — RespirFacile</Text>
       </BaseLayout>
     )
   }
@@ -77,7 +77,7 @@ export function ReferralAppliedEmail(props: ReferralAppliedEmailProps) {
 
       <Text style={stepBox}>
         <strong>📋 Comment obtenir votre mois gratuit :</strong><br /><br />
-        1. Continuez à utiliser ParlerMoinsVite pendant votre essai gratuit<br />
+        1. Continuez à utiliser RespirFacile pendant votre essai gratuit<br />
         2. Quand vous passerez à l'abonnement payant, un <strong>coupon de 100% de réduction</strong> sera automatiquement appliqué sur votre <strong>2e mois</strong><br />
         3. Résultat : vous payez le 1er mois, le 2e est <strong>entièrement offert</strong>
       </Text>
@@ -91,11 +91,11 @@ export function ReferralAppliedEmail(props: ReferralAppliedEmailProps) {
       </Text>
 
       <Button href={dashboardUrl} style={button}>
-        Continuer sur ParlerMoinsVite
+        Continuer sur RespirFacile
       </Button>
 
       <Text style={signatureText}>À bientôt,</Text>
-      <Text style={signatureName}>Clément — ParlerMoinsVite</Text>
+      <Text style={signatureName}>Clément — RespirFacile</Text>
     </BaseLayout>
   )
 }

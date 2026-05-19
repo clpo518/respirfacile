@@ -48,11 +48,11 @@ export function SubscriptionConfirmedEmail(props: SubscriptionConfirmedEmailProp
       )}
 
       <Text style={smallText}>
-        Des questions ? Écrivez-nous à contact@parlermoinsvite.fr
+        Des questions ? Écrivez-nous à contact@respirfacile.fr
       </Text>
 
       <Text style={signatureText}>À votre service,</Text>
-      <Text style={signatureName}>L'équipe Parler Moins Vite</Text>
+      <Text style={signatureName}>L'équipe RespirFacile</Text>
     </BaseLayout>
   )
 }

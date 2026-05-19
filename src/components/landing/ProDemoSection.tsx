@@ -48,7 +48,7 @@ export const ProDemoSection = () => {
             Voici ce que vos patients <span className="text-primary">utiliseront</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            3 modes parmi les 12 disponibles. Vos patients s'exercent en autonomie entre deux séances.
+            3 exemples parmi nos exercices respiratoires. Vos patients s'exercent en autonomie entre deux séances.
           </p>
         </motion.div>
 
@@ -86,7 +86,7 @@ export const ProDemoSection = () => {
                     Mode Lecture — Guidage thérapeutique
                   </span>
                   <p className="text-muted-foreground text-sm">
-                    Le surligneur avance mot par mot et s'adapte à la vitesse cible du patient (de 3.0 à 5.0 syll/s). Le patient lit à voix haute en suivant le rythme.
+                    Le guidage avance étape par étape et s'adapte au programme prescrit. Le patient suit les instructions de respiration à son rythme.
                   </p>
                 </div>
 
@@ -97,7 +97,7 @@ export const ProDemoSection = () => {
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   {[
                     { label: "Modes", value: "Libre / Guidé / Syllabique" },
-                    { label: "Biofeedback", value: "SPS en temps réel" },
+                    { label: "Biofeedback", value: "Guidage en temps réel" },
                     { label: "Adapté", value: "Enfant → Senior" },
                   ].map((item, i) => (
                     <div key={i} className="text-center p-3 bg-muted/50 rounded-lg">
@@ -108,7 +108,7 @@ export const ProDemoSection = () => {
                 </div>
 
                 <p className="text-center text-xs text-muted-foreground">
-                  👆 Cliquez pour lancer. Le surligneur avance au rythme recommandé (~4 syll/s).
+                  👆 Cliquez pour lancer. Le guidage suit le rythme respiratoire recommandé.
                 </p>
               </TabsContent>
 
@@ -120,7 +120,7 @@ export const ProDemoSection = () => {
                     Mode Dialogue — Transfert en situation réelle
                   </span>
                   <p className="text-muted-foreground text-sm">
-                    Le patient pose le téléphone et discute. Un seul gros indicateur visuel guide le débit en temps réel.
+                    Le patient pose le téléphone et respire. Un seul gros indicateur visuel guide le rythme respiratoire en temps réel.
                   </p>
                 </div>
 
@@ -128,7 +128,7 @@ export const ProDemoSection = () => {
                   <div className="w-44 h-44 rounded-full border-4 border-emerald-500 bg-emerald-100 dark:bg-emerald-900/30 flex flex-col items-center justify-center shadow-lg">
                     <span className="text-5xl">✅</span>
                     <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">Parfait</span>
-                    <span className="text-xs text-muted-foreground">4.0 syll/s</span>
+                    <span className="text-xs text-muted-foreground">6 cpm</span>
                   </div>
 
                   <div className="grid grid-cols-3 gap-4 w-full max-w-sm">
@@ -159,7 +159,7 @@ export const ProDemoSection = () => {
                 </div>
 
                 <p className="text-center text-xs text-muted-foreground">
-                  💬 L'emoji change en temps réel selon le débit du patient — visible de loin, sans stress.
+                  💬 L'emoji change en temps réel selon le rythme respiratoire — visible de loin, sans stress.
                 </p>
               </TabsContent>
 

@@ -79,7 +79,7 @@ const WhatsNewModal = () => {
             <p>
               <strong className="text-foreground">💡 Comment ça marche ?</strong><br />
               Ouvrez la fiche d'un patient et cliquez sur <em>Modifier</em> à côté de l'objectif de vitesse. 
-              La cible recommandée est <em>vitesse habituelle − 1 syll/s</em>.
+              La cible recommandée est <em>score habituel − 1 pt</em>.
             </p>
           </motion.div>
         </div>

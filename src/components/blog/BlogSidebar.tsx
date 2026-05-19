@@ -3,10 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Stethoscope, Users, BarChart3, Shield, Activity, Zap } from "lucide-react";
-import type { BlogPost } from "@/data/blogPosts";
+interface RelatedPost {
+  id: string;
+  slug: string;
+  category: string;
+  title: string;
+}
 
 interface BlogSidebarProps {
-  relatedPosts: BlogPost[];
+  relatedPosts: RelatedPost[];
   audience: 'pro' | 'patient';
   ctaLink?: string;
   ctaLabel?: string;
@@ -27,7 +32,7 @@ export default function BlogSidebar({ relatedPosts, audience, ctaLink, ctaLabel 
                   <Stethoscope className="w-5 h-5 text-primary" />
                 </div>
                 <span className="font-bold text-foreground text-sm">
-                  ParlerMoinsVite Pro
+                  RespirFacile Pro
                 </span>
               </div>
 

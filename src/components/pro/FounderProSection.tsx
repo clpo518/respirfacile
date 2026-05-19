@@ -57,7 +57,7 @@ export const FounderProSection = () => {
                   {/* Name overlay */}
                   <div className="absolute bottom-4 left-4 right-4 bg-slate-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-slate-700/50">
                     <p className="font-semibold text-white">Clément</p>
-                    <p className="text-sm text-slate-400">Fondateur • Bredouilleur</p>
+                    <p className="text-sm text-slate-400">Fondateur</p>
                   </div>
                 </div>
               </div>
@@ -82,14 +82,14 @@ export const FounderProSection = () => {
 
               <div className="space-y-4 text-slate-300 leading-relaxed">
                 <p>
-                  Je m'appelle Clément. En 2022, j'ai enfin consulté pour mon <strong className="text-white">bredouillement</strong>. 
-                  Mon orthophoniste était formidable. Mais une fois rentré chez moi, je n'avais aucun outil 
+                  Je m'appelle Clément. En 2022, j'ai commencé un suivi en <strong className="text-white">rééducation respiratoire</strong>.
+                  Mon orthophoniste était formidable. Mais une fois rentré chez moi, je n'avais aucun outil
                   pour appliquer ce qu'elle m'enseignait.
                 </p>
-                
+
                 <p>
-                  <strong className="text-white">Pas de feedback visuel.</strong> Pas de mesure objective. 
-                  Juste un chronomètre et l'espoir de "parler plus lentement" — 
+                  <strong className="text-white">Pas de feedback visuel.</strong> Pas de mesure objective.
+                  Juste des consignes écrites et l'espoir de "bien respirer"
                   sans savoir si je le faisais vraiment.
                 </p>
 
@@ -98,8 +98,8 @@ export const FounderProSection = () => {
                 </p>
 
                 <p>
-                  Aujourd'hui, des dizaines de patients utilisent l'application entre leurs séances. 
-                  Leurs orthophonistes reçoivent des données objectives — SPS, durée de pratique, régularité — 
+                  Aujourd'hui, des dizaines de patients utilisent l'application entre leurs séances.
+                  Leurs orthophonistes reçoivent des données objectives — scores de séance, durée de pratique, régularité —
                   sans effort supplémentaire.
                 </p>
               </div>

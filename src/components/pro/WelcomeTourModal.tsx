@@ -30,7 +30,7 @@ const slides = [
   {
     icon: PartyPopper,
     title: "Bienvenue dans votre espace Pro !",
-    description: "Merci de rejoindre ParlerMoinsVite. Vous allez pouvoir suivre vos patients, mesurer leur débit et piloter leur rééducation à distance.",
+    description: "Merci de rejoindre RespirFacile. Vous allez pouvoir suivre vos patients, mesurer leur débit et piloter leur rééducation à distance.",
     visual: "welcome",
     color: "from-primary to-emerald-500",
     iconBg: "bg-primary/10",
@@ -57,7 +57,7 @@ const slides = [
   {
     icon: BarChart3,
     title: "Suivi en temps réel",
-    description: "Visualisez l'activité de chaque patient : exercices réalisés, débit syllabique (SPS), régularité d'entraînement.",
+    description: "Visualisez l'activité de chaque patient : exercices réalisés, score de séance, régularité d'entraînement.",
     visual: "tracking",
     color: "from-green-500 to-emerald-500",
     iconBg: "bg-green-100 dark:bg-green-900/30",

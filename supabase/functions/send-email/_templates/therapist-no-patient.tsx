@@ -107,8 +107,8 @@ export function TherapistNoPatientEmail(props: TherapistNoPatientEmailProps) {
       </Text>
 
       <Text style={signatureText}>À très vite,</Text>
-      <Text style={signatureName}>Clément — Fondateur de Parler Moins Vite</Text>
-      <Text style={signatureEmail}>contact@parlermoinsvite.fr</Text>
+      <Text style={signatureName}>Clément — Fondateur de RespirFacile</Text>
+      <Text style={signatureEmail}>contact@respirfacile.fr</Text>
     </BaseLayout>
   )
 }

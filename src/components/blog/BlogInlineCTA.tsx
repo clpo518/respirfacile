@@ -21,7 +21,7 @@ export default function BlogInlineCTA({ ctaLink, ctaLabel }: BlogInlineCTAProps)
             Mesurez un débit en 10 secondes.
           </h4>
           <p className="text-muted-foreground text-sm mb-4">
-            Il existe une méthode plus simple. Testez ParlerMoinsVite gratuitement.
+            Il existe une méthode plus simple. Testez RespirFacile gratuitement.
           </p>
           <Button asChild size="sm">
             <Link to={link}>

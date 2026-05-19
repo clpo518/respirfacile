@@ -17,7 +17,7 @@ const LiveSessionCard = () => {
             <Sparkles className="w-4 h-4" />Nouveau
           </span>
           <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
-            <Timer className="w-4 h-4" />Mode En séance
+            <Timer className="w-4 h-4" />Mode En consultation
           </span>
         </div>
 
@@ -25,24 +25,24 @@ const LiveSessionCard = () => {
           {/* Left: Content */}
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
-              Débitmètre{" "}
+              Suivi en consultation{" "}
               <span className="text-primary italic">en direct</span>
             </h2>
 
             <p className="text-lg text-muted-foreground mb-2">
-              Mesurez le débit de parole de votre patient en temps réel, directement pendant la consultation.
+              Guidez votre patient dans un exercice respiratoire directement pendant la séance, sur votre tablette.
             </p>
             <p className="text-lg text-foreground font-semibold mb-6">
-              Un chronomètre, une jauge, zéro distraction.
+              Interface épurée, résultats instantanés, zéro distraction.
             </p>
 
             <ul className="space-y-3 mb-8">
               {[
                 "Interface plein écran, sans distraction",
-                "Mesure SPS en temps réel (méthode Van Zaalen)",
-                "Une jauge par interlocuteur — patient vs thérapeute",
-                "Bilan instantané : moyenne, min, max",
-                "Sauvegardé sur le profil du patient",
+                "Exercice guidé en temps réel avec le patient",
+                "Jauge de cohérence et cycles respiratoires",
+                "Bilan instantané sauvegardé sur le profil",
+                "Continuité avec les exercices à domicile",
               ].map((text, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -56,7 +56,7 @@ const LiveSessionCard = () => {
           <div className="relative">
             <div className="bg-card rounded-xl shadow-lg p-6 border border-border">
               <p className="text-sm text-muted-foreground text-center mb-4 font-medium">
-                Aperçu du débitmètre
+                Aperçu du suivi en séance
               </p>
 
               {/* Circular gauge mock */}
@@ -90,9 +90,9 @@ const LiveSessionCard = () => {
                     viewport={{ once: true }}
                     transition={{ delay: 0.8 }}
                   >
-                    4.2
+                    6
                   </motion.span>
-                  <span className="text-xs text-muted-foreground">syll/s</span>
+                  <span className="text-xs text-muted-foreground">cycles/min</span>
                 </div>
               </div>
 
@@ -103,16 +103,16 @@ const LiveSessionCard = () => {
                   <span>Séance : <strong className="text-foreground">2 min 34</strong></span>
                 </div>
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                  ✅ Normo-fluent
+                  ✅ Bonne cohérence
                 </span>
               </div>
 
               {/* Mini stats */}
               <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border">
                 {[
-                  { label: "Moy.", value: "4.2" },
-                  { label: "Min", value: "3.1" },
-                  { label: "Max", value: "5.4" },
+                  { label: "Cycles", value: "14" },
+                  { label: "Score", value: "87%" },
+                  { label: "Durée", value: "2:34" },
                 ].map((stat) => (
                   <div key={stat.label} className="text-center">
                     <p className="text-lg font-bold text-foreground">{stat.value}</p>

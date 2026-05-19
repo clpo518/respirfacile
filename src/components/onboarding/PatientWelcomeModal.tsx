@@ -27,8 +27,8 @@ interface PatientWelcomeModalProps {
 const allSlides = [
   {
     icon: PartyPopper,
-    title: "Bienvenue sur ParlerMoinsVite !",
-    description: "Merci de nous faire confiance. Vous allez découvrir un outil conçu pour vous aider à maîtriser votre débit de parole, à votre rythme.",
+    title: "Bienvenue sur RespirFacile !",
+    description: "Merci de nous faire confiance. Vous allez découvrir un outil conçu pour vous aider à mieux respirer, à votre rythme et depuis chez vous.",
     visual: "welcome",
     color: "from-primary to-emerald-500",
     iconBg: "bg-primary/10",
@@ -38,7 +38,7 @@ const allSlides = [
   {
     icon: Target,
     title: "Votre objectif personnalisé",
-    description: "En fonction de votre âge, l'application calcule automatiquement votre vitesse de parole cible. Pas de comparaison inutile !",
+    description: "Votre orthophoniste a sélectionné des exercices adaptés à votre situation. Chaque programme est personnalisé selon vos besoins.",
     visual: "target",
     color: "from-primary to-primary/80",
     iconBg: "bg-primary/10",
@@ -48,7 +48,7 @@ const allSlides = [
   {
     icon: Mic,
     title: "Entraînez-vous chaque jour",
-    description: "5 à 10 minutes suffisent. Lisez à voix haute, l'application mesure votre débit en temps réel et vous guide.",
+    description: "5 à 10 minutes suffisent. Lancez un exercice respiratoire guidé, pratiquez à votre rythme, l'application enregistre votre séance.",
     visual: "practice",
     color: "from-blue-500 to-cyan-500",
     iconBg: "bg-blue-100 dark:bg-blue-900/30",
@@ -152,14 +152,14 @@ const PatientWelcomeModal = ({ open, onClose, patientName, hasTherapist = false 
         return (
           <div className="bg-muted/50 rounded-xl p-4 border border-border/50">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-muted-foreground">Votre objectif</span>
+              <span className="text-xs text-muted-foreground">Votre programme</span>
               <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">Personnalisé</span>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-primary">4.2</span>
-              <span className="text-sm text-muted-foreground">syllabes/sec</span>
+              <span className="text-3xl font-bold text-primary">5×</span>
+              <span className="text-sm text-muted-foreground">par semaine</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">Adapté à votre tranche d'âge</p>
+            <p className="text-xs text-muted-foreground mt-2">Adapté à votre situation par votre orthophoniste</p>
           </div>
         );
       case "practice":

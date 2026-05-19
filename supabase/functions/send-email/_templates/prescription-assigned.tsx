@@ -21,7 +21,7 @@ export function PrescriptionAssignedEmail({
   therapistName = 'Votre orthophoniste',
   exerciseTitle = 'Exercice',
   message,
-  exerciseUrl = 'https://www.parlermoinsvite.fr/dashboard',
+  exerciseUrl = 'https://www.respirfacile.fr/dashboard',
 }: PrescriptionAssignedEmailProps) {
   return (
     <BaseLayout preview={`${therapistName} vous a prescrit un exercice`}>

@@ -22,7 +22,7 @@ export function PatientFirstSessionEmail(props: PatientJoinedEmailProps) {
       <Text style={paragraph}>Bonjour {therapistName},</Text>
 
       <Text style={celebrationBox}>
-        🏆 <strong>{patientName}</strong> vient de terminer son tout premier exercice sur ParlerMoinsVite !
+        🏆 <strong>{patientName}</strong> vient de terminer son tout premier exercice sur RespirFacile !
       </Text>
 
       <Text style={paragraph}>
@@ -40,7 +40,7 @@ export function PatientFirstSessionEmail(props: PatientJoinedEmailProps) {
       </Text>
 
       <Text style={signatureText}>À bientôt,</Text>
-      <Text style={signatureName}>L'équipe Parler Moins Vite</Text>
+      <Text style={signatureName}>L'équipe RespirFacile</Text>
     </BaseLayout>
   )
 }

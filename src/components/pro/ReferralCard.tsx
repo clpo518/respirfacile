@@ -76,7 +76,7 @@ const ReferralCard = () => {
   const handleCopyLink = async () => {
     if (!stats?.referralCode) return;
 
-    const referralLink = `https://www.parlermoinsvite.fr/auth?ref=${stats.referralCode}`;
+    const referralLink = `https://www.respirfacile.fr/auth?ref=${stats.referralCode}`;
     const success = await copyToClipboard(referralLink);
     
     if (success) {
@@ -91,8 +91,8 @@ const ReferralCard = () => {
   const handleCopyMessage = async () => {
     if (!stats?.referralCode) return;
 
-    const referralLink = `https://www.parlermoinsvite.fr/auth?ref=${stats.referralCode}`;
-    const message = `Salut ! Je te recommande ParlerMoinsVite, un outil génial pour le suivi des patients en rééducation du débit. 
+    const referralLink = `https://www.respirfacile.fr/auth?ref=${stats.referralCode}`;
+    const message = `Salut ! Je te recommande RespirFacile, un outil génial pour le suivi des patients en rééducation du débit. 
 
 En t'inscrivant avec mon lien, on bénéficie tous les deux d'1 mois offert 🎁
 
@@ -174,7 +174,7 @@ C'est simple : tu crées ton compte via ce lien, tu testes gratuitement pendant 
           data: {
             userName: myName,
             referrerName: referrerName,
-            dashboardUrl: "https://www.parlermoinsvite.fr/patient/list",
+            dashboardUrl: "https://www.respirfacile.fr/patient/list",
             isReferrer: false,
           },
         },

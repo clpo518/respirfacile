@@ -40,10 +40,10 @@ export const HeroSection = () => {
           >
             <span className="badge-clinical inline-flex">
               <Activity className="w-3.5 h-3.5" />
-              Bredouillement · Tachylalie · Bégaiement
+              SAOS · Myofonctionnel · Respiration nasale
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-muted-foreground text-xs font-medium">
-              Recommandé par les orthophonistes
+              Prescrit par les orthophonistes
             </span>
           </motion.div>
           
@@ -54,8 +54,8 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Vous parlez trop vite ?{" "}
-            <span className="gradient-text">Reprenez le contrôle.</span>
+            Respirez mieux,{" "}
+            <span className="gradient-text">chaque jour.</span>
           </motion.h1>
           
           {/* Subheadline */}
@@ -65,8 +65,8 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            L'application d'entraînement pour les troubles de la fluence : bredouillement, tachylalie et bégaiement. 
-            Mesurez votre débit, visualisez vos progrès et entraînez-vous 5 min/jour.
+            L'application d'exercices respiratoires prescrite par votre orthophoniste. Pratiquez à domicile,
+            suivez vos progrès et améliorez votre qualité de vie — 5 min/jour suffisent.
           </motion.p>
           
           {/* CTAs */}
@@ -77,8 +77,8 @@ export const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <Button asChild size="lg" className="text-base px-8 h-14 shadow-md hover:shadow-lg">
-              <Link to="/diagnostic">
-                Tester ma vitesse
+              <Link to="/auth?tab=signup">
+                Commencer gratuitement
                 <ArrowRight className="w-5 h-5 ml-1" />
               </Link>
             </Button>

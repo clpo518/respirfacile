@@ -4,143 +4,150 @@ import { useAuth } from "@/contexts/AuthContext"
 import { usePatientProgram } from "@/hooks/usePatientProgram"
 import { EXERCISES, EXERCISES_BY_CATEGORY } from "@/data/exercises"
 import { AppLayout } from "@/components/AppLayout"
-import { ClinicalContextBadge } from "@/components/library/ClinicalContextBadge"
 import { motion } from "framer-motion"
-import { Clock, ChevronRight } from "lucide-react"
+import { Clock, Play, Mic } from "lucide-react"
 import type { ExerciseCategory } from "@/data/exercises"
 
 // ─────────────────────────────────────────────
-// Practice — bibliothèque d'exercices
+// Practice — bibliothèque d'exercices (desktop-first)
 // ─────────────────────────────────────────────
 
-const CATEGORY_LABELS: Record<ExerciseCategory, string> = {
-  pause_controlee: "Pause Contrôlée",
-  coherence_cardiaque: "Cohérence Cardiaque",
-  respiration_nasale: "Respiration Nasale",
-  myofonctionnel: "Myofonctionnel",
-  diaphragmatique: "Diaphragmatique",
-  relaxation: "Relaxation",
-}
-
-const ALL_CATEGORIES = Object.keys(CATEGORY_LABELS) as ExerciseCategory[]
+const CATEGORIES: { id: ExerciseCategory | "all"; label: string; emoji: string; bg: string; chip: string }[] = [
+  { id: "all",              label: "Tout",               emoji: "🌿", bg: "bg-forest/10",     chip: "bg-forest/10 text-forest" },
+  { id: "pause_controlee",  label: "Pause Contrôlée",    emoji: "🫁", bg: "bg-emerald-50",    chip: "bg-emerald-100 text-emerald-700" },
+  { id: "coherence_cardiaque", label: "Cohérence Cardiaque", emoji: "❤️", bg: "bg-red-50",   chip: "bg-red-100 text-red-700" },
+  { id: "respiration_nasale",  label: "Respiration Nasale", emoji: "👃", bg: "bg-sky-50",    chip: "bg-sky-100 text-sky-700" },
+  { id: "myofonctionnel",   label: "Myofonctionnel",     emoji: "👅", bg: "bg-violet-50",    chip: "bg-violet-100 text-violet-700" },
+  { id: "diaphragmatique",  label: "Diaphragmatique",    emoji: "🌬️", bg: "bg-orange-50",   chip: "bg-orange-100 text-orange-700" },
+  // "relaxation" retiré du filtre — aucun exercice dans cette catégorie pour l'instant
+]
 
 const Practice = () => {
   const navigate = useNavigate()
-  const { profile, isTherapist } = useAuth()
-  const { program, todayExercises } = usePatientProgram()
-
+  const { isTherapist } = useAuth()
+  const { todayExercises } = usePatientProgram()
   const [activeCategory, setActiveCategory] = useState<ExerciseCategory | "all">("all")
 
-  // Exercices filtrés
+  const programExerciseIds = new Set(todayExercises.map(e => e.id))
+
   const filteredExercises = activeCategory === "all"
     ? EXERCISES
     : (EXERCISES_BY_CATEGORY[activeCategory] ?? [])
 
-  // Exercices du programme du patient (pour badge "Dans votre programme")
-  const programExerciseIds = new Set(todayExercises.map(e => e.id))
+  const activeCatMeta = CATEGORIES.find(c => c.id === activeCategory)!
 
   return (
     <AppLayout>
-      <div className="pb-24 lg:pb-8">
+      <div className="pb-24 lg:pb-10">
 
         {/* ── Header ──────────────────────────── */}
-        <header className="px-5 pt-10 lg:pt-12 pb-2">
+        <header className="px-6 pt-10 lg:pt-12 pb-2">
           <p className="text-sm text-muted-foreground">Explorer</p>
           <h1 className="font-display text-2xl text-foreground mt-0.5">Tous les exercices</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {filteredExercises.length} exercice{filteredExercises.length > 1 ? "s" : ""}
+            {activeCategory !== "all" && ` · ${activeCatMeta.label}`}
+          </p>
         </header>
 
-        <div className="px-5 mt-5 space-y-5">
+        <div className="mt-5 space-y-5">
 
-          {/* ── Filtres catégories ────────────── */}
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-5 px-5">
-            <CategoryChip
-              label="Tout"
-              active={activeCategory === "all"}
-              onClick={() => setActiveCategory("all")}
-            />
-            {ALL_CATEGORIES.map(cat => (
-              <CategoryChip
-                key={cat}
-                label={CATEGORY_LABELS[cat]}
-                active={activeCategory === cat}
-                onClick={() => setActiveCategory(cat)}
-              />
+          {/* ── Filtres ──────────────────────────── */}
+          <div className="px-6 flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-0">
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id as ExerciseCategory | "all")}
+                className={`
+                  shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-pill text-xs font-medium transition-all duration-200
+                  ${activeCategory === cat.id
+                    ? "bg-primary text-white shadow-soft"
+                    : "bg-card border border-border text-muted-foreground hover:border-primary/30"}
+                `}
+              >
+                <span>{cat.emoji}</span>
+                {cat.label}
+              </button>
             ))}
           </div>
 
-          {/* ── Liste exercices : 1 col mobile, 2 col desktop ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+          {/* ── Grille exercices ─────────────────── */}
+          {/* Mobile: 1 col · md: 2 col · lg: 3 col */}
+          <div className="px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredExercises.map((ex, i) => {
-              const isInProgram = programExerciseIds.has(ex.id)
-              const isContraindicated = program?.profile_type
-                ? ex.contraindications?.includes(program.profile_type as any)
-                : false
+              const catMeta   = CATEGORIES.find(c => c.id === ex.category)
+              const inProgram = programExerciseIds.has(ex.id)
 
               return (
                 <motion.button
                   key={ex.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.02 }}
-                  onClick={() => {
-                    if (!isContraindicated) navigate(`/session-live?exercise=${ex.id}`)
-                  }}
-                  disabled={isContraindicated}
-                  className={`
-                    w-full flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-200 text-left
-                    ${isContraindicated
-                      ? "opacity-40 bg-muted border-border cursor-not-allowed"
-                      : "bg-card border-border hover:border-primary/30 hover:shadow-soft cursor-pointer"
-                    }
-                  `}
+                  transition={{ delay: i * 0.025 }}
+                  onClick={() => navigate(`/session-live?exercise=${ex.id}`)}
+                  className="group flex flex-col rounded-2xl border border-border bg-card hover:border-primary/30 hover:shadow-soft transition-all duration-200 text-left overflow-hidden"
                 >
-                  {/* Icône */}
-                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center shrink-0 text-2xl">
-                    {ex.icon}
+                  {/* Bandeau couleur catégorie */}
+                  <div className={`h-24 ${catMeta?.bg ?? "bg-muted"} flex items-center justify-center relative overflow-hidden`}>
+                    {/* Overlay hover */}
+                    <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors" />
+                    <span className="text-4xl group-hover:scale-110 transition-transform duration-300 relative z-10">
+                      {ex.icon}
+                    </span>
+                    {/* Badge programme */}
+                    {inProgram && (
+                      <span className="absolute top-2 right-2 text-[9px] font-semibold bg-primary text-white px-2 py-0.5 rounded-full">
+                        Programme
+                      </span>
+                    )}
+                    {/* Badge vocal */}
+                    {ex.voice_exercise && (
+                      <span className="absolute top-2 left-2 flex items-center gap-1 text-[9px] font-semibold bg-white/80 text-violet-700 px-2 py-0.5 rounded-full shadow-sm">
+                        <Mic className="w-2.5 h-2.5" /> Vocal
+                      </span>
+                    )}
                   </div>
 
-                  {/* Infos */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-medium text-foreground truncate">{ex.name_fr}</p>
-                      {isInProgram && !isContraindicated && (
-                        <span className="badge-active text-[10px] px-2 py-0.5">Programme</span>
-                      )}
-                      {isContraindicated && (
-                        <span className="badge-warning text-[10px] px-2 py-0.5">Non recommandé</span>
-                      )}
+                  {/* Contenu card */}
+                  <div className="flex flex-col flex-1 p-4 gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground leading-tight">{ex.name_fr}</p>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+                        {ex.description_fr}
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                      {ex.description_fr}
-                    </p>
-                    <div className="flex items-center gap-3 mt-1 flex-wrap">
+
+                    {/* Meta row */}
+                    <div className="flex items-center gap-2 flex-wrap mt-auto pt-2 border-t border-border/60">
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock className="w-3 h-3" />
                         {formatDuration(ex.duration_seconds)}
                       </span>
-                      <span className="text-xs text-muted-foreground">
-                        {CATEGORY_LABELS[ex.category as ExerciseCategory] ?? ex.category}
+                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${catMeta?.chip ?? "bg-muted text-muted-foreground"}`}>
+                        {catMeta?.label ?? ex.category}
                       </span>
-                      {isTherapist && (
-                        <ClinicalContextBadge
-                          category={ex.category}
-                          exerciseId={ex.id}
-                          compact
-                        />
-                      )}
+                      {/* Niveau */}
+                      <span className="ml-auto">
+                        <DifficultyBadge level={ex.difficulty} />
+                      </span>
                     </div>
                   </div>
 
-                  {!isContraindicated && (
-                    <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                  )}
+                  {/* CTA pied de card */}
+                  <div className="px-4 pb-3">
+                    <div className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors text-primary text-xs font-semibold">
+                      <Play className="w-3 h-3 fill-primary" />
+                      Commencer
+                    </div>
+                  </div>
                 </motion.button>
               )
             })}
           </div>
 
           {filteredExercises.length === 0 && (
-            <div className="text-center py-12">
+            <div className="text-center py-16 px-6">
+              <span className="text-3xl mb-3 block">🔍</span>
               <p className="text-muted-foreground text-sm">Aucun exercice dans cette catégorie</p>
             </div>
           )}
@@ -155,20 +162,17 @@ const Practice = () => {
 // Sub-components
 // ─────────────────────────────────────────────
 
-function CategoryChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function DifficultyBadge({ level }: { level: 1 | 2 | 3 }) {
+  const map: Record<1 | 2 | 3, { label: string; cls: string }> = {
+    1: { label: "Débutant",      cls: "bg-emerald-50 text-emerald-700" },
+    2: { label: "Intermédiaire", cls: "bg-amber-50   text-amber-700" },
+    3: { label: "Avancé",        cls: "bg-rose-50    text-rose-700" },
+  }
+  const { label, cls } = map[level]
   return (
-    <button
-      onClick={onClick}
-      className={`
-        shrink-0 px-4 py-2 rounded-pill text-xs font-medium transition-all duration-200
-        ${active
-          ? "bg-primary text-white shadow-soft"
-          : "bg-card border border-border text-muted-foreground hover:border-primary/30"
-        }
-      `}
-    >
+    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${cls}`}>
       {label}
-    </button>
+    </span>
   )
 }
 
@@ -176,9 +180,9 @@ function CategoryChip({ label, active, onClick }: { label: string; active: boole
 // Helpers
 // ─────────────────────────────────────────────
 
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60)
-  return m > 0 ? `${m} min` : `${seconds}s`
+function formatDuration(s: number): string {
+  const m = Math.floor(s / 60)
+  return m > 0 ? `${m} min` : `${s}s`
 }
 
 export default Practice

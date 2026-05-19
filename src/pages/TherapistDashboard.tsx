@@ -1,17 +1,17 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate, Navigate } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
 import { useAuth } from "@/contexts/AuthContext"
 import { supabase } from "@/integrations/supabase/client"
-import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import {
-  Users, ChevronRight, Settings, Copy, CheckCheck,
-  TrendingUp, Activity, Wind
+  Users, ChevronRight, Copy, CheckCheck,
+  TrendingUp, Activity, Wind, Layers
 } from "lucide-react"
 import TrialBanner from "@/components/pro/TrialBanner"
 import OnboardingChecklist from "@/components/pro/OnboardingChecklist"
 import { RecommendButton } from "@/components/pro/RecommendButton"
+import { AppLayout } from "@/components/AppLayout"
 
 // ─────────────────────────────────────────────
 // Types
@@ -38,13 +38,10 @@ const TherapistDashboard = () => {
   const { profile, isPatient, isTrialing } = useAuth()
   const [codeCopied, setCodeCopied] = useState(false)
 
-  // Rediriger si c'est un patient
-  if (isPatient) {
-    navigate("/dashboard")
-    return null
-  }
+  if (isPatient) return <Navigate to="/dashboard" replace />
 
   const therapistCode = profile?.therapist_code ?? "—"
+  const firstName = profile?.full_name?.split(" ")[0] ?? "Praticien"
 
   const copyCode = () => {
     navigator.clipboard.writeText(therapistCode)
@@ -58,7 +55,6 @@ const TherapistDashboard = () => {
     queryFn: async () => {
       if (!profile?.id) return []
 
-      // 1. Récupérer les liens therapist_patients
       const { data: links, error: linksError } = await supabase
         .from("therapist_patients")
         .select("patient_id, is_active")
@@ -69,7 +65,6 @@ const TherapistDashboard = () => {
       const patientIds = links.map(l => l.patient_id)
       const activeMap = Object.fromEntries(links.map(l => [l.patient_id, l.is_active]))
 
-      // 2. Profils patients
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("id, full_name, avatar_url")
@@ -77,14 +72,12 @@ const TherapistDashboard = () => {
 
       if (profilesError) return []
 
-      // 3. Programmes actifs
       const { data: programs } = await supabase
         .from("patient_programs")
         .select("patient_id, profile_type, week_number")
         .in("patient_id", patientIds)
         .eq("is_active", true)
 
-      // 4. Sessions cette semaine
       const startOfWeek = getStartOfWeek().toISOString()
       const { data: sessions } = await supabase
         .from("sessions")
@@ -93,7 +86,6 @@ const TherapistDashboard = () => {
         .eq("completed", true)
         .gte("created_at", startOfWeek)
 
-      // 5. Dernière session par patient
       const { data: lastSessions } = await supabase
         .from("sessions")
         .select("user_id, created_at")
@@ -101,7 +93,6 @@ const TherapistDashboard = () => {
         .eq("completed", true)
         .order("created_at", { ascending: false })
 
-      // Agréger
       const programMap = Object.fromEntries(
         (programs ?? []).map(p => [p.patient_id, p])
       )
@@ -161,6 +152,10 @@ const TherapistDashboard = () => {
     : 0
   const activePatients = patients.filter(p => p.is_active).length
 
+  // ── Triage patients ───────────────────────
+  const patientsAtRisk    = patients.filter(p => p.is_active && p.sessions_this_week === 0)
+  const patientsActive    = patients.filter(p => p.sessions_this_week > 0)
+
   // ── Checklist / Trial ─────────────────────
   const daysRemaining = (() => {
     if (!profile?.trial_ends_at) return 0
@@ -172,138 +167,165 @@ const TherapistDashboard = () => {
   const firstPatientId = patients[0]?.id ?? null
 
   return (
-    <div className="min-h-screen bg-organic pb-24">
+    <AppLayout>
+      <div className="pb-24 lg:pb-10">
 
-      {/* ── TrialBanner ─────────────────────── */}
-      {isTrialing && (
-        <TrialBanner
-          daysRemaining={daysRemaining}
-          activePatients={activePatients}
-          totalSessions={allTimeSessionsCount}
-        />
-      )}
+        {/* ── TrialBanner ─────────────────────── */}
+        {isTrialing && (
+          <TrialBanner
+            daysRemaining={daysRemaining}
+            activePatients={activePatients}
+            totalSessions={allTimeSessionsCount}
+          />
+        )}
 
-      {/* ── Header ──────────────────────────── */}
-      <header className="px-5 pt-12 pb-2 flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm text-muted-foreground">Espace praticien</p>
-          <h1 className="font-display text-2xl text-foreground mt-0.5">
-            {profile?.full_name?.split(" ")[0] ?? "Praticien"} 🌿
-          </h1>
-        </div>
-        <div className="flex items-center gap-2 mt-1 shrink-0">
-          <RecommendButton />
-          <Link to="/settings" className="p-2 rounded-xl hover:bg-muted transition-colors">
-            <Settings className="w-5 h-5 text-muted-foreground" />
-          </Link>
-        </div>
-      </header>
-
-      <div className="px-5 space-y-5 mt-6">
-
-        {/* ── Checklist onboarding ─────────── */}
-        <OnboardingChecklist
-          hasPatients={patients.length > 0}
-          hasAssignedExercise={hasAssignedExercise}
-          hasConsultedPatient={hasConsultedPatient}
-          therapistCode={therapistCode}
-          firstPatientId={firstPatientId}
-        />
-
-        {/* ── Code PRO ─────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card-rf p-4"
-        >
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-            Votre code praticien
-          </p>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-display text-2xl text-primary tracking-widest">{therapistCode}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Partagez ce code à vos patients pour qu'ils s'inscrivent
+        {/* ── Header ──────────────────────────── */}
+        <header className="px-6 pt-10 pb-2 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              {formatDay()}
+            </p>
+            <h1 className="font-display text-2xl text-foreground mt-1">
+              Bonjour, {firstName} 👋
+            </h1>
+            {patients.length > 0 && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {activePatients} patient{activePatients !== 1 ? "s" : ""} actif{activePatients !== 1 ? "s" : ""} · {totalSessionsThisWeek} séance{totalSessionsThisWeek !== 1 ? "s" : ""} cette semaine
               </p>
-            </div>
-            <button
-              onClick={copyCode}
-              className="p-3 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors"
-            >
-              {codeCopied
-                ? <CheckCheck className="w-5 h-5 text-primary" />
-                : <Copy className="w-5 h-5 text-primary" />
-              }
-            </button>
+            )}
           </div>
-        </motion.div>
+          <div className="flex items-center gap-2 mt-1 shrink-0">
+            <RecommendButton />
+          </div>
+        </header>
 
-        {/* ── Aperçu hebdomadaire ───────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="card-rf p-4"
-        >
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
-            Aperçu hebdomadaire
-          </p>
-          <div className="grid grid-cols-3 gap-3">
+        <div className="px-6 space-y-5 mt-6">
+
+          {/* ── Checklist onboarding ─────────── */}
+          <OnboardingChecklist
+            hasPatients={patients.length > 0}
+            hasAssignedExercise={hasAssignedExercise}
+            hasConsultedPatient={hasConsultedPatient}
+            therapistCode={therapistCode}
+            firstPatientId={firstPatientId}
+          />
+
+          {/* ── Code PRO ─────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl p-5 bg-gradient-to-br from-forest-dark to-forest"
+          >
+            <p className="text-[10px] font-semibold text-white/50 uppercase tracking-widest mb-2">
+              Votre code praticien
+            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-display text-3xl text-white tracking-[0.18em] font-bold">
+                  {therapistCode}
+                </p>
+                <p className="text-xs text-white/60 mt-1">
+                  Partagez-le à vos patients pour les inviter
+                </p>
+              </div>
+              <button
+                onClick={copyCode}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 transition-colors text-white text-xs font-semibold"
+              >
+                {codeCopied
+                  ? <><CheckCheck className="w-4 h-4" /> Copié</>
+                  : <><Copy className="w-4 h-4" /> Copier</>
+                }
+              </button>
+            </div>
+          </motion.div>
+
+          {/* ── Aperçu hebdomadaire ───────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="grid grid-cols-3 gap-3"
+          >
             <StatCard
               icon={<Activity className="w-4 h-4 text-primary" />}
               value={totalSessionsThisWeek}
               label="Séances"
+              sub="cette semaine"
             />
             <StatCard
               icon={<TrendingUp className="w-4 h-4 text-primary" />}
               value={`${avgCompletion}%`}
-              label="Complétion"
+              label="Observance"
+              sub="en moyenne"
             />
             <StatCard
-              icon={<Users className="w-4 h-4 text-primary" />}
-              value={activePatients}
-              label="Patients actifs"
+              icon={<Layers className="w-4 h-4 text-primary" />}
+              value={allTimeSessionsCount}
+              label="Total"
+              sub="depuis le début"
             />
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* ── Liste patients ────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Mes patients · {patients.length}
-            </p>
-          </div>
+          {/* ── Liste patients ────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Mes patients · {patients.length}
+              </p>
+            </div>
 
-          {isLoading ? (
-            <div className="space-y-2">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="card-rf p-4 animate-shimmer h-20" />
-              ))}
-            </div>
-          ) : patients.length === 0 ? (
-            <EmptyPatients code={therapistCode} />
-          ) : (
-            <div className="space-y-2">
-              {patients.map((patient, i) => (
-                <PatientRow key={patient.id} patient={patient} index={i} />
-              ))}
-            </div>
-          )}
-        </motion.div>
+            {isLoading ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="rounded-2xl border border-border bg-card p-4 animate-shimmer h-[88px]" />
+                ))}
+              </div>
+            ) : patients.length === 0 ? (
+              <EmptyPatients code={therapistCode} />
+            ) : (
+              <div className="space-y-2">
+
+                {/* Patients à relancer — en premier pour triage clinique */}
+                {patientsAtRisk.length > 0 && (
+                  <>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-bold text-terra uppercase tracking-wider">⚡ À relancer</span>
+                      <div className="flex-1 h-px bg-terra/20" />
+                    </div>
+                    {patientsAtRisk.map((patient, i) => (
+                      <PatientRow key={patient.id} patient={patient} index={i} />
+                    ))}
+                  </>
+                )}
+
+                {/* Patients actifs */}
+                {patientsActive.length > 0 && (
+                  <>
+                    {patientsAtRisk.length > 0 && (
+                      <div className="flex items-center gap-2 mb-1 mt-4">
+                        <span className="text-[10px] font-bold text-primary uppercase tracking-wider">🌿 En progression</span>
+                        <div className="flex-1 h-px bg-primary/20" />
+                      </div>
+                    )}
+                    {patientsActive.map((patient, i) => (
+                      <PatientRow key={patient.id} patient={patient} index={patientsAtRisk.length + i} />
+                    ))}
+                  </>
+                )}
+
+              </div>
+            )}
+          </motion.div>
+
+        </div>
 
       </div>
-
-      {/* ── Bottom nav ──────────────────────── */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-6 py-3 flex items-center justify-around safe-area-bottom">
-        <NavItem href="/patients" icon={<Users className="w-5 h-5" />} label="Patients" active />
-        <NavItem href="/settings" icon={<Settings className="w-5 h-5" />} label="Profil" active={false} />
-      </nav>
-    </div>
+    </AppLayout>
   )
 }
 
@@ -311,12 +333,20 @@ const TherapistDashboard = () => {
 // Sub-components
 // ─────────────────────────────────────────────
 
-function StatCard({ icon, value, label }: { icon: React.ReactNode; value: string | number; label: string }) {
+function StatCard({
+  icon, value, label, sub
+}: {
+  icon: React.ReactNode
+  value: string | number
+  label: string
+  sub?: string
+}) {
   return (
-    <div className="rounded-xl bg-muted/60 p-3 text-center">
-      <div className="flex items-center justify-center mb-1">{icon}</div>
-      <p className="font-display text-xl text-foreground">{value}</p>
-      <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>
+    <div className="rounded-2xl bg-card border border-border p-3.5 text-center">
+      <div className="flex items-center justify-center mb-1.5">{icon}</div>
+      <p className="font-display text-2xl text-foreground leading-none">{value}</p>
+      <p className="text-[11px] font-medium text-foreground/70 mt-1">{label}</p>
+      {sub && <p className="text-[9px] text-muted-foreground mt-0.5">{sub}</p>}
     </div>
   )
 }
@@ -327,23 +357,13 @@ function PatientRow({ patient, index }: { patient: PatientWithStats; index: numb
     ? patient.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
     : "??"
 
-  const statusColor = patient.sessions_this_week >= 5
-    ? "bg-primary/10 text-primary"
-    : patient.sessions_this_week >= 2
-    ? "bg-warning/15 text-warning"
-    : "bg-muted text-muted-foreground"
-
-  const statusLabel = patient.sessions_this_week >= 5
-    ? "En bonne voie"
-    : patient.sessions_this_week >= 2
-    ? `${patient.sessions_this_week} séances`
-    : patient.sessions_this_week === 0
-    ? "Aucune séance"
-    : `${patient.sessions_this_week} séance`
+  const isAtRisk   = patient.sessions_this_week === 0
+  const isOnTrack  = patient.sessions_this_week >= 4
+  const progress   = Math.min(100, (patient.sessions_this_week / 5) * 100)
 
   const lastActive = patient.last_session_at
     ? formatRelativeDate(new Date(patient.last_session_at))
-    : "Jamais connecté"
+    : "Jamais"
 
   return (
     <motion.button
@@ -351,29 +371,49 @@ function PatientRow({ patient, index }: { patient: PatientWithStats; index: numb
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04 }}
       onClick={() => navigate(`/patients/${patient.id}`)}
-      className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-border bg-card hover:border-primary/30 hover:shadow-soft transition-all duration-200 text-left"
+      className={`
+        w-full flex items-center gap-3 p-4 rounded-2xl border bg-card
+        hover:border-primary/30 hover:shadow-soft transition-all duration-200 text-left
+        ${isAtRisk ? "border-terra/30 bg-terra/5" : "border-border"}
+      `}
     >
       {/* Avatar */}
-      <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-        <span className="text-sm font-semibold text-primary">{initials}</span>
+      <div className={`
+        w-11 h-11 rounded-full flex items-center justify-center shrink-0
+        ${isAtRisk ? "bg-terra/10" : "bg-primary/10"}
+      `}>
+        <span className={`text-sm font-semibold ${isAtRisk ? "text-terra" : "text-primary"}`}>
+          {initials}
+        </span>
       </div>
 
-      {/* Infos */}
+      {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground truncate">
-          {patient.full_name ?? "Patient"}
-        </p>
-        <div className="flex items-center gap-2 mt-0.5">
-          <span className={`badge-rf text-[10px] px-2 py-0.5 ${statusColor}`}>
-            {statusLabel}
-          </span>
-          {patient.week_number > 0 && (
-            <span className="text-[10px] text-muted-foreground">
-              S{patient.week_number}
-            </span>
-          )}
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm font-semibold text-foreground truncate">{patient.full_name ?? "Patient"}</p>
+          <span className="text-[10px] text-muted-foreground ml-2 shrink-0">{lastActive}</span>
         </div>
-        <p className="text-[10px] text-muted-foreground mt-0.5">{lastActive}</p>
+
+        {/* Progress bar */}
+        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${
+              isAtRisk    ? "bg-muted-foreground/20" :
+              isOnTrack   ? "bg-primary" :
+                            "bg-amber-400"
+            }`}
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        <div className="flex items-center justify-between mt-1.5">
+          <span className="text-[10px] text-muted-foreground">
+            {patient.sessions_this_week}/5 séances
+            {patient.week_number > 0 && ` · Semaine ${patient.week_number}`}
+          </span>
+          {isAtRisk  && <span className="text-[10px] font-bold text-terra/80">Aucune séance</span>}
+          {isOnTrack && <span className="text-[10px] font-bold text-primary">En bonne voie ✓</span>}
+        </div>
       </div>
 
       <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -383,24 +423,23 @@ function PatientRow({ patient, index }: { patient: PatientWithStats; index: numb
 
 function EmptyPatients({ code }: { code: string }) {
   return (
-    <div className="card-rf p-6 text-center space-y-3">
-      <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-        <Wind className="w-7 h-7 text-primary" />
+    <div className="rounded-2xl border border-dashed border-border p-8 text-center space-y-4">
+      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+        <Wind className="w-8 h-8 text-primary/60" />
       </div>
-      <h2 className="font-display text-lg text-foreground">Aucun patient encore</h2>
-      <p className="text-sm text-muted-foreground">
-        Partagez votre code <span className="font-semibold text-primary">{code}</span> à vos patients pour qu'ils rejoignent votre espace.
-      </p>
+      <div>
+        <h2 className="font-display text-lg text-foreground">Aucun patient pour l'instant</h2>
+        <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto leading-relaxed">
+          Partagez votre code{" "}
+          <span className="font-bold text-primary tracking-wider">{code}</span>{" "}
+          et vos patients rejoindront votre espace en quelques secondes.
+        </p>
+      </div>
+      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 rounded-full text-xs font-medium text-primary">
+        <Users className="w-3 h-3" />
+        Accès totalement gratuit pour les patients
+      </div>
     </div>
-  )
-}
-
-function NavItem({ href, icon, label, active }: { href: string; icon: React.ReactNode; label: string; active: boolean }) {
-  return (
-    <a href={href} className={`flex flex-col items-center gap-1 transition-colors ${active ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}>
-      {icon}
-      <span className="text-[10px] font-medium">{label}</span>
-    </a>
   )
 }
 
@@ -424,8 +463,15 @@ function formatRelativeDate(date: Date): string {
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
   if (diffDays === 0) return "Aujourd'hui"
   if (diffDays === 1) return "Hier"
-  if (diffDays < 7) return `Il y a ${diffDays} jours`
-  return `Il y a ${Math.floor(diffDays / 7)} semaine${diffDays >= 14 ? "s" : ""}`
+  if (diffDays < 7) return `Il y a ${diffDays} j`
+  return `Il y a ${Math.floor(diffDays / 7)} sem.`
+}
+
+function formatDay(): string {
+  const days = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
+  const months = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
+  const now = new Date()
+  return `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]}`
 }
 
 export default TherapistDashboard

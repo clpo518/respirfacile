@@ -4,28 +4,28 @@ import { Activity, Shield, Eye, Stethoscope, Award, Heart } from "lucide-react";
 const trustBadges = [
   {
     icon: Heart,
-    label: "Membre de l'Association Parole Bégaiement",
+    label: "Conçu avec des orthophonistes spécialisés",
     isHighlight: true,
   },
   {
     icon: Activity,
-    label: "Calcul de Vitesse en Temps Réel",
+    label: "Exercices guidés en temps réel",
   },
   {
     icon: Eye,
-    label: "Retour Visuel Motivant",
+    label: "Retour visuel motivant",
   },
   {
     icon: Stethoscope,
-    label: "Méthode Clinique Validée",
+    label: "Approche clinique evidence-based",
   },
   {
     icon: Shield,
-    label: "Données Sécurisées (RGPD)",
+    label: "Données sécurisées (RGPD)",
   },
   {
     icon: Award,
-    label: "Recommandé par les Orthophonistes",
+    label: "Prescrit par les orthophonistes",
   },
 ];
 
@@ -41,9 +41,9 @@ export const TrustSection = () => {
           transition={{ duration: 0.5 }}
         >
           <p className="text-muted-foreground text-sm md:text-base">
-            Méthode basée sur les travaux de{" "}
-            <span className="font-semibold text-foreground">Van Zaalen & Reichel</span> et les protocoles de l'
-            <span className="font-semibold text-foreground">International Cluttering Association</span>.
+            Approche basée sur les recommandations de l'
+            <span className="font-semibold text-foreground">International Association of Logopedics and Phoniatrics (IALP)</span>
+            {" "}en rééducation oro-myo-fonctionnelle et respiratoire.
           </p>
         </motion.div>
 

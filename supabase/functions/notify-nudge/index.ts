@@ -89,7 +89,7 @@ serve(async (req) => {
       userName: patient.full_name || authUser.user.email.split("@")[0],
       daysSinceLastSession: Math.max(daysSince, 1),
       currentStreak: patient.current_streak || 0,
-      practiceUrl: "https://www.parlermoinsvite.fr/dashboard",
+      practiceUrl: "https://www.respirfacile.fr/dashboard",
     });
 
     if (!emailResult.success) {

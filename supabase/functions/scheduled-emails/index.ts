@@ -109,7 +109,7 @@ serve(async (req) => {
             userName: patient.full_name || authUser.user.email.split("@")[0],
             daysSinceLastSession,
             currentStreak: patient.current_streak || 0,
-            practiceUrl: "https://www.parlermoinsvite.fr/practice",
+            practiceUrl: "https://www.respirfacile.fr/practice",
           });
 
           if (emailResult.success) {
@@ -247,7 +247,7 @@ serve(async (req) => {
               targetSps,
               currentStreak: profile.current_streak || 0,
               improvement,
-              practiceUrl: "https://www.parlermoinsvite.fr/practice",
+              practiceUrl: "https://www.respirfacile.fr/practice",
             });
 
             if (emailResult.success) {
@@ -350,7 +350,7 @@ serve(async (req) => {
               deepgramCostWeek,
               deepgramCostMonth,
               deepgramCostTotal,
-              dashboardUrl: "https://www.parlermoinsvite.fr/admin",
+              dashboardUrl: "https://www.respirfacile.fr/admin",
             });
 
             if (emailResult.success) {
@@ -433,7 +433,7 @@ serve(async (req) => {
               inactivePatients: linkedPatients.length - activeCount,
               totalPatientSessions,
               patients: patientSummaries,
-              dashboardUrl: "https://www.parlermoinsvite.fr/dashboard/therapist",
+              dashboardUrl: "https://www.respirfacile.fr/patients",
             });
 
             if (emailResult.success) {
@@ -490,7 +490,7 @@ serve(async (req) => {
               therapistName: therapist.full_name || authUser.user.email.split("@")[0],
               daysRemaining,
               patientsCount: patientsCount || 0,
-              subscribeUrl: "https://www.parlermoinsvite.fr/pro/subscription",
+              subscribeUrl: "https://www.respirfacile.fr/pro/subscription",
               referralCode: therapist.referral_code || null,
             });
 
@@ -533,7 +533,7 @@ serve(async (req) => {
             const emailResult = await sendEmail("b2c_trial_expiring", authUser.user.email, {
               patientName: patient.full_name || authUser.user.email.split("@")[0],
               daysRemaining,
-              subscribeUrl: "https://www.parlermoinsvite.fr/dashboard",
+              subscribeUrl: "https://www.respirfacile.fr/dashboard",
             });
 
             if (emailResult.success) {
@@ -652,8 +652,8 @@ serve(async (req) => {
           const emailResult = await sendEmail("therapist_no_patient", authUser.user.email, {
             therapistName: therapist.full_name || authUser.user.email.split("@")[0],
             therapistCode: therapist.therapist_code || null,
-            dashboardUrl: "https://www.parlermoinsvite.fr/dashboard/therapist",
-            sessionLiveUrl: "https://www.parlermoinsvite.fr/session-live",
+            dashboardUrl: "https://www.respirfacile.fr/patients",
+            sessionLiveUrl: "https://www.respirfacile.fr/practice",
           });
 
           if (emailResult.success) {

@@ -24,7 +24,7 @@ export function NewsletterOrthoV2Email() {
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <Text style={logoText}>🎙️ Parler Moins Vite</Text>
+            <Text style={logoText}>🎙️ RespirFacile</Text>
             <Text style={editionText}>Newsletter #2 — Mars 2026</Text>
           </Section>
 
@@ -69,7 +69,7 @@ export function NewsletterOrthoV2Email() {
             <Section style={founderSection}>
               <Img
                 src={`${baseUrl}/clement-founder.jpg?v=2`}
-                alt="Clément, fondateur de ParlerMoinsVite"
+                alt="Clément, fondateur de RespirFacile"
                 width="100"
                 height="100"
                 style={founderImg}
@@ -82,7 +82,7 @@ export function NewsletterOrthoV2Email() {
             </Section>
 
             <Text style={text}>
-              ParlerMoinsVite, c'est un <strong>débitmètre intelligent</strong> avec biofeedback
+              RespirFacile, c'est un <strong>débitmètre intelligent</strong> avec biofeedback
               en temps réel, pensé pour les orthophonistes et leurs patients. Pas une startup
               à 50 salariés — juste moi, mon clavier, et beaucoup trop de café. ☕
             </Text>
@@ -204,7 +204,7 @@ export function NewsletterOrthoV2Email() {
 
             {/* CTA Button */}
             <Section style={ctaSection}>
-              <Link href="https://www.parlermoinsvite.fr/pro" style={ctaButton}>
+              <Link href="https://www.respirfacile.fr/pro" style={ctaButton}>
                 Découvrir les nouveautés →
               </Link>
             </Section>
@@ -247,7 +247,7 @@ export function NewsletterOrthoV2Email() {
                 📞 <strong>06 98 42 54 43</strong> (appel, SMS ou WhatsApp)
               </Text>
               <Text style={contactText}>
-                📧 <Link href="mailto:contact@parlermoinsvite.fr" style={link}>contact@parlermoinsvite.fr</Link>
+                📧 <Link href="mailto:contact@respirfacile.fr" style={link}>contact@respirfacile.fr</Link>
               </Text>
               <Text style={contactText}>
                 📅 Envie d'une visio de 15 min ? Écrivez-moi, je suis toujours dispo.
@@ -274,7 +274,7 @@ export function NewsletterOrthoV2Email() {
 
             <Text style={signature}>
               Clément<br />
-              <em>Fondateur de ParlerMoinsVite — Ancien bredouilleur, toujours à fond 🚀</em><br />
+              <em>Fondateur de RespirFacile — Ancien bredouilleur, toujours à fond 🚀</em><br />
               <em>Annecy 🏔️</em>
             </Text>
           </Section>
@@ -282,10 +282,10 @@ export function NewsletterOrthoV2Email() {
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              © {new Date().getFullYear()} Parler Moins Vite. Tous droits réservés.
+              © {new Date().getFullYear()} RespirFacile. Tous droits réservés.
             </Text>
             <Text style={footerText}>
-              <Link href="https://www.parlermoinsvite.fr" style={footerLink}>www.parlermoinsvite.fr</Link>
+              <Link href="https://www.respirfacile.fr" style={footerLink}>www.respirfacile.fr</Link>
             </Text>
           </Section>
         </Container>

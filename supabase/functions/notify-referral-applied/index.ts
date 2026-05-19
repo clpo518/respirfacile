@@ -56,7 +56,7 @@ serve(async (req) => {
           data: {
             userName: referrerName,
             referrerName: referredName,
-            dashboardUrl: "https://www.parlermoinsvite.fr/patient/list",
+            dashboardUrl: "https://www.respirfacile.fr/patients",
             isReferrer: true,
           },
         }),

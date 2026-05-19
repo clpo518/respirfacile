@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2 } from 'lucide-react';
 
 export default function Pricing() {
+  const [isAnnual, setIsAnnual] = useState(false);
   const plans = [
     {
       name: 'Starter',
@@ -26,7 +28,7 @@ export default function Pricing() {
       monthly: 25,
       annual: 20,
       patients: '30 patients',
-      description: 'Pour la plupart des orthos',
+      description: 'Pour la plupart des orthophonistes',
       features: [
         'Jusqu\'à 30 patients',
         'Suivi de l\'observance',
@@ -84,31 +86,39 @@ export default function Pricing() {
   };
 
   return (
-    <main className="w-full bg-white">
+    <main className="w-full bg-background">
       {/* Header */}
-      <section className="relative w-full bg-gradient-to-br from-gray-50 to-blue-50 py-20 md:py-28 px-4 sm:px-6 lg:px-8">
+      <section className="relative w-full bg-gradient-to-br from-sand to-sand/60 py-20 md:py-28 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">
+            <h1 className="font-display text-5xl md:text-6xl font-bold text-foreground mb-4">
               Tarifs simples et transparents
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
               30 jours d'essai gratuit. Aucune carte bancaire requise. Annulez quand vous voulez.
             </p>
 
             {/* Toggle button */}
             <div className="flex items-center justify-center gap-4 mb-12">
-              <span className="text-sm text-gray-600">Facturation mensuelle</span>
-              <div className="relative inline-block h-8 w-16 bg-gray-200 rounded-full">
-                <div className="absolute left-1 top-1 w-6 h-6 bg-white rounded-full transition-transform duration-300" />
-              </div>
-              <span className="text-sm text-gray-600">
+              <span className={`text-sm transition-colors ${!isAnnual ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+                Facturation mensuelle
+              </span>
+              <button
+                onClick={() => setIsAnnual(!isAnnual)}
+                className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none ${isAnnual ? 'bg-primary' : 'bg-muted'}`}
+                aria-label="Basculer facturation annuelle"
+              >
+                <span
+                  className={`inline-block h-6 w-6 transform rounded-full bg-card shadow-md transition-transform duration-300 ${isAnnual ? 'translate-x-9' : 'translate-x-1'}`}
+                />
+              </button>
+              <span className={`text-sm transition-colors ${isAnnual ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
                 Facturation annuelle{' '}
-                <span className="font-semibold text-teal-600">Économisez 20%</span>
+                <span className="font-semibold text-forest">Économisez 20%</span>
               </span>
             </div>
           </motion.div>
@@ -116,7 +126,7 @@ export default function Pricing() {
       </section>
 
       {/* Pricing cards */}
-      <section className="relative w-full py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="relative w-full py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-background">
         <div className="max-w-7xl mx-auto">
           <motion.div
             variants={containerVariants}
@@ -131,14 +141,14 @@ export default function Pricing() {
                 variants={itemVariants}
                 className={`relative rounded-2xl transition-all duration-300 ${
                   plan.highlighted
-                    ? 'ring-2 ring-gradient-to-r from-blue-500 to-teal-500 shadow-2xl scale-105'
-                    : 'border border-gray-200'
-                } ${plan.highlighted ? 'bg-white' : 'bg-gray-50'}`}
+                    ? 'ring-2 ring-primary shadow-2xl scale-105'
+                    : 'border border-border'
+                } ${plan.highlighted ? 'bg-card' : 'bg-muted/40'}`}
               >
                 {/* Highlighted badge */}
                 {plan.highlighted && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-r from-blue-600 to-teal-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                    <div className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
                       Recommandé
                     </div>
                   </div>
@@ -146,24 +156,29 @@ export default function Pricing() {
 
                 <div className="p-8">
                   {/* Plan name and description */}
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h3 className="font-display text-2xl font-bold text-foreground mb-2">
                     {plan.name}
                   </h3>
-                  <p className="text-gray-600 mb-6">{plan.description}</p>
+                  <p className="text-muted-foreground mb-6">{plan.description}</p>
 
                   {/* Pricing */}
                   <div className="mb-6">
-                    <div className="text-4xl font-bold text-gray-900">
-                      {plan.monthly}€
-                      <span className="text-lg text-gray-600">/mois</span>
+                    <div className="font-display text-4xl font-bold text-foreground">
+                      {isAnnual && plan.annual ? plan.annual : plan.monthly}€
+                      <span className="text-lg text-muted-foreground">/mois</span>
                     </div>
-                    {plan.annual && (
-                      <p className="text-sm text-gray-600 mt-2">
-                        ou {plan.annual}€/mois annuel
+                    {isAnnual && plan.annual && (
+                      <p className="text-sm text-forest font-medium mt-2">
+                        Soit {plan.annual * 12}€/an — 2 mois offerts
                       </p>
                     )}
-                    <p className="text-sm text-gray-500 mt-4">
-                      Jusqu'à <span className="font-semibold">{plan.patients}</span>
+                    {!isAnnual && plan.annual && (
+                      <p className="text-sm text-muted-foreground mt-2">
+                        ou {plan.annual}€/mois en annuel
+                      </p>
+                    )}
+                    <p className="text-sm text-muted-foreground mt-4">
+                      Jusqu'à <span className="font-semibold text-foreground">{plan.patients}</span>
                     </p>
                   </div>
 
@@ -172,20 +187,20 @@ export default function Pricing() {
                     size="lg"
                     className={`w-full rounded-lg font-semibold mb-8 ${
                       plan.highlighted
-                        ? 'bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white'
-                        : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
+                        ? 'bg-primary hover:bg-forest-light text-primary-foreground'
+                        : 'bg-muted hover:bg-muted/80 text-foreground'
                     }`}
                     asChild
                   >
-                    <a href="/pro/signup">{plan.cta}</a>
+                    <a href="/auth?tab=signup">{plan.cta}</a>
                   </Button>
 
                   {/* Features list */}
-                  <div className="space-y-4 border-t border-gray-200 pt-8">
+                  <div className="space-y-4 border-t border-border pt-8">
                     {plan.features.map((feature, featureIndex) => (
                       <div key={featureIndex} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700 text-sm">{feature}</span>
+                        <CheckCircle2 className="w-5 h-5 text-forest flex-shrink-0 mt-0.5" />
+                        <span className="text-muted-foreground text-sm">{feature}</span>
                       </div>
                     ))}
                   </div>
@@ -202,11 +217,11 @@ export default function Pricing() {
             viewport={{ once: true }}
             className="mt-16 text-center"
           >
-            <div className="bg-blue-50 rounded-lg p-6 border border-blue-200 inline-block">
-              <p className="text-gray-700">
+            <div className="bg-forest/5 rounded-lg p-6 border border-forest/15 inline-block">
+              <p className="text-foreground">
                 <span className="font-semibold">Tous les plans incluent :</span>
               </p>
-              <p className="text-gray-600 mt-2">
+              <p className="text-muted-foreground mt-2">
                 Accès patient gratuit · Données hébergées en France · RGPD conforme · Support personnalisé
               </p>
             </div>
@@ -215,9 +230,9 @@ export default function Pricing() {
       </section>
 
       {/* FAQ */}
-      <section className="relative w-full bg-gray-50 py-20 md:py-28 px-4 sm:px-6 lg:px-8">
+      <section className="relative w-full bg-muted/40 py-20 md:py-28 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
+          <h2 className="font-display text-3xl font-bold text-foreground mb-12 text-center">
             Questions sur les tarifs
           </h2>
 
@@ -226,12 +241,12 @@ export default function Pricing() {
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="bg-white rounded-lg p-6 border border-gray-200"
+              className="bg-card rounded-lg p-6 border border-border"
             >
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-display font-semibold text-foreground mb-2">
                 Puis-je essayer gratuitement ?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Oui, 30 jours gratuits avec accès complet. Aucune carte bancaire requise.
               </p>
             </motion.div>
@@ -241,12 +256,12 @@ export default function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="bg-white rounded-lg p-6 border border-gray-200"
+              className="bg-card rounded-lg p-6 border border-border"
             >
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-display font-semibold text-foreground mb-2">
                 Dois-je payer avant la fin de l'essai ?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Non. Après 30 jours, vous serez facturé uniquement si vous continuez. Vous pouvez annuler à tout moment.
               </p>
             </motion.div>
@@ -256,13 +271,13 @@ export default function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-lg p-6 border border-gray-200"
+              className="bg-card rounded-lg p-6 border border-border"
             >
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-display font-semibold text-foreground mb-2">
                 Qu'est-ce qui change entre les plans ?
               </h3>
-              <p className="text-gray-600">
-                Le nombre de patients que vous pouvez gérer. Les fonctionnalités (suivi, exercices, bilan) sont identiques sur tous les plans. Le support s'améliore avec Starter → Pro → Cabinet.
+              <p className="text-muted-foreground">
+                Le nombre de patients que vous pouvez gérer. Les fonctionnalités (suivi, exercices, bilan) sont identiques sur tous les plans. Le support s'améliore avec Starter vers Pro vers Cabinet.
               </p>
             </motion.div>
 
@@ -271,12 +286,12 @@ export default function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="bg-white rounded-lg p-6 border border-gray-200"
+              className="bg-card rounded-lg p-6 border border-border"
             >
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-display font-semibold text-foreground mb-2">
                 Les patients paient-ils ?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Non, jamais. Vous payez pour vous. Les patients accèdent gratuitement avec le code que vous générez.
               </p>
             </motion.div>
@@ -292,10 +307,10 @@ export default function Pricing() {
           >
             <Button
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white rounded-lg font-semibold"
+              className="bg-primary hover:bg-forest-light text-primary-foreground rounded-lg font-semibold"
               asChild
             >
-              <a href="/pro/signup">Commencer mon essai gratuit</a>
+              <a href="/auth?tab=signup">Commencer mon essai gratuit</a>
             </Button>
           </motion.div>
         </div>

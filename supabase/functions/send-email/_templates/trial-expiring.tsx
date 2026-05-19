@@ -18,7 +18,7 @@ export function TrialExpiringEmail(props: TrialExpiringEmailProps) {
   const { therapistName = 'Cher orthophoniste', daysRemaining, patientsCount, subscribeUrl, referralCode } = props
   
   const referralUrl = referralCode 
-    ? `https://parlermoinsvite.fr/pro?ref=${referralCode}` 
+    ? `https://respirfacile.fr/pro?ref=${referralCode}` 
     : null;
   
   return (
@@ -30,7 +30,7 @@ export function TrialExpiringEmail(props: TrialExpiringEmailProps) {
       <Text style={paragraph}>Bonjour {therapistName},</Text>
 
       <Text style={paragraph}>
-        Votre période d'essai gratuite de Parler Moins Vite Pro arrive à son terme dans {daysRemaining} jour{daysRemaining > 1 ? 's' : ''}.
+        Votre période d'essai gratuite de RespirFacile Pro arrive à son terme dans {daysRemaining} jour{daysRemaining > 1 ? 's' : ''}.
       </Text>
 
       {patientsCount > 0 && (
@@ -40,7 +40,7 @@ export function TrialExpiringEmail(props: TrialExpiringEmailProps) {
       )}
 
       <Text style={benefitsBox}>
-        ✨ Avec Parler Moins Vite Pro : Suivi illimité de vos patients, accès aux métriques cliniques avancées, génération de bilans PDF, assignation d'exercices personnalisés, et support prioritaire.
+        ✨ Avec RespirFacile Pro : Suivi illimité de vos patients, accès aux métriques cliniques avancées, génération de bilans PDF, assignation d'exercices personnalisés, et support prioritaire.
       </Text>
 
       <Text style={testimonialBox}>
@@ -53,12 +53,12 @@ export function TrialExpiringEmail(props: TrialExpiringEmailProps) {
 
       {referralCode && referralUrl && (
         <Text style={referralBox}>
-          💡 Astuce parrainage : Recommandez Parler Moins Vite à un confrère et recevez tous les deux 1 mois gratuit ! Partagez simplement ce lien : {referralUrl} — Votre code : {referralCode}
+          💡 Astuce parrainage : Recommandez RespirFacile à un confrère et recevez tous les deux 1 mois gratuit ! Partagez simplement ce lien : {referralUrl} — Votre code : {referralCode}
         </Text>
       )}
 
       <Text style={smallText}>
-        Des questions sur nos offres ? Écrivez-nous à contact@parlermoinsvite.fr — nous serons ravis de vous aider.
+        Des questions sur nos offres ? Écrivez-nous à contact@respirfacile.fr — nous serons ravis de vous aider.
       </Text>
     </BaseLayout>
   )

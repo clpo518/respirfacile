@@ -31,7 +31,9 @@ export interface Exercise {
   metrics_tracked: string[];
   target_profile: PatientProfile[];
   description_fr: string;
-  family_icon: string;
+  icon: string;
+  /** Exercice avec production vocale — patient produit des sons mesurables */
+  voice_exercise?: boolean;
 }
 
 export const EXERCISES: Exercise[] = [
@@ -53,7 +55,7 @@ export const EXERCISES: Exercise[] = [
     ],
     metrics_tracked: ['pause_steps', 'comfort_level'],
     target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
-    family_icon: '🫁',
+    icon: '🫁',
   },
   {
     id: 'pause_20',
@@ -72,7 +74,7 @@ export const EXERCISES: Exercise[] = [
     ],
     metrics_tracked: ['pause_duration', 'comfort_level'],
     target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
-    family_icon: '🫁',
+    icon: '🫁',
   },
   {
     id: 'pause_25',
@@ -90,7 +92,7 @@ export const EXERCISES: Exercise[] = [
     ],
     metrics_tracked: ['pause_duration', 'comfort_level'],
     target_profile: ['adult_saos_mild', 'adult_mixed'],
-    family_icon: '🫁',
+    icon: '🫁',
   },
 
   // Cohérence cardiaque
@@ -116,17 +118,17 @@ export const EXERCISES: Exercise[] = [
       'adult_tmof',
       'adult_mixed',
     ],
-    family_icon: '💓',
+    icon: '💓',
   },
   {
     id: 'coherence_4_6',
     category: 'coherence_cardiaque',
-    name_fr: 'Cohérence cardiaque 4-6',
+    name_fr: 'Cohérence Cardiaque · Expiration longue',
     duration_seconds: 300,
     sets: 5,
     difficulty: 1,
     description_fr:
-      'Variante avec expiration prolongée — favorise la détente et le sommeil.',
+      'Expiration 6s > inspiration 4s — active le système parasympathique. Idéal avant le coucher.',
     instructions_fr: [
       'Inspirez par le nez pendant 4 secondes',
       'Expirez par le nez pendant 6 secondes',
@@ -140,7 +142,7 @@ export const EXERCISES: Exercise[] = [
       'adult_tmof',
       'adult_mixed',
     ],
-    family_icon: '💓',
+    icon: '💓',
   },
 
   // Myofonctionnel
@@ -160,7 +162,7 @@ export const EXERCISES: Exercise[] = [
     ],
     metrics_tracked: ['hold_duration'],
     target_profile: ['adult_tmof', 'adult_mixed', 'adult_saos_mild'],
-    family_icon: '👅',
+    icon: '👅',
   },
   {
     id: 'claquement_langue',
@@ -178,16 +180,16 @@ export const EXERCISES: Exercise[] = [
     ],
     metrics_tracked: ['reps_completed'],
     target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
-    family_icon: '👅',
+    icon: '👅',
   },
   {
     id: 'aspiration_langue',
     category: 'myofonctionnel',
-    name_fr: 'Aspiration linguale',
+    name_fr: 'Aspiration de la langue',
     duration_seconds: 150,
     difficulty: 2,
     description_fr:
-      'Renforce toute la langue contre le palais — l\'un des exercices OMT les plus efficaces.',
+      'Renforce toute la langue contre le palais dur — l\'un des exercices OMT les plus efficaces selon la littérature.',
     instructions_fr: [
       'Collez toute la langue contre le palais',
       'Ouvrez la bouche le plus possible sans décoller la langue',
@@ -196,7 +198,7 @@ export const EXERCISES: Exercise[] = [
     ],
     metrics_tracked: ['hold_duration', 'reps_completed'],
     target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
-    family_icon: '👅',
+    icon: '👅',
   },
   {
     id: 'gargarisme',
@@ -204,16 +206,18 @@ export const EXERCISES: Exercise[] = [
     name_fr: 'Gargarisme (voile du palais)',
     duration_seconds: 90,
     difficulty: 1,
-    description_fr: 'Renforce le voile du palais — réduit le ronflement.',
+    description_fr: 'Renforce le voile du palais en vibration active — réduit le ronflement de façon mesurable.',
     instructions_fr: [
       'Prenez une petite gorgée d\'eau',
       'Faites un gargarisme fort pendant 30 secondes',
+      'Sentez la vibration au fond de la gorge',
       'Répétez 3 fois',
       'Idéal le matin après le brossage',
     ],
     metrics_tracked: ['duration_completed'],
     target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
-    family_icon: '🗣️',
+    icon: '🗣️',
+    voice_exercise: true,
   },
   {
     id: 'phonemes_kaga',
@@ -222,7 +226,7 @@ export const EXERCISES: Exercise[] = [
     duration_seconds: 120,
     difficulty: 1,
     description_fr:
-      'Exercice phonétique pour renforcer le voile du palais et la base de la langue.',
+      'Articulation phonétique guidée — renforce le voile du palais et la base de la langue par vibration vocale.',
     instructions_fr: [
       'Prononcez distinctement "Ka" 10 fois',
       'Puis "Ga" 10 fois',
@@ -231,7 +235,8 @@ export const EXERCISES: Exercise[] = [
     ],
     metrics_tracked: ['reps_completed'],
     target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
-    family_icon: '🗣️',
+    icon: '🗣️',
+    voice_exercise: true,
   },
 
   // Respiration nasale
@@ -257,7 +262,7 @@ export const EXERCISES: Exercise[] = [
       'adult_mixed',
       'adult_saos_severe',
     ],
-    family_icon: '👃',
+    icon: '👃',
   },
   {
     id: 'narine_alternee',
@@ -276,7 +281,7 @@ export const EXERCISES: Exercise[] = [
     ],
     metrics_tracked: ['cycles_completed'],
     target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
-    family_icon: '👃',
+    icon: '👃',
   },
 
   // Diaphragmatique
@@ -302,7 +307,7 @@ export const EXERCISES: Exercise[] = [
       'adult_tmof',
       'adult_mixed',
     ],
-    family_icon: '🫁',
+    icon: '🫁',
   },
 ];
 
@@ -374,6 +379,7 @@ export const exerciseCategories = EXERCISE_FAMILIES.map((f) => ({
   icon: f.icon,
   color: f.color,
   description: '',
+  exercises: EXERCISES.filter((e) => e.category === f.id),
 }));
 
 // EXERCISES_BY_CATEGORY: used by Practice.tsx

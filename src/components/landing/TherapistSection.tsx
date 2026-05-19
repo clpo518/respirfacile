@@ -15,29 +15,29 @@ import {
 const features = [
   {
     icon: BarChart3,
-    text: "Taux d'Articulation (SPS) : Mesure le débit réel en excluant les silences (méthode Van Zaalen)."
+    text: "Prescriptions ciblées : envoyez des exercices personnalisés directement sur l'application du patient."
   },
   {
     icon: Gauge,
-    text: "Débitmètre en séance : Mesurez le débit de votre patient en direct, sur votre tablette, pendant la consultation."
+    text: "Suivi de l'observance : visualisez les séances réalisées et l'assiduité de chaque patient en un coup d'œil."
   },
   {
     icon: Headphones,
-    text: "Écoute différée : Recevez les enregistrements de vos patients entre les séances."
+    text: "Historique des séances : accédez aux comptes-rendus et à la progression entre les rendez-vous."
   },
   {
     icon: Target,
-    text: "Ratio de Fluence : Visualisez le temps de parole vs temps de pause pour chaque session."
+    text: "Objectifs personnalisés : adaptez la fréquence et le programme à chaque profil clinique."
   },
   {
     icon: FileText,
-    text: "Aide au bilan : Données objectives prêtes à intégrer dans vos comptes-rendus cliniques."
+    text: "Aide au compte-rendu : données objectives prêtes à intégrer dans votre dossier patient."
   }
 ];
 
 export const TherapistSection = () => {
   return (
-    <section className="py-24 bg-slate-50 dark:bg-slate-900/50">
+    <section className="py-24 bg-muted/40">
       <div className="container px-4 md:px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left: Content */}
@@ -47,18 +47,17 @@ export const TherapistSection = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest/10 text-forest text-sm font-medium mb-6">
               <Stethoscope className="w-4 h-4" />
               Espace Orthophoniste
             </div>
-            
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               Un outil de télé-soin pensé pour votre pratique.
             </h2>
             
             <p className="text-lg text-muted-foreground mb-8">
-              « Le bredouillement nécessite un entraînement quotidien intensif » 
-              <span className="text-sm">(Van Zaalen)</span>. 
+              La rééducation respiratoire repose sur la régularité à domicile.
               <br />
               <strong>Déléguez l'entraînement, gardez l'expertise.</strong>
             </p>
@@ -73,15 +72,15 @@ export const TherapistSection = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <feature.icon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <div className="w-8 h-8 rounded-lg bg-forest/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <feature.icon className="w-4 h-4 text-forest" />
                   </div>
                   <p className="text-foreground">{feature.text}</p>
                 </motion.div>
               ))}
             </div>
 
-            <Button asChild size="lg" className="gap-2 bg-blue-600 hover:bg-blue-700">
+            <Button asChild size="lg" className="gap-2 bg-primary hover:bg-forest-light text-primary-foreground">
               <Link to="/pro">
                 Créer un compte Pro (Gratuit)
                 <ArrowRight className="w-4 h-4" />
@@ -97,10 +96,10 @@ export const TherapistSection = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 border border-border/50">
+            <div className="bg-card rounded-2xl shadow-2xl p-8 border border-border">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <Stethoscope className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <div className="w-10 h-10 rounded-full bg-forest/10 flex items-center justify-center">
+                  <Stethoscope className="w-5 h-5 text-forest" />
                 </div>
                 <div>
                   <p className="font-semibold">Tableau de bord Pro</p>
@@ -115,22 +114,22 @@ export const TherapistSection = () => {
                   { name: "Thomas L.", progress: 45, sessions: 5 },
                   { name: "Sophie M.", progress: 92, sessions: 18 }
                 ].map((patient, index) => (
-                  <div key={index} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-border/50">
+                  <div key={index} className="p-4 rounded-xl bg-muted/40 border border-border">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium">{patient.name}</span>
                       <span className="text-xs text-muted-foreground">{patient.sessions} séances</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                         <motion.div
-                          className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"
+                          className="h-full bg-gradient-to-r from-forest to-forest-light rounded-full"
                           initial={{ width: 0 }}
                           whileInView={{ width: `${patient.progress}%` }}
                           viewport={{ once: true }}
                           transition={{ duration: 1, delay: index * 0.2 }}
                         />
                       </div>
-                      <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                      <span className="text-sm font-semibold text-forest">
                         {patient.progress}%
                       </span>
                     </div>
@@ -147,8 +146,8 @@ export const TherapistSection = () => {
             </div>
 
             {/* Floating badge */}
-            <div className="absolute -bottom-4 -right-4 px-4 py-2 bg-white dark:bg-slate-800 rounded-full shadow-lg border border-border/50">
-              <span className="text-sm font-medium">🔬 Compatible PRAAT</span>
+            <div className="absolute -bottom-4 -right-4 px-4 py-2 bg-card rounded-full shadow-lg border border-border">
+              <span className="text-sm font-medium">🩺 Données exportables</span>
             </div>
           </motion.div>
         </div>

@@ -30,7 +30,7 @@ serve(async (req) => {
     // Get emails from auth.users via admin API
     const results: { email: string; status: string }[] = [];
     const dialogueImageUrl = `${supabaseUrl}/storage/v1/object/public/email-assets/email-dialogue-multi.png`;
-    const baseUrl = "https://parlermoinsvite.lovable.app";
+    const baseUrl = "https://respirfacile.fr";
 
     for (const therapist of therapists || []) {
       try {
@@ -56,7 +56,7 @@ serve(async (req) => {
             data: {
               userName: firstName,
               newTrialEndDate: formattedDate,
-              dashboardUrl: `${baseUrl}/dashboard/therapist`,
+              dashboardUrl: `${baseUrl}/patients`,
               dialogueImageUrl,
             },
           },

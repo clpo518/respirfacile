@@ -21,7 +21,7 @@ export function SubscriptionExpiringEmail(props: SubscriptionExpiringEmailProps)
       <Text style={paragraph}>Bonjour {userName},</Text>
 
       <Text style={paragraph}>
-        Votre abonnement Parler Moins Vite arrive à expiration le {expirationDate}.
+        Votre abonnement RespirFacile arrive à expiration le {expirationDate}.
       </Text>
 
       <Text style={paragraph}>

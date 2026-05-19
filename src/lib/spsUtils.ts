@@ -6,8 +6,6 @@
  * Clinical targets: 2.0-6.0 SPS (vs 120-200 WPM)
  */
 
-import { countSyllables } from './syllabify';
-
 // Maximum realistic SPS for a human speaker (~9 syllables/sec)
 export const MAX_REALISTIC_SPS = 10.0;
 
@@ -122,7 +120,7 @@ export function calculateSafeMaxSPS(history: number[]): number {
 }
 
 /**
- * Adaptive thresholds: more forgiving for low targets (e.g. Tortue 2.0 syll/s).
+ * Adaptive thresholds: more forgiving for low targets (e.g. Tortue 2.0 pts).
  * Scale factor is >1 when target < 4, meaning bands widen.
  * Returns { good, bad } absolute diff thresholds.
  */
@@ -225,7 +223,7 @@ export function getSpeedFeedback(avgSps: number, targetSps: number = 4.0): {
   if (diff >= -good && diff <= good) {
     return {
       title: "Objectif atteint",
-      description: `Votre débit de ${avgSps.toFixed(1)} syll/s est pile dans l'objectif de ${targetSps.toFixed(1)} syll/s. Bravo !`,
+      description: `Votre débit de ${avgSps.toFixed(1)} pts est pile dans l'objectif de ${targetSps.toFixed(1)} pts. Bravo !`,
       emoji: "✨",
       colorClass: "text-green-600"
     };
@@ -234,7 +232,7 @@ export function getSpeedFeedback(avgSps: number, targetSps: number = 4.0): {
   if (diff > good && diff <= bad) {
     return {
       title: "Légèrement au-dessus",
-      description: `Votre débit de ${avgSps.toFixed(1)} syll/s dépasse l'objectif de ${targetSps.toFixed(1)} syll/s. Pensez à marquer davantage les pauses.`,
+      description: `Votre débit de ${avgSps.toFixed(1)} pts dépasse l'objectif de ${targetSps.toFixed(1)} pts. Pensez à marquer davantage les pauses.`,
       emoji: "⚡",
       colorClass: "text-orange-600"
     };
@@ -243,7 +241,7 @@ export function getSpeedFeedback(avgSps: number, targetSps: number = 4.0): {
   if (diff > bad) {
     return {
       title: "Débit trop rapide",
-      description: `Votre débit de ${avgSps.toFixed(1)} syll/s est bien au-dessus de l'objectif de ${targetSps.toFixed(1)} syll/s. Essayez de ralentir.`,
+      description: `Votre débit de ${avgSps.toFixed(1)} pts est bien au-dessus de l'objectif de ${targetSps.toFixed(1)} pts. Essayez de ralentir.`,
       emoji: "🔴",
       colorClass: "text-red-600"
     };
@@ -252,7 +250,7 @@ export function getSpeedFeedback(avgSps: number, targetSps: number = 4.0): {
   if (diff < -good && diff >= -bad) {
     return {
       title: "Bien contrôlé",
-      description: `Votre débit de ${avgSps.toFixed(1)} syll/s est légèrement sous l'objectif. Vous maîtrisez bien votre rythme.`,
+      description: `Votre débit de ${avgSps.toFixed(1)} pts est légèrement sous l'objectif. Vous maîtrisez bien votre rythme.`,
       emoji: "🐢",
       colorClass: "text-emerald-600"
     };
@@ -261,19 +259,10 @@ export function getSpeedFeedback(avgSps: number, targetSps: number = 4.0): {
   // diff < -bad
   return {
     title: "Régime très lent",
-    description: `Votre débit de ${avgSps.toFixed(1)} syll/s est très en-dessous de l'objectif de ${targetSps.toFixed(1)} syll/s. Vous pouvez accélérer progressivement.`,
+    description: `Votre débit de ${avgSps.toFixed(1)} pts est très en-dessous de l'objectif de ${targetSps.toFixed(1)} pts. Vous pouvez accélérer progressivement.`,
     emoji: "🐢",
     colorClass: "text-blue-600"
   };
-}
-
-/**
- * Calculate syllables from text and elapsed time to get SPS
- */
-export function calculateSPSFromText(text: string, elapsedSeconds: number): number {
-  if (elapsedSeconds <= 0) return 0;
-  const syllables = countSyllables(text);
-  return Math.round((syllables / elapsedSeconds) * 10) / 10;
 }
 
 /**
@@ -307,10 +296,10 @@ export function getDebitStatus(avgSps: number): {
     return { label: "Débit lent", shortLabel: "Lent", color: "green" };
   }
   if (avgSps <= 5.5) {
-    return { label: "Débit normo-fluent", shortLabel: "Normo-fluent", color: "green" };
+    return { label: "Score optimal", shortLabel: "Optimal", color: "green" };
   }
   if (avgSps <= 6.5) {
-    return { label: "Débit rapide", shortLabel: "Rapide", color: "yellow" };
+    return { label: "Score élevé", shortLabel: "Élevé", color: "yellow" };
   }
-  return { label: "Tachylalie", shortLabel: "Tachylalie", color: "red" };
+  return { label: "Score très élevé", shortLabel: "Très élevé", color: "red" };
 }

@@ -31,7 +31,7 @@ const PatientHomeworkSection = () => {
     const fetchAssignments = async () => {
       if (!user) return;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("assignments")
         .select(`
           id,

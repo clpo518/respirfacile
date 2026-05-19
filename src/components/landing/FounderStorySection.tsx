@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import founderImage from '@/assets/clement-founder.jpg';
 
 export function FounderStorySection() {
   return (
-    <section className="relative w-full bg-gradient-to-br from-gray-50 to-blue-50 py-20 md:py-28 px-4 sm:px-6 lg:px-8">
+    <section className="relative w-full bg-gradient-to-br from-sand to-sand/40 py-20 md:py-28 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left: Image/Avatar area */}
+          {/* Left: Photo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -14,8 +15,12 @@ export function FounderStorySection() {
             viewport={{ once: true }}
             className="flex justify-center"
           >
-            <div className="relative w-80 h-80 rounded-2xl bg-gradient-to-br from-blue-400 to-teal-400 shadow-2xl flex items-center justify-center">
-              <div className="text-8xl">👨‍💼</div>
+            <div className="relative w-80 h-80 rounded-2xl overflow-hidden shadow-2xl">
+              <img
+                src={founderImage}
+                alt="Clément, fondateur de RespirFacile"
+                className="w-full h-full object-cover object-top"
+              />
             </div>
           </motion.div>
 
@@ -28,14 +33,14 @@ export function FounderStorySection() {
             className="space-y-6"
           >
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
                 Pourquoi j'ai créé Respirfacile
               </h2>
             </div>
 
-            <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
+            <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
               <p>
-                J'ai fondé parlermoinsvite.fr pour les personnes qui bégaient. En deux ans, on a aidé 500+ utilisateurs à retrouver confiance en eux.
+                J'ai moi-même souffert d'apnée du sommeil. La CPAP fonctionnait, mais je ne supportais pas de dormir avec un masque toutes les nuits.
               </p>
 
               <p>
@@ -47,29 +52,29 @@ export function FounderStorySection() {
               </p>
 
               <p>
-                C'est comme ça que Respirfacile est né. Même approche que parlermoinsvite.fr — utiliser la technologie pour transformer un problème de santé en quelque chose de mesurable et durable.
+                C'est comme ça que Respirfacile est né. Utiliser la technologie pour transformer un problème de santé en quelque chose de mesurable, quotidien, et durable.
               </p>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-gray-200">
-              <p className="text-gray-600">
-                <span className="font-semibold">Clément Poirier</span>, fondateur
+            <div className="space-y-4 pt-4 border-t border-border">
+              <p className="text-muted-foreground">
+                <span className="font-semibold">Clément</span>, fondateur
               </p>
               <div className="flex gap-4">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white rounded-lg font-semibold"
+                  className="bg-primary hover:bg-forest-light text-primary-foreground rounded-lg font-semibold"
                   asChild
                 >
-                  <a href="/pro/signup">Rejoindre le mouvement</a>
+                  <a href="/auth?tab=signup">Rejoindre le mouvement</a>
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="rounded-lg font-semibold border-2"
+                  className="rounded-lg font-semibold border-2 border-forest/30 hover:bg-forest/5"
                   asChild
                 >
-                  <a href="mailto:clement@respirfacile.fr">Me contacter</a>
+                  <a href="mailto:contact@respirfacile.fr">Me contacter</a>
                 </Button>
               </div>
             </div>

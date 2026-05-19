@@ -156,8 +156,8 @@ const PatientProgressCard = ({ sessions, targetSps }: PatientProgressCardProps) 
              isRegressing ? <TrendingUp className="w-4 h-4" /> :
              <Target className="w-4 h-4" />}
             <span>
-              {isImproving ? `−${improvement} syll/sec` :
-               isRegressing ? `+${Math.abs(improvement)} syll/sec` :
+              {isImproving ? `−${improvement} pts` :
+               isRegressing ? `+${Math.abs(improvement)} pts` :
                "Stable"}
             </span>
           </motion.div>
@@ -177,7 +177,7 @@ const PatientProgressCard = ({ sessions, targetSps }: PatientProgressCardProps) 
             <div className="text-2xl font-bold text-foreground">
               {overallAvg}
             </div>
-            <div className="text-[11px] text-muted-foreground font-medium mt-0.5">syll/sec moy.</div>
+            <div className="text-[11px] text-muted-foreground font-medium mt-0.5">pts moy.</div>
           </motion.div>
           <motion.div
             initial={{ y: 10, opacity: 0 }}
@@ -189,7 +189,7 @@ const PatientProgressCard = ({ sessions, targetSps }: PatientProgressCardProps) 
             <div className="text-2xl font-bold text-foreground">
               {targetPercentage}%
             </div>
-            <div className="text-[11px] text-muted-foreground font-medium mt-0.5">≤ {effectiveTarget} syll/sec</div>
+            <div className="text-[11px] text-muted-foreground font-medium mt-0.5">≤ {effectiveTarget} pts</div>
           </motion.div>
         </div>
 
@@ -236,7 +236,7 @@ const PatientProgressCard = ({ sessions, targetSps }: PatientProgressCardProps) 
                   padding: "8px 12px",
                 }}
                 labelStyle={{ color: "hsl(var(--muted-foreground))", fontSize: 11 }}
-                formatter={(value: number) => [`${value} syll/sec`, "Vitesse moyenne"]}
+                formatter={(value: number) => [`${value} pts`, "Score moyen"]}
               />
               
               {/* Target line */}
@@ -273,7 +273,7 @@ const PatientProgressCard = ({ sessions, targetSps }: PatientProgressCardProps) 
         <div className="flex items-center justify-center gap-5 text-[11px]">
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-            <span className="text-muted-foreground">Vitesse moyenne</span>
+            <span className="text-muted-foreground">Score moyen</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3.5 h-[2px] border-t-[2px] border-dashed border-primary opacity-70" />

@@ -80,7 +80,7 @@ const PatientExpiredOverlay = () => {
         </Button>
 
         <p className="text-xs text-muted-foreground mt-4">
-          Des questions ? Écrivez-nous à contact@parlermoinsvite.fr
+          Des questions ? Écrivez-nous à contact@respirfacile.fr
         </p>
       </motion.div>
     </motion.div>

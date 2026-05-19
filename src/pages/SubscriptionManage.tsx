@@ -123,7 +123,7 @@ const SubscriptionManage = () => {
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">P</span>
             </div>
-            <span className="font-display font-bold">ParlerMoinsVite</span>
+            <span className="font-display font-bold">RespirFacile</span>
           </div>
         </div>
       </header>
@@ -364,7 +364,7 @@ const SubscriptionManage = () => {
                 onClick={() => {
                   const subject = encodeURIComponent("[Résiliation] Demande de désabonnement");
                   const body = encodeURIComponent(`Bonjour,\n\nJe souhaite résilier mon abonnement Premium.\n\nMon email de compte : ${user?.email || ""}\n\nMerci de traiter ma demande.\n\nCordialement`);
-                  window.open(`mailto:contact@parlermoinsvite.fr?subject=${subject}&body=${body}`, "_blank");
+                  window.open(`mailto:contact@respirfacile.fr?subject=${subject}&body=${body}`, "_blank");
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground/70 underline-offset-4 hover:underline transition-colors"
               >

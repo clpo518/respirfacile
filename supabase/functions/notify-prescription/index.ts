@@ -90,7 +90,7 @@ serve(async (req) => {
       therapistName,
       exerciseTitle,
       message: message || undefined,
-      exerciseUrl: "https://www.parlermoinsvite.fr/dashboard",
+      exerciseUrl: "https://www.respirfacile.fr/dashboard",
     });
 
     if (!emailResult.success) {

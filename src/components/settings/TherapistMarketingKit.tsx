@@ -25,50 +25,50 @@ const BADGES: BadgeConfig[] = [
     id: "clinical",
     label: "Clinique",
     tagline: "Praticien Partenaire",
-    subtitle: "Parler Moins Vite",
-    previewBg: "bg-gradient-to-br from-[hsl(173,58%,32%)] to-[hsl(173,58%,26%)]",
+    subtitle: "RespirFacile",
+    previewBg: "bg-gradient-to-br from-[hsl(166,33%,27%)] to-[hsl(166,33%,20%)]",
     previewText: "text-white",
     previewAccent: "",
     icon: Activity,
-    htmlStyle: `background: linear-gradient(135deg, hsl(173 58% 32%), hsl(173 58% 26%)); color: white; padding: 14px 22px; border-radius: 14px; display: inline-flex; align-items: center; gap: 14px; font-family: system-ui, -apple-system, sans-serif; text-decoration: none; box-shadow: 0 6px 20px rgba(15, 118, 110, 0.35); transition: transform 0.2s;`,
+    htmlStyle: `background: linear-gradient(135deg, hsl(166 33% 27%), hsl(166 33% 20%)); color: white; padding: 14px 22px; border-radius: 14px; display: inline-flex; align-items: center; gap: 14px; font-family: system-ui, -apple-system, sans-serif; text-decoration: none; box-shadow: 0 6px 20px rgba(45, 90, 79, 0.35); transition: transform 0.2s;`,
     htmlText1: "Praticien Partenaire",
-    htmlText2: "Parler Moins Vite",
+    htmlText2: "RespirFacile",
     htmlIconColor: "white",
   },
   {
     id: "expert",
     label: "Expert",
-    tagline: "Expert en Troubles du Débit",
-    subtitle: "Bredouillement & Bégaiement",
+    tagline: "Spécialiste Rééducation Respiratoire",
+    subtitle: "SAOS & Troubles myofonctionnels",
     previewBg: "bg-gradient-to-br from-slate-800 to-slate-900",
     previewText: "text-white",
     previewAccent: "",
     icon: Shield,
     htmlStyle: `background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 14px 22px; border-radius: 14px; display: inline-flex; align-items: center; gap: 14px; font-family: system-ui, -apple-system, sans-serif; text-decoration: none; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.4); transition: transform 0.2s;`,
-    htmlText1: "Expert en Troubles du Débit",
-    htmlText2: "Bredouillement & Bégaiement",
-    htmlIconColor: "#38bdf8",
+    htmlText1: "Spécialiste Rééducation Respiratoire",
+    htmlText2: "SAOS & Troubles myofonctionnels",
+    htmlIconColor: "#6ee7b7",
   },
   {
     id: "light",
     label: "Clair",
     tagline: "Recommandé par votre orthophoniste",
-    subtitle: "parlermoinsvite.fr",
+    subtitle: "respirfacile.fr",
     previewBg: "bg-white border-2 border-border",
     previewText: "text-foreground",
     previewAccent: "text-primary",
     icon: Heart,
     htmlStyle: `background: #ffffff; color: #1f2937; padding: 14px 22px; border-radius: 14px; border: 2px solid #e5e7eb; display: inline-flex; align-items: center; gap: 14px; font-family: system-ui, -apple-system, sans-serif; text-decoration: none; box-shadow: 0 4px 14px rgba(0,0,0,0.08); transition: transform 0.2s;`,
     htmlText1: "Recommandé par votre orthophoniste",
-    htmlText2: "parlermoinsvite.fr",
-    htmlIconColor: "#0F766E",
+    htmlText2: "respirfacile.fr",
+    htmlIconColor: "#2D5A4F",
   },
 ];
 
-const publishedUrl = "https://www.parlermoinsvite.fr";
+const publishedUrl = "https://www.respirfacile.fr";
 
 function generateBadgeHTML(badge: BadgeConfig) {
-  return `<!-- Badge Parler Moins Vite -->
+  return `<!-- Badge RespirFacile -->
 <a href="${publishedUrl}" target="_blank" rel="noopener noreferrer" style="${badge.htmlStyle}">
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="${badge.htmlIconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
   <span>
@@ -101,7 +101,7 @@ const TherapistMarketingKit = () => {
           🏅 Badge pour votre site
         </CardTitle>
         <CardDescription>
-          Un petit clin d'œil à ajouter sur votre site ou votre profil Doctolib pour indiquer à vos patients que vous utilisez Parler Moins Vite.
+          Un petit clin d'œil à ajouter sur votre site ou votre profil Doctolib pour indiquer à vos patients que vous utilisez RespirFacile.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

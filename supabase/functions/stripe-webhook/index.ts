@@ -61,7 +61,7 @@ async function notifyAdminNewPayment(
         <p><strong>Email :</strong> ${userEmail}</p>
         <p><strong>Rôle :</strong> ${role}</p>
         <p><strong>Plan :</strong> ${planName}</p>
-        <p style="color:#6e7282;font-size:13px;margin-top:24px;">— Parler Moins Vite (notification automatique)</p>
+        <p style="color:#6e7282;font-size:13px;margin-top:24px;">— RespirFacile (notification automatique)</p>
       </div>
     `;
     const res = await fetch("https://api.resend.com/emails", {
@@ -71,8 +71,8 @@ async function notifyAdminNewPayment(
         Authorization: `Bearer ${resendKey}`,
       },
       body: JSON.stringify({
-        from: "Parler Moins Vite <noreply@parlermoinsvite.fr>",
-        to: ["parlermoinsvite@gmail.com"],
+        from: "RespirFacile <noreply@respirfacile.fr>",
+        to: ["clement@escape-kit.com"],
         subject,
         html,
       }),
@@ -242,8 +242,8 @@ serve(async (req) => {
               isTherapist: isB2BPlan,
               invoiceUrl,
               dashboardUrl: isB2BPlan
-                ? "https://www.parlermoinsvite.fr/patient/list"
-                : "https://www.parlermoinsvite.fr/practice",
+                ? "https://www.respirfacile.fr/patients"
+                : "https://www.respirfacile.fr/practice",
             });
             // Notify admin
             await notifyAdminNewPayment(
@@ -384,7 +384,7 @@ serve(async (req) => {
               await sendEmail("referral_completed", referrerEmail, {
                 userName: referrerName,
                 filleulName: referredName || "Votre filleul(e)",
-                dashboardUrl: "https://www.parlermoinsvite.fr/patient/list",
+                dashboardUrl: "https://www.respirfacile.fr/patients",
               });
             }
 
@@ -393,7 +393,7 @@ serve(async (req) => {
               await sendEmail("referral_completed", referredEmail, {
                 userName: referredName || "Cher utilisateur",
                 filleulName: referrerName,
-                dashboardUrl: "https://www.parlermoinsvite.fr/patient/list",
+                dashboardUrl: "https://www.respirfacile.fr/patients",
               });
             }
           } catch (emailError) {
@@ -496,8 +496,8 @@ serve(async (req) => {
               await sendEmail("subscription_canceled", email, {
                 userName: userName || "Utilisateur",
                 resubscribeUrl: isTherapist
-                  ? "https://www.parlermoinsvite.fr/pro/subscription"
-                  : "https://www.parlermoinsvite.fr/pricing",
+                  ? "https://www.respirfacile.fr/pro/subscription"
+                  : "https://www.respirfacile.fr/pricing",
               });
             }
           }
@@ -548,8 +548,8 @@ serve(async (req) => {
               await sendEmail("payment_failed", email, {
                 userName: userName || "Utilisateur",
                 updatePaymentUrl: isTherapist
-                  ? "https://www.parlermoinsvite.fr/pro/subscription/manage"
-                  : "https://www.parlermoinsvite.fr/subscription/manage",
+                  ? "https://www.respirfacile.fr/subscription/manage"
+                  : "https://www.respirfacile.fr/subscription/manage",
               });
             }
           }

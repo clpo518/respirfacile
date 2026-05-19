@@ -44,7 +44,7 @@ export function FirstWinEmail(props: FirstWinEmailProps) {
       </Text>
 
       <Text style={signatureText}>Fiers de vous,</Text>
-      <Text style={signatureName}>L'équipe Parler Moins Vite</Text>
+      <Text style={signatureName}>L'équipe RespirFacile</Text>
     </BaseLayout>
   )
 }

@@ -89,7 +89,7 @@ serve(async (req) => {
       patientName,
       therapistName,
       commentPreview: commentPreview.length > 200 ? commentPreview.slice(0, 200) + "…" : commentPreview,
-      sessionUrl: `https://www.parlermoinsvite.fr/session/${sessionId}`,
+      sessionUrl: `https://www.respirfacile.fr/session/${sessionId}`,
     });
 
     if (!emailResult.success) {

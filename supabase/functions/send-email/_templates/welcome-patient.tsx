@@ -16,7 +16,7 @@ interface WelcomePatientEmailProps {
 
 export function WelcomePatientEmail(props: WelcomePatientEmailProps) {
   const { patientName = 'Cher patient', therapistName, appUrl, isSolo, referralCode } = props
-  const referralLink = referralCode ? `https://www.parlermoinsvite.fr/auth?tab=signup&ref=${referralCode}` : null
+  const referralLink = referralCode ? `https://www.respirfacile.fr/auth?tab=signup&ref=${referralCode}` : null
   return (
     <BaseLayout preview="Tout commence par une première respiration.">
       <Heading style={heading}>Bienvenue chez vous 🌟</Heading>
@@ -29,7 +29,7 @@ export function WelcomePatientEmail(props: WelcomePatientEmailProps) {
 
       {therapistName && (
         <Text style={paragraph}>
-          {therapistName} vous a invité à rejoindre Parler Moins Vite. Ensemble, vous allez progresser à votre rythme, en toute sérénité.
+          {therapistName} vous a invité à rejoindre RespirFacile. Ensemble, vous allez progresser à votre rythme, en toute sérénité.
         </Text>
       )}
 
@@ -63,7 +63,7 @@ export function WelcomePatientEmail(props: WelcomePatientEmailProps) {
       )}
 
       <Text style={signatureText}>À vos côtés,</Text>
-      <Text style={signatureName}>L'équipe Parler Moins Vite</Text>
+      <Text style={signatureName}>L'équipe RespirFacile</Text>
     </BaseLayout>
   )
 }

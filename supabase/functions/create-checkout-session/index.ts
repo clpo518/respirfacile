@@ -70,19 +70,19 @@ serve(async (req) => {
         seatsLimit = 3;
         subscriptionPlan = "starter_3";
         productDescription = "Essentiel - 3 sièges patients";
-        successUrl = `${req.headers.get("origin")}/patient/list?payment=success`;
+        successUrl = `${req.headers.get("origin")}/patients?payment=success`;
       } else if (plan === "expert") {
         priceId = Deno.env.get("STRIPE_PRICE_ID_EXPERT");
         seatsLimit = 5;
         subscriptionPlan = "pro_5";
         productDescription = "Expert - 5 sièges patients";
-        successUrl = `${req.headers.get("origin")}/patient/list?payment=success`;
+        successUrl = `${req.headers.get("origin")}/patients?payment=success`;
       } else if (plan === "premium") {
         priceId = Deno.env.get("STRIPE_PRICE_ID_PREMIUM");
         seatsLimit = 10;
         subscriptionPlan = "premium_10";
         productDescription = "Premium - 10 sièges patients";
-        successUrl = `${req.headers.get("origin")}/patient/list?payment=success`;
+        successUrl = `${req.headers.get("origin")}/patients?payment=success`;
       }
     } else if (isB2CPlan) {
       // B2C autonomous patient plan

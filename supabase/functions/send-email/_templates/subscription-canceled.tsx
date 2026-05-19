@@ -20,7 +20,7 @@ export function SubscriptionCanceledEmail(props: SubscriptionCanceledEmailProps)
       <Text style={paragraph}>Bonjour {userName},</Text>
 
       <Text style={paragraph}>
-        Nous vous confirmons que votre abonnement Parler Moins Vite a bien été annulé. Nous respectons votre décision et vous remercions d'avoir fait partie de notre communauté.
+        Nous vous confirmons que votre abonnement RespirFacile a bien été annulé. Nous respectons votre décision et vous remercions d'avoir fait partie de notre communauté.
       </Text>
 
       <Text style={dataBox}>
@@ -40,7 +40,7 @@ export function SubscriptionCanceledEmail(props: SubscriptionCanceledEmailProps)
       </Text>
 
       <Text style={paragraph}>
-        Votre retour nous aide énormément. Écrivez-nous à contact@parlermoinsvite.fr
+        Votre retour nous aide énormément. Écrivez-nous à contact@respirfacile.fr
       </Text>
 
       <Text style={paragraph}>
@@ -48,7 +48,7 @@ export function SubscriptionCanceledEmail(props: SubscriptionCanceledEmailProps)
       </Text>
 
       <Text style={signatureText}>Avec gratitude,</Text>
-      <Text style={signatureName}>L'équipe Parler Moins Vite</Text>
+      <Text style={signatureName}>L'équipe RespirFacile</Text>
     </BaseLayout>
   )
 }

@@ -55,10 +55,20 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
-        speed: {
-          calm: "hsl(var(--speed-calm))",
-          fast: "hsl(var(--speed-fast))",
-          critical: "hsl(var(--speed-critical))",
+        // Tokens spécifiques respirfacile
+        forest: {
+          DEFAULT: "#2D5A4F",     // vert forêt principal (Stitch primary)
+          light: "#3D7A6A",       // hover state
+          dark: "#1E3D35",        // live session bg
+          muted: "#7BA99A",       // vert sauge doux
+        },
+        sand: {
+          DEFAULT: "#F5F0EB",     // background chaud
+          dark: "#EDE5DB",        // card bg
+        },
+        terra: {
+          DEFAULT: "#C4785A",     // terre cuite (warning, conseil du jour)
+          light: "#E8A98A",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
@@ -72,8 +82,10 @@ export default {
         },
       },
       fontFamily: {
+        // Body : DM Sans — lisible, neutre
         sans: ['DM Sans', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['Nunito', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        // Display : Fraunces — serif chaud pour les titres (comme dans Stitch)
+        display: ['Fraunces', 'Lora', 'Georgia', 'serif'],
       },
       fontSize: {
         '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
@@ -85,6 +97,8 @@ export default {
         xl: "calc(var(--radius) + 4px)",
         "2xl": "calc(var(--radius) + 8px)",
         "3xl": "1.75rem",
+        "4xl": "2rem",
+        pill: "999px",            // boutons arrondis full
       },
       boxShadow: {
         'sm': 'var(--shadow-sm)',
@@ -92,8 +106,9 @@ export default {
         'lg': 'var(--shadow-lg)',
         'card': 'var(--shadow-card)',
         'card-hover': 'var(--shadow-card-hover)',
-        'soft': '0 4px 20px -6px hsl(170 45% 41% / 0.08)',
-        'glow': '0 0 24px -4px hsl(170 45% 41% / 0.15)',
+        'soft': '0 4px 20px -6px rgba(45, 90, 79, 0.08)',
+        'glow': '0 0 32px -4px rgba(45, 90, 79, 0.20)',
+        'forest': '0 8px 32px -8px rgba(45, 90, 79, 0.25)',
       },
       keyframes: {
         "accordion-down": {
@@ -120,6 +135,34 @@ export default {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        // Animations spécifiques respiration
+        "breathe-in": {
+          "0%": { transform: "scale(1)", opacity: "0.7" },
+          "100%": { transform: "scale(1.18)", opacity: "1" },
+        },
+        "breathe-out": {
+          "0%": { transform: "scale(1.18)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "0.7" },
+        },
+        "breathe-hold": {
+          "0%, 100%": { transform: "scale(1.18)", opacity: "0.9" },
+        },
+        "pulse-breathe": {
+          "0%, 100%": { transform: "scale(1)", boxShadow: "0 0 0 0 rgba(45,90,79,0.3)" },
+          "50%": { transform: "scale(1.06)", boxShadow: "0 0 0 20px rgba(45,90,79,0)" },
+        },
+        "ripple": {
+          "0%": { transform: "scale(1)", opacity: "0.4" },
+          "100%": { transform: "scale(2.2)", opacity: "0" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        "shimmer": {
+          from: { backgroundPosition: "200% 0" },
+          to: { backgroundPosition: "-200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -128,6 +171,12 @@ export default {
         "fade-in": "fade-in 0.4s ease-out forwards",
         "scale-in": "scale-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "slide-up": "slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        "breathe-in": "breathe-in 4s ease-in-out forwards",
+        "breathe-out": "breathe-out 4s ease-in-out forwards",
+        "pulse-breathe": "pulse-breathe 4s ease-in-out infinite",
+        "ripple": "ripple 2s ease-out infinite",
+        "float": "float 5s ease-in-out infinite",
+        "shimmer": "shimmer 2s linear infinite",
       },
       transitionDuration: {
         '250': '250ms',
@@ -140,5 +189,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;

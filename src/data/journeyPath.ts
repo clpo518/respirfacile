@@ -13,7 +13,7 @@ export interface JourneyStep {
   requiredValidations: number;
 }
 
-/** Default journey for "speed" goal (bredouillement / tachylalie) */
+/** Default journey for "speed" goal (tachyphémie / débit excessif) */
 export const JOURNEY_STEPS_SPEED: JourneyStep[] = [
   {
     index: 0,
@@ -89,14 +89,14 @@ export const JOURNEY_STEPS_SPEED: JourneyStep[] = [
   },
 ];
 
-/** Journey for "fluency" goal (bégaiement, blocages, répétitions) */
+/** Journey for "coordination" goal (respiration, régularité) */
 export const JOURNEY_STEPS_FLUENCY: JourneyStep[] = [
   {
     index: 0,
     categoryId: "breath-control",
     title: "Respiration & souffle",
     icon: "🌬️",
-    description: "Posez les bases de la fluence",
+    description: "Posez les bases de la coordination respiratoire",
     exerciseIds: ["breath-1", "breath-2", "breath-3"],
     requiredValidations: 3,
   },
@@ -114,7 +114,7 @@ export const JOURNEY_STEPS_FLUENCY: JourneyStep[] = [
     categoryId: "fluency-reading",
     title: "Lecture douce",
     icon: "🌊",
-    description: "Textes adaptés à la fluence",
+    description: "Textes adaptés à la rééducation respiratoire",
     exerciseIds: ["fluency-read-1", "fluency-read-2", "fluency-read-3"],
     requiredValidations: 3,
   },

@@ -1,134 +1,97 @@
-import { Link } from "react-router-dom";
-import { ArrowLeft, Mail, Send, Zap, Users, ShieldCheck, Play } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Wind, Mail, Stethoscope, User, MessageSquare } from "lucide-react";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22,1,0.36,1] } },
+};
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.10 } } };
 
 const Contact = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-background">
-      <div className="container max-w-2xl mx-auto px-4 py-12 md:py-16">
-        {/* Back Link */}
-        <Link 
-          to="/" 
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Retour à l'accueil
-        </Link>
-
-        {/* Header */}
-        <motion.div 
-          className="text-center mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Besoin d'aide ? On vous écoute.
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Notre équipe est basée à Annecy. Nous lisons et répondons personnellement à chaque message.
-          </p>
-        </motion.div>
-
-        {/* Trust Grid */}
-        <motion.div 
-          className="grid grid-cols-3 gap-4 md:gap-8 mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <div className="flex flex-col items-center text-center gap-2">
-            <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-              <Zap className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+    <div className="min-h-screen bg-background">
+      <header className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
+        <div className="container px-4 md:px-6 h-16 flex items-center justify-between">
+          <button onClick={() => navigate("/")} className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
+              <Wind className="w-4 h-4 text-white" />
             </div>
-            <span className="text-sm font-medium text-muted-foreground">Réponse Rapide (24h)</span>
-          </div>
-          <div className="flex flex-col items-center text-center gap-2">
-            <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <span className="font-display font-semibold text-foreground text-lg">RespirFacile</span>
+          </button>
+          <button onClick={() => navigate("/auth")} className="btn-forest text-sm px-4 py-2">Connexion</button>
+        </div>
+      </header>
+
+      <div className="pt-32 pb-24 px-4 md:px-6">
+        <div className="container mx-auto max-w-2xl">
+          <motion.div variants={stagger} initial="hidden" animate="show">
+            <motion.div variants={fadeUp} className="text-center mb-12">
+              <h1 className="font-display text-5xl font-semibold text-foreground mb-4">Contactez-nous</h1>
+              <p className="text-xl text-muted-foreground">Une question, un retour, une suggestion ? On vous répond sous 24h.</p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 gap-6">
+
+              {/* Professionnels */}
+              <motion.div variants={fadeUp} className="card-rf p-6 flex gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <Stethoscope className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-foreground mb-1">Professionnels de santé</h3>
+                  <p className="text-sm text-muted-foreground mb-3">Démo, questions sur l'abonnement PRO, intégration dans votre pratique.</p>
+                  <a href="mailto:contact@respirfacile.fr" className="inline-flex items-center gap-2 text-primary text-sm font-medium hover:underline">
+                    <Mail className="w-4 h-4" />
+                    contact@respirfacile.fr
+                  </a>
+                </div>
+              </motion.div>
+
+              {/* Patients */}
+              <motion.div variants={fadeUp} className="card-rf p-6 flex gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center shrink-0">
+                  <User className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-foreground mb-1">Patients</h3>
+                  <p className="text-sm text-muted-foreground mb-3">Problème de connexion, question sur un exercice, accès à votre compte.</p>
+                  <a href="mailto:contact@respirfacile.fr" className="inline-flex items-center gap-2 text-primary text-sm font-medium hover:underline">
+                    <Mail className="w-4 h-4" />
+                    contact@respirfacile.fr
+                  </a>
+                </div>
+              </motion.div>
+
+              {/* Général */}
+              <motion.div variants={fadeUp} className="card-rf p-6 flex gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center shrink-0">
+                  <MessageSquare className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-foreground mb-1">Général & presse</h3>
+                  <p className="text-sm text-muted-foreground mb-3">Partenariats, presse, tout autre sujet.</p>
+                  <a href="mailto:contact@respirfacile.fr" className="inline-flex items-center gap-2 text-primary text-sm font-medium hover:underline">
+                    <Mail className="w-4 h-4" />
+                    contact@respirfacile.fr
+                  </a>
+                </div>
+              </motion.div>
+
             </div>
-            <span className="text-sm font-medium text-muted-foreground">Support Humain</span>
-          </div>
-          <div className="flex flex-col items-center text-center gap-2">
-            <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6 text-green-600 dark:text-green-400" />
-            </div>
-            <span className="text-sm font-medium text-muted-foreground">100% Confidentiel</span>
-          </div>
-        </motion.div>
 
-        {/* Main Action Card */}
-        <motion.div 
-          className="bg-card shadow-lg rounded-2xl p-8 text-center border border-border"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-            <Mail className="w-8 h-8 text-primary" />
-          </div>
-          
-          <h2 className="text-xl font-semibold text-foreground mb-4">
-            Envoyez-nous un email direct.
-          </h2>
-          
-          <Button 
-            size="lg" 
-            className="w-full md:w-auto gap-2 mb-4"
-            asChild
-          >
-            <a href="mailto:contact@parlermoinsvite.fr">
-              Écrire à l'équipe
-              <Send className="w-4 h-4" />
-            </a>
-          </Button>
-          
-          <p className="text-sm text-muted-foreground">
-            Ou écrivez manuellement à : <span className="font-medium text-foreground select-all">contact@parlermoinsvite.fr</span>
-          </p>
-        </motion.div>
-
-        {/* Demo Video Card */}
-        <motion.div 
-          className="bg-card shadow-lg rounded-2xl p-8 text-center border border-primary/20 mt-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.25 }}
-        >
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-            <Play className="w-8 h-8 text-primary" />
-          </div>
-          
-          <h2 className="text-xl font-semibold text-foreground mb-2">
-            Envie de découvrir l'outil ?
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Regardez notre démo de 12 minutes — tout ce qu'il faut savoir sur ParlerMoinsVite en un coup d'œil.
-          </p>
-          
-          <Button 
-            size="lg" 
-            variant="outline"
-            className="w-full md:w-auto gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-            asChild
-          >
-            <a href="https://www.youtube.com/watch?v=EW9oW9ZiaS8" target="_blank" rel="noopener noreferrer">
-              ▶ Voir la démo (12 min)
-            </a>
-          </Button>
-        </motion.div>
-
-        {/* Footer note */}
-        <motion.p 
-          className="text-center text-xs text-muted-foreground mt-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          🌿 Inspirez... Expirez... On prend le temps de vous répondre.
-        </motion.p>
+            <motion.div variants={fadeUp} className="mt-10 text-center text-sm text-muted-foreground">
+              Réponse garantie sous 24h les jours ouvrés · Basé en France 🌿
+            </motion.div>
+          </motion.div>
+        </div>
       </div>
+
+      <footer className="py-8 px-4 border-t border-border/50 text-center">
+        <p className="text-xs text-muted-foreground">© 2025 RespirFacile</p>
+      </footer>
     </div>
   );
 };

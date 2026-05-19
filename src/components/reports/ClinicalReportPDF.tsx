@@ -442,7 +442,7 @@ const ClinicalReportPDF: React.FC<ClinicalReportPDFProps> = ({
             {/* Header */}
             <View style={[styles.tableRow, styles.tableHeader]}>
               <Text style={[styles.tableCell, styles.tableCellHeader]}>Situation</Text>
-              <Text style={[styles.tableCell, styles.tableCellHeader, styles.tableCellCenter]}>Mesuré (syll/s)</Text>
+              <Text style={[styles.tableCell, styles.tableCellHeader, styles.tableCellCenter]}>Mesuré (pts)</Text>
               <Text style={[styles.tableCell, styles.tableCellHeader, styles.tableCellCenter]}>Norme</Text>
               <Text style={[styles.tableCell, styles.tableCellHeader, styles.tableCellCenter]}>Interprétation</Text>
             </View>
@@ -471,7 +471,7 @@ const ClinicalReportPDF: React.FC<ClinicalReportPDFProps> = ({
               ))
             }
             
-            {/* Articulatory Rate */}
+            {/* Score respiratoire */}
             <View style={[styles.tableRow, styles.tableRowLast]}>
               <Text style={styles.tableCell}>Vitesse d'articulation*</Text>
               <Text style={[styles.tableCell, styles.tableCellCenter]}>{analysis.articulatoryRate.toFixed(2)}</Text>
@@ -480,7 +480,7 @@ const ClinicalReportPDF: React.FC<ClinicalReportPDFProps> = ({
             </View>
           </View>
           <Text style={{ fontSize: 7, color: colors.textMuted, marginTop: 4 }}>
-            * Vitesse d'articulation estimée selon Van Zaalen = débit hors pauses respiratoires
+            * Mesure estimée des cycles respiratoires hors pauses et transitions
           </Text>
         </View>
         
@@ -520,15 +520,15 @@ const ClinicalReportPDF: React.FC<ClinicalReportPDFProps> = ({
               <View style={styles.chartLegend}>
                 <View style={styles.chartLegendItem}>
                   <View style={[styles.chartLegendDot, { backgroundColor: colors.primary }]} />
-                  <Text style={styles.chartLegendText}>Normo-fluent (≤ 4.5)</Text>
+                  <Text style={styles.chartLegendText}>Score optimal (≤ 4.5)</Text>
                 </View>
                 <View style={styles.chartLegendItem}>
                   <View style={[styles.chartLegendDot, { backgroundColor: colors.warning }]} />
-                  <Text style={styles.chartLegendText}>Rapide (4.5-5.5)</Text>
+                  <Text style={styles.chartLegendText}>Score moyen (4.5-5.5)</Text>
                 </View>
                 <View style={styles.chartLegendItem}>
                   <View style={[styles.chartLegendDot, { backgroundColor: colors.danger }]} />
-                  <Text style={styles.chartLegendText}>Tachylalie (&gt; 5.5)</Text>
+                  <Text style={styles.chartLegendText}>Score élevé (&gt; 5.5)</Text>
                 </View>
               </View>
             </View>
@@ -571,13 +571,13 @@ const ClinicalReportPDF: React.FC<ClinicalReportPDFProps> = ({
             Les données présentées sont à intégrer dans l'évaluation globale du patient.
           </Text>
           <Text style={[styles.disclaimerText, { marginTop: 6 }]}>
-            Données collectées via ParlerMoinsVite.fr • Plateforme d'entraînement à la fluence
+            Données collectées via respirfacile.fr • Plateforme d'entraînement à la fluence
           </Text>
         </View>
         
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>ParlerMoinsVite.fr — Outil d'aide à la mesure</Text>
+          <Text style={styles.footerText}>respirfacile.fr — Outil d'aide à la mesure</Text>
           <Text style={styles.footerText}>Page 1/1</Text>
         </View>
       </Page>

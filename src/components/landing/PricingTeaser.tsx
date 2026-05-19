@@ -53,12 +53,12 @@ export const PricingTeaser = () => {
 
             <div className="grid sm:grid-cols-2 gap-4 mb-8">
               {[
-                "+60 exercices variés : lecture, oral libre, rébus…",
-                "Mesure de vitesse en temps réel (SPS)",
-                "Détection des disfluences (euh, du coup...)",
+                "6 catégories d'exercices : pause contrôlée, cohérence cardiaque, respiration nasale…",
+                "Exercices prescrits par votre orthophoniste",
                 "Historique et courbes de progression",
-                "Partage audio avec votre orthophoniste",
-                "Objectifs personnalisés selon votre âge",
+                "Notifications de rappel quotidien",
+                "Séances partagées avec votre orthophoniste",
+                "Programme adapté à votre profil de soins",
               ].map((feature, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />

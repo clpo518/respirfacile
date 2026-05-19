@@ -19,8 +19,8 @@ export function WelcomeTherapistEmail(props: WelcomeTherapistEmailProps) {
   const { therapistName = 'Cher orthophoniste', therapistCode, referralCode, dashboardUrl } = props
   
   const referralUrl = referralCode 
-    ? `https://parlermoinsvite.fr/pro?ref=${referralCode}` 
-    : 'https://parlermoinsvite.fr/pro';
+    ? `https://respirfacile.fr/pro?ref=${referralCode}` 
+    : 'https://respirfacile.fr/pro';
   
   return (
     <BaseLayout preview="Votre compte Pro est prêt — invitez votre premier patient.">
@@ -107,11 +107,11 @@ export function WelcomeTherapistEmail(props: WelcomeTherapistEmailProps) {
       )}
 
       <Text style={paragraph}>
-        Des questions ? Écrivez-nous à contact@parlermoinsvite.fr
+        Des questions ? Écrivez-nous à contact@respirfacile.fr
       </Text>
 
       <Text style={signatureText}>À votre service,</Text>
-      <Text style={signatureName}>L'équipe Parler Moins Vite</Text>
+      <Text style={signatureName}>L'équipe RespirFacile</Text>
     </BaseLayout>
   )
 }

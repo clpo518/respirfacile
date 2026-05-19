@@ -9,49 +9,49 @@ import { Badge } from "@/components/ui/badge";
 const metrics = [
   {
     icon: Activity,
-    title: "SPS (Syllabes/Seconde)",
-    description: "Mesure le débit d'articulation par paquets de 5 syllabes (hors pauses et silences).",
-    details: "Le calcul attend 5 syllabes prononcées, puis divise par le temps de parole réel du paquet (silences exclus). Ce mode par paquets donne un retour stable et cliniquement fiable, sans être perturbé par les pauses naturelles.",
+    title: "Score de séance",
+    description: "Mesure la qualité respiratoire sur l'ensemble de l'exercice.",
+    details: "Un score ≤ 4.5 pts indique une bonne régularité. Entre 4.5 et 6 pts : à améliorer. Au-delà de 6 pts : rythme irrégulier à travailler avec l'orthophoniste.",
     color: "text-emerald-500",
     bgColor: "bg-emerald-500/10"
   },
   {
     icon: Timer,
-    title: "Ratio de Fluence",
-    description: "Temps de parole / Temps total de session.",
-    details: "> 80% = Parole continue | 60-80% = Pauses naturelles | < 60% = Blocages possibles",
+    title: "Taux de complétion",
+    description: "Pourcentage de la séance réalisée en continuité.",
+    details: "> 80% = Excellent | 60-80% = Correct | < 60% = Interrompue — à surveiller",
     color: "text-cyan-500",
     bgColor: "bg-cyan-500/10"
   },
   {
     icon: MessageCircleWarning,
-    title: "Disfluences (Mots d'Appui)",
+    title: "Mots d'appui",
     description: "\"euh\", \"du coup\", \"en fait\" détectés automatiquement.",
-    details: "L'algorithme identifie les disfluences en temps réel",
+    details: "Indicateur de relâchement attentionnel pendant les exercices de lecture ou de parole guidée",
     color: "text-orange-500",
     bgColor: "bg-orange-500/10"
   },
   {
     icon: Type,
-    title: "Comptage Syllabique",
-    description: "Algorithme optimisé pour le français.",
-    details: "Gestion des 'e' muets, contractions ('j'suis', 't'as')",
+    title: "Cycles respiratoires",
+    description: "Nombre de cycles complétés pendant la séance.",
+    details: "Chaque cycle correspond à une inspiration + expiration complètes selon le rythme prescrit",
     color: "text-primary",
     bgColor: "bg-primary/10"
   },
   {
     icon: Activity,
-    title: "Accélération max",
-    description: "Vitesse maximale atteinte pendant la session.",
-    details: "Un écart important entre la moyenne et le max peut révéler des accélérations involontaires — un indicateur clé en tachylalie et bredouillement.",
+    title: "Score maximal",
+    description: "Score le plus élevé atteint pendant la séance.",
+    details: "Un écart important entre le score moyen et le score max révèle des épisodes d'irrégularité à cibler en consultation.",
     color: "text-red-500",
     bgColor: "bg-red-500/10"
   },
   {
     icon: AudioWaveform,
-    title: "Analyse du Bégaiement",
-    description: "Détection acoustique des blocages, répétitions et allongements.",
-    details: "🔴 Blocages (silences > 1s) • 🟡 Répétitions • 🟣 Allongements",
+    title: "Analyse myofonctionnelle",
+    description: "Détection des patterns respiratoires buccaux et nasaux.",
+    details: "Évalue la prévalence de la respiration nasale vs buccale au fil des séances",
     color: "text-purple-500",
     bgColor: "bg-purple-500/10",
     isBeta: true,
@@ -76,7 +76,7 @@ export const MetricsInfoCard = () => {
             <div>
               <CardTitle className="text-lg">Comprendre les métriques</CardTitle>
               <p className="text-sm text-muted-foreground">
-                SPS, Fluence, Fillers — Tout ce qu'il faut savoir
+                Score, complétion, cycles — Tout ce qu'il faut savoir
               </p>
             </div>
           </div>

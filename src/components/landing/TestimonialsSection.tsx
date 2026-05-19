@@ -3,27 +3,27 @@ import { Star, Quote } from "lucide-react";
 
 const testimonials = [
   {
-    quote: "L'outil qu'il me manquait pour mesurer objectivement le débit de parole de mes patients. Bien conçu et facile d'utilisation.",
+    quote: "L'outil qu'il me manquait pour suivre l'observance de mes patients entre les séances. Mes patients s'exercent vraiment à domicile maintenant.",
     author: "Fanny H.",
     role: "Orthophoniste libérale",
     rating: 5,
   },
   {
-    quote: "Avant, je parlais trop vite en réunion sans m'en rendre compte. Avec le biofeedback, j'ai intégré le bon rythme.",
+    quote: "Depuis que je fais mes exercices de respiration nasale régulièrement, je ronfle beaucoup moins. Mon orthophoniste voit mes progrès en direct.",
     author: "Thomas R.",
-    role: "Cadre en entreprise",
+    role: "Patient SAOS, 47 ans",
     rating: 5,
   },
   {
-    quote: "Mon orthophoniste voit mes progrès entre les séances. Je me sens suivi même à la maison.",
+    quote: "Facile à utiliser même pour moi. 5 minutes par jour et ma respiration s'améliore vraiment. Je me sens suivie même entre les rendez-vous.",
     author: "Sarah M.",
-    role: "Étudiante, 22 ans",
+    role: "Patiente, 34 ans",
     rating: 5,
   },
   {
-    quote: "Enfin une application qui distingue bégaiement et bredouillement. Les exercices sont variés et motivants.",
+    quote: "Les exercices de cohérence cardiaque m'aident à gérer mon stress au quotidien. Bien conçu, je recommande à mes collègues.",
     author: "Marc D.",
-    role: "Ingénieur, bredouilleur",
+    role: "Infirmier, 38 ans",
     rating: 5,
   },
 ];

@@ -6,60 +6,48 @@ import { useState, useEffect } from "react";
 const methodCards = [
   {
     icon: AlertTriangle,
-    title: "Le Problème",
+    title: "Le Défi",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
     borderColor: "border-red-500/20",
-    description: "Les outils classiques divisent le nombre de mots par le temps total. Si le patient fait une pause respiratoire, son score s'effondre artificiellement."
+    description: "Entre les séances, les patients s'exercent seuls sans feedback objectif. Il est impossible de savoir s'ils appliquent correctement les consignes respiratoires."
   },
   {
     icon: CheckCircle2,
-    title: "Notre Solution",
+    title: "Notre Approche",
     color: "text-emerald-500",
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/20",
-    description: "Nous calculons les Syllabes Par Seconde (SPS) en utilisant les timestamps précis de chaque mot. On exclut les silences et pauses."
+    description: "Chaque exercice est enregistré et analysé : régularité des cycles, durée, observance. Un score de séance synthétise la qualité de la pratique."
   },
   {
     icon: Target,
-    title: "Impact Clinique",
+    title: "Bénéfice Clinique",
     color: "text-cyan-500",
     bgColor: "bg-cyan-500/10",
     borderColor: "border-cyan-500/20",
-    description: "Le patient qui fait une pause de 2 secondes n'est pas pénalisé : on mesure son débit RÉEL d'articulation, pas le temps d'hésitation."
+    description: "L'orthophoniste dispose de données objectives à chaque consultation — courbe de progression, taux d'observance, évolution semaine par semaine."
   }
 ];
 
 const AnimatedComparison = () => {
-  const [animating, setAnimating] = useState(false);
-  const [wrongValue, setWrongValue] = useState(0);
-  const [rightValue, setRightValue] = useState(0);
+  const [progressA, setProgressA] = useState(0);
+  const [progressB, setProgressB] = useState(0);
 
   useEffect(() => {
-    // Start animation after component mount
     const timer = setTimeout(() => {
-      setAnimating(true);
-      // Animate wrong value (slow because includes silence)
-      const wrongInterval = setInterval(() => {
-        setWrongValue(prev => {
-          if (prev >= 1.1) {
-            clearInterval(wrongInterval);
-            return 1.1;
-          }
-          return prev + 0.1;
+      const intervalA = setInterval(() => {
+        setProgressA(prev => {
+          if (prev >= 40) { clearInterval(intervalA); return 40; }
+          return prev + 2;
         });
-      }, 150);
-      
-      // Animate right value (fast because excludes silence)
-      const rightInterval = setInterval(() => {
-        setRightValue(prev => {
-          if (prev >= 2.7) {
-            clearInterval(rightInterval);
-            return 2.7;
-          }
-          return prev + 0.3;
+      }, 80);
+      const intervalB = setInterval(() => {
+        setProgressB(prev => {
+          if (prev >= 85) { clearInterval(intervalB); return 85; }
+          return prev + 3;
         });
-      }, 100);
+      }, 60);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -68,42 +56,42 @@ const AnimatedComparison = () => {
   return (
     <div className="bg-slate-800/80 rounded-2xl p-6 border border-slate-700/50">
       <div className="text-center mb-6">
-        <p className="text-slate-300 mb-2">Patient prononce :</p>
+        <p className="text-slate-300 mb-2">Même patient, deux semaines d'écart :</p>
         <p className="text-xl font-medium text-white">
-          "Bonjour..." <span className="text-slate-500">[pause 2s]</span> "...Marie."
+          6 séances complétées — durée moyenne 8 min
         </p>
-        <p className="text-sm text-slate-400 mt-2">4 syllabes • Temps total : 3.5s • Temps de parole : 1.5s</p>
+        <p className="text-sm text-slate-400 mt-2">Exercice prescrit : cohérence cardiaque • Cible : 6 cycles/min</p>
       </div>
 
       <div className="space-y-4">
-        {/* Wrong method */}
+        {/* Before */}
         <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <span className="text-red-500 text-xl">❌</span>
-              <span className="text-slate-300 font-medium">Méthode classique</span>
+              <span className="text-red-500 text-xl">📅</span>
+              <span className="text-slate-300 font-medium">Semaine 1</span>
             </div>
             <span className="font-mono font-bold text-red-400 text-xl">
-              {wrongValue.toFixed(1)} SPS
+              {progressA}% dans la cible
             </span>
           </div>
-          <p className="text-sm text-slate-400 mb-2">4 syllabes ÷ 3.5s (temps total)</p>
-          <Progress value={(wrongValue / 4) * 100} className="h-2 bg-slate-700" />
+          <p className="text-sm text-slate-400 mb-2">Rythme irrégulier — 3 séances sur 6 à 6 cpm</p>
+          <Progress value={progressA} className="h-2 bg-slate-700" />
         </div>
 
-        {/* Right method */}
+        {/* After */}
         <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <span className="text-emerald-500 text-xl">✅</span>
-              <span className="text-slate-300 font-medium">Notre méthode (Van Zaalen)</span>
+              <span className="text-emerald-500 text-xl">📅</span>
+              <span className="text-slate-300 font-medium">Semaine 2</span>
             </div>
             <span className="font-mono font-bold text-emerald-400 text-xl">
-              {rightValue.toFixed(1)} SPS
+              {progressB}% dans la cible
             </span>
           </div>
-          <p className="text-sm text-slate-400 mb-2">4 syllabes ÷ 1.5s (temps de parole réel)</p>
-          <Progress value={(rightValue / 4) * 100} className="h-2 bg-slate-700 [&>div]:bg-emerald-500" />
+          <p className="text-sm text-slate-400 mb-2">Progression nette — 5 séances sur 6 à 6 cpm</p>
+          <Progress value={progressB} className="h-2 bg-slate-700 [&>div]:bg-emerald-500" />
         </div>
       </div>
     </div>
@@ -125,10 +113,10 @@ export const MethodologySection = () => {
             Notre Méthodologie Clinique
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Une mesure qui compte : le <span className="text-cyan-400">Taux d'Articulation</span>
+            Un suivi qui compte : <span className="text-cyan-400">l'observance à domicile</span>
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            Basé sur la définition de l'Articulatory Rate de <strong className="text-slate-300">Van Zaalen</strong>
+            Des données objectives pour chaque séance — sans effort supplémentaire pour l'orthophoniste
           </p>
         </motion.div>
 
@@ -177,11 +165,11 @@ export const MethodologySection = () => {
           </span>
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 text-sm text-slate-300">
             <Sparkles className="w-4 h-4 text-cyan-400" />
-            Comptage syllabique français optimisé
+            6 catégories d'exercices respiratoires
           </span>
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 text-sm text-slate-300">
             <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-            Conforme à l'Articulatory Rate
+            Conforme aux recommandations IALP
           </span>
         </motion.div>
       </div>

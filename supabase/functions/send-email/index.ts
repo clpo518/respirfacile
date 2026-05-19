@@ -84,7 +84,7 @@ const EMAIL_SUBJECTS: Record<EmailType, string | ((data: Record<string, unknown>
   subscription_confirmed: "✅ Votre abonnement est activé",
   subscription_expiring: (data) => `Votre abonnement expire le ${data.expirationDate}`,
   inactivity_reminder: (data) => `⏰ Cela fait ${data.daysSinceLastSession} jour${data.daysSinceLastSession > 1 ? 's' : ''} sans pratique`,
-  weekly_report: "📊 Votre bilan hebdomadaire Parler Moins Vite",
+  weekly_report: "📊 Votre bilan hebdomadaire RespirFacile",
   welcome_patient: "Bienvenue chez vous – Votre parole, votre rythme",
   welcome_therapist: "Bienvenue dans l'aventure 🎯 — on est ravis de vous accueillir",
   refund_confirmation: "💳 Confirmation de votre remboursement",
@@ -93,12 +93,12 @@ const EMAIL_SUBJECTS: Record<EmailType, string | ((data: Record<string, unknown>
   patient_joined: (data) => `${data.patientName} est bien connecté à votre compte`,
   patient_archived: "Votre suivi est en pause",
   b2c_trial_expiring: (data) => `⏰ Plus que ${data.daysRemaining} jour${(data.daysRemaining as number) > 1 ? 's' : ''} d'essai gratuit`,
-  admin_weekly_digest: "🏠 Digest Admin – Parler Moins Vite",
+  admin_weekly_digest: "🏠 Digest Admin – RespirFacile",
   trial_extended: "🎉 Votre accès gratuit est prolongé",
-  newsletter_ortho_v1: "☕ Les coulisses de ParlerMoinsVite — Nouveautés & nuits blanches",
+  newsletter_ortho_v1: "☕ Les coulisses de RespirFacile — Nouveautés & nuits blanches",
   therapist_expiring_patient: (data) => `⚠️ Votre accès se termine dans ${data.daysRemaining} jour${(data.daysRemaining as number) > 1 ? 's' : ''}`,
   prescription_assigned: (data) => `📋 ${data.therapistName} vous a prescrit un exercice`,
-  therapist_no_patient: "💡 Rappel : invitez votre premier patient sur Parler Moins Vite",
+  therapist_no_patient: "💡 Rappel : invitez votre premier patient sur RespirFacile",
   trial_bug_apology: "🔧 Votre essai gratuit a été rétabli — et une surprise !",
   newsletter_ortho_v2: "🔥 3 nouveautés qui m'ont arraché les cheveux — Newsletter #2",
   newsletter_ortho_v3: "🌍 L'application a traversé 4 733 km — Newsletter #3",
@@ -404,7 +404,7 @@ serve(async (req) => {
 
     // Send the email
     const emailResponse = await resend.emails.send({
-      from: "Parler Moins Vite <noreply@parlermoinsvite.fr>",
+      from: "RespirFacile <noreply@respirfacile.fr>",
       to: [to],
       subject,
       html,
