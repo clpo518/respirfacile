@@ -430,9 +430,9 @@ function EmptyPatients({ code }: { code: string }) {
       <div>
         <h2 className="font-display text-lg text-foreground">Aucun patient pour l'instant</h2>
         <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto leading-relaxed">
-          Partagez votre code{" "}
+          Donnez votre code{" "}
           <span className="font-bold text-primary tracking-wider">{code}</span>{" "}
-          et vos patients rejoindront votre espace en quelques secondes.
+          à vos patients. Ils créent leur compte en 30 secondes et leurs séances apparaissent ici en temps réel.
         </p>
       </div>
       <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 rounded-full text-xs font-medium text-primary">

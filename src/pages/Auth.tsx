@@ -213,7 +213,7 @@ const Auth = () => {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label>Mot de passe</Label>
-              <button type="button" onClick={() => setForgotPassword(true)} className="text-xs text-muted-foreground hover:text-primary">Oublié ?</button>
+              <button type="button" onClick={() => setForgotPassword(true)} className="text-xs text-muted-foreground hover:text-primary">Mot de passe oublié ?</button>
             </div>
             <Input id="auth-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" />
           </div>
@@ -267,7 +267,7 @@ const Auth = () => {
         </div>
         <div className="space-y-3">
           <RoleCard icon={<KeyRound className="w-5 h-5" />} title="J'ai un code praticien" description="Mon orthophoniste / kiné m'a donné un code PRO-XXXXXX" selected={patientMode === "code"} onClick={() => setPatientMode("code")} full />
-          <RoleCard icon={<User className="w-5 h-5" />} title="Je m'inscris seul" description="7 jours d'essai gratuit en autonomie" selected={patientMode === "solo"} onClick={() => setPatientMode("solo")} full />
+          <RoleCard icon={<User className="w-5 h-5" />} title="Je m'inscris en autonomie" description="7 jours d'essai gratuit, sans code praticien" selected={patientMode === "solo"} onClick={() => setPatientMode("solo")} full />
         </div>
         <Button className="w-full btn-forest" onClick={() => setStep("form")}>
           Continuer <ArrowRight className="w-4 h-4" />

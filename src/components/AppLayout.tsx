@@ -81,7 +81,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <ExternalLink className="w-3 h-3" />
             Site public
           </Link>
-          <p className="text-[10px] text-muted-foreground/40">v1.0 · Fait en France</p>
+          <p className="text-[10px] text-muted-foreground/40">v0.1.0 · Fait avec 🌿 en France</p>
         </div>
       </aside>
 

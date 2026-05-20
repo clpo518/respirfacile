@@ -183,9 +183,9 @@ const Dashboard = () => {
                     <Stethoscope className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs text-white/60">Prescrit par</p>
+                    <p className="text-xs text-white/60">{therapistName ? "Prescrit par" : "Votre programme"}</p>
                     <p className="text-sm font-semibold text-white">
-                      {therapistName ?? "Votre orthophoniste"}
+                      {therapistName ?? "RespirFacile"}
                     </p>
                   </div>
                   <span className="ml-auto text-[10px] font-semibold bg-green-400/20 text-green-300 border border-green-400/30 px-2 py-0.5 rounded-full">
@@ -197,8 +197,9 @@ const Dashboard = () => {
                   Programme respiratoire<br />personnalisé · 8 semaines
                 </h2>
                 <p className="text-white/65 text-sm leading-relaxed mb-5">
-                  Votre praticien configure votre programme basé sur votre profil.
-                  Vous recevrez vos exercices dès la prochaine consultation.
+                  {therapistName
+                    ? "Votre praticien configure votre programme basé sur votre profil. Vous recevrez vos exercices dès la prochaine consultation."
+                    : "Choisissez votre profil ci-dessous pour lancer votre programme de 8 semaines en autonomie."}
                 </p>
 
                 {/* Stats scientifiques */}
@@ -418,10 +419,13 @@ const Dashboard = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-forest">
-                    {therapistName ? `Suivi par ${therapistName}` : "Suivi par votre orthophoniste"}
+                    {therapistName ? `Suivi par ${therapistName}` : "Programme en autonomie"}
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">
-                    Progression transmise en temps réel · {stats.totalSessions} séance{stats.totalSessions !== 1 ? "s" : ""} validée{stats.totalSessions !== 1 ? "s" : ""}
+                    {therapistName
+                    ? `Progression transmise en temps réel · ${stats.totalSessions} séance${stats.totalSessions !== 1 ? "s" : ""} validée${stats.totalSessions !== 1 ? "s" : ""}`
+                    : `${stats.totalSessions} séance${stats.totalSessions !== 1 ? "s" : ""} validée${stats.totalSessions !== 1 ? "s" : ""} · continuez sur votre lancée`
+                  }
                   </p>
                 </div>
                 {profileMeta && (
