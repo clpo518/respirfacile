@@ -441,7 +441,7 @@ const Dashboard = () => {
                 {[
                   { value: `${stats.currentWeek}/8`,                      label: "Semaine",    color: "text-forest" },
                   { value: stats.sessionsThisWeek,                         label: "Cette sem.", color: "text-primary" },
-                  { value: streak > 0 ? `${streak}🔥` : "0",              label: "Jours streak", color: streak >= 7 ? "text-orange-500" : streak >= 3 ? "text-amber-500" : "text-muted-foreground" },
+                  { value: streak > 0 ? `${streak}🔥` : "0",              label: "Jours d'affilée", color: streak >= 7 ? "text-orange-500" : streak >= 3 ? "text-amber-500" : "text-muted-foreground" },
                   { value: `${totalMinutes}min`,                            label: "Pratiqué",   color: "text-amber-600" },
                 ].map(({ value, label, color }) => (
                   <div key={label} className="card-rf p-2.5 text-center">

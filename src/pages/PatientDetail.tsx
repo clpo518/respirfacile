@@ -154,7 +154,7 @@ const PatientDetail = () => {
   <div class="stat"><div class="stat-v">${program?.week_number ?? "—"}/8</div><div class="stat-l">Semaine programme</div></div>
 </div>
 <h2 style="font-size:15px;color:#2D5A4F">10 dernières séances</h2>
-<table><thead><tr><th>Date</th><th>Exercice</th><th>Durée</th><th>Score</th></tr></thead>
+<table><thead><tr><th>Date</th><th>Exercice</th><th>Durée</th><th>Note</th></tr></thead>
 <tbody>${rows || "<tr><td colspan='4' style='text-align:center;color:#999'>Aucune séance enregistrée</td></tr>"}</tbody></table>
 <div class="footer">Bilan généré par RespirFacile · contact@respirfacile.fr · Document médical confidentiel.</div>
 </body></html>`
@@ -315,7 +315,7 @@ const PatientDetail = () => {
                       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Exercice</span>
                       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide w-24 text-center">Date</span>
                       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide w-20 text-center">Durée</span>
-                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide w-16 text-center">Score</span>
+                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide w-16 text-center">Note</span>
                     </div>
                     {sessions.map((session, i) => {
                       const ex = getExerciseById(session.exercise_id)
