@@ -109,7 +109,7 @@ const History = () => {
                 onClick={() => navigate("/practice")}
                 className="btn-forest px-6 py-2.5 text-sm"
               >
-                Explorer les exercices
+                Commencer un exercice
               </button>
             </motion.div>
           )}

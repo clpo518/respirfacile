@@ -171,14 +171,14 @@ const PatientDetail = () => {
     : null
 
   const lastSessionLabel =
-    lastSessionDaysAgo === null ? "Aucune séance" :
-    lastSessionDaysAgo === 0   ? "Aujourd'hui" :
+    lastSessionDaysAgo === null ? "—" :
+    lastSessionDaysAgo === 0   ? "Auj." :
     lastSessionDaysAgo === 1   ? "Hier" :
-    `Il y a ${lastSessionDaysAgo} j`
+    `J−${lastSessionDaysAgo}`
 
   const complianceColor =
-    weekCount >= 3 ? { dot: "bg-green-500",  text: "text-green-700", badge: "bg-green-50 border-green-200 text-green-700",  label: "Actif" } :
-    weekCount >= 1 ? { dot: "bg-amber-500",  text: "text-amber-700", badge: "bg-amber-50 border-amber-200 text-amber-700",  label: "Partiel" } :
+    weekCount >= 3 ? { dot: "bg-green-500",  text: "text-green-700", badge: "bg-green-50 border-green-200 text-green-700",  label: "Régulier" } :
+    weekCount >= 1 ? { dot: "bg-amber-500",  text: "text-amber-700", badge: "bg-amber-50 border-amber-200 text-amber-700",  label: "Irrégulier" } :
                      { dot: "bg-red-500",    text: "text-red-700",   badge: "bg-red-50 border-red-200 text-red-700",        label: "Inactif" }
 
   const profileTypeLabel = program?.profile_type
@@ -260,7 +260,7 @@ const PatientDetail = () => {
               </div>
               <div className="w-px h-12 bg-border" />
               <div className="flex-1 text-center">
-                <p className="font-display text-2xl text-foreground">{lastSessionLabel}</p>
+                <p className="font-display text-xl font-semibold text-foreground">{lastSessionLabel}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Dernière séance</p>
               </div>
               <div className="w-px h-12 bg-border" />

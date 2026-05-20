@@ -351,8 +351,8 @@ const Dashboard = () => {
               transition={{ delay: 0.36 }}
               className="card-rf p-5"
             >
-              <p className="text-sm font-semibold text-foreground mb-0.5">Je connais mon diagnostic</p>
-              <p className="text-xs text-muted-foreground mb-4">Démarrez votre programme personnalisé en autonomie :</p>
+              <p className="text-sm font-semibold text-foreground mb-0.5">Démarrer en autonomie</p>
+              <p className="text-xs text-muted-foreground mb-4">Choisissez votre profil pour lancer votre programme personnalisé.</p>
 
               <div className="grid grid-cols-2 gap-2.5 mb-4">
                 {[
@@ -441,7 +441,7 @@ const Dashboard = () => {
                 {[
                   { value: `${stats.currentWeek}/8`,                      label: "Semaine",    color: "text-forest" },
                   { value: stats.sessionsThisWeek,                         label: "Cette sem.", color: "text-primary" },
-                  { value: streak > 0 ? `${streak}🔥` : "0",              label: "Jours d'affilée", color: streak >= 7 ? "text-orange-500" : streak >= 3 ? "text-amber-500" : "text-muted-foreground" },
+                  { value: streak > 0 ? `${streak}🔥` : "0",              label: "Série",           color: streak >= 7 ? "text-orange-500" : streak >= 3 ? "text-amber-500" : "text-muted-foreground" },
                   { value: `${totalMinutes}min`,                            label: "Pratiqué",   color: "text-amber-600" },
                 ].map(({ value, label, color }) => (
                   <div key={label} className="card-rf p-2.5 text-center">
@@ -508,7 +508,7 @@ const Dashboard = () => {
                   <span className="text-4xl block">🎉</span>
                   <h2 className="font-display text-xl text-primary">Programme du jour terminé !</h2>
                   <p className="text-sm text-muted-foreground">
-                    Votre séance est validée. Votre orthophoniste voit votre progression en temps réel.
+                    Tous vos exercices du jour sont complétés. Votre orthophoniste voit votre progression en temps réel.
                   </p>
                   <button
                     onClick={() => navigate("/practice")}

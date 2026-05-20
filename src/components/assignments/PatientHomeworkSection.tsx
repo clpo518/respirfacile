@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { getCategoryById } from "@/data/exercises";
-import { BookOpen, ChevronRight, Clock, MessageSquare, Target } from "lucide-react";
+import { BookOpen, ChevronRight, Clock, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Assignment {
@@ -131,8 +131,8 @@ const PatientHomeworkSection = () => {
       <Card className="border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/10 overflow-hidden">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Target className="w-5 h-5 text-primary" />
-            🎯 Mes Prescriptions
+            <span className="text-xl">🩺</span>
+            Exercices prescrits
             <Badge variant="destructive" className="ml-auto">
               {assignments.length} en attente
             </Badge>

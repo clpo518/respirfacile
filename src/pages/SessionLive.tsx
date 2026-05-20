@@ -588,7 +588,7 @@ const SessionLive = () => {
                       <p className="font-display text-xl font-bold" style={{ color: colors.text }}>
                         {formatDuration(elapsed)}
                       </p>
-                      <p className="text-xs mt-0.5" style={{ color: colors.text + "99" }}>pratiqué</p>
+                      <p className="text-xs mt-0.5" style={{ color: colors.text + "99" }}>durée</p>
                     </div>
                     <div className="flex-1 rounded-2xl p-3 text-center" style={{ background: colors.bg }}>
                       <p className="font-display text-xl font-bold" style={{ color: colors.text }}>

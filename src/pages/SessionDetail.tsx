@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useAuth } from "@/contexts/AuthContext"
 import { supabase } from "@/integrations/supabase/client"
 import { motion } from "framer-motion"
-import { ArrowLeft, Clock, Star, RotateCcw, History, CheckCircle2, BookOpen } from "lucide-react"
+import { ArrowLeft, Clock, Star, RotateCcw, History, BookOpen } from "lucide-react"
 import { getExerciseById } from "@/data/exercises"
 import type { SessionRow } from "@/integrations/supabase/types"
 
@@ -166,9 +166,11 @@ const SessionDetail = () => {
               <p className="text-[10px] text-muted-foreground mt-0.5">Durée</p>
             </div>
             <div className="flex-1 rounded-2xl bg-muted/60 p-3 text-center">
-              <CheckCircle2 className="w-4 h-4 text-green-600 mx-auto mb-1" />
-              <p className="font-display text-xl text-green-700">Terminée</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">Statut</p>
+              <BookOpen className="w-4 h-4 text-primary mx-auto mb-1" />
+              <p className="font-display text-xl text-foreground">
+                {exercise?.instructions_fr.length ?? "—"}
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Étapes</p>
             </div>
           </div>
         </motion.div>
