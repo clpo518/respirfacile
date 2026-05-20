@@ -85,7 +85,7 @@ const PatientHomeworkSection = () => {
 
   const handleStartExercise = (assignment: Assignment) => {
     if (assignment.exercise_id) {
-      navigate(`/session-live?exercise=${assignment.exercise_id}`)
+      navigate(`/session-live?exercise=${assignment.exercise_id}&assignment=${assignment.id}`)
     } else {
       navigate(`/practice?category=${assignment.exercise_category}&assignment=${assignment.id}`)
     }

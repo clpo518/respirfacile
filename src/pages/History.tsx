@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
 import { useAuth } from "@/contexts/AuthContext"
@@ -5,12 +6,14 @@ import { supabase } from "@/integrations/supabase/client"
 import { AppLayout } from "@/components/AppLayout"
 import { getExerciseById } from "@/data/exercises"
 import { motion } from "framer-motion"
-import { Clock, ChevronRight, Calendar } from "lucide-react"
+import { Clock, ChevronRight, Calendar, Loader2 } from "lucide-react"
 import type { SessionRow } from "@/integrations/supabase/types"
 
 // ─────────────────────────────────────────────
 // History — historique des séances patient
 // ─────────────────────────────────────────────
+
+const PAGE_SIZE = 20
 
 const CAT_CHIP: Record<string, string> = {
   pause_controlee:     "bg-emerald-100 text-emerald-700",
@@ -33,9 +36,12 @@ const CAT_LABEL: Record<string, string> = {
 const History = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const [page, setPage] = useState(0)
+  const [allSessions, setAllSessions] = useState<SessionRow[]>([])
+  const [hasMore, setHasMore] = useState(true)
 
-  const { data: sessions = [], isLoading } = useQuery({
-    queryKey: ["all_sessions", user?.id],
+  const { isLoading, isFetching } = useQuery({
+    queryKey: ["all_sessions", user?.id, page],
     queryFn: async () => {
       if (!user) return []
       const { data } = await supabase
@@ -44,15 +50,18 @@ const History = () => {
         .eq("user_id", user.id)
         .eq("completed", true)
         .order("created_at", { ascending: false })
-        .limit(50)
-      return (data ?? []) as SessionRow[]
+        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
+      const rows = (data ?? []) as SessionRow[]
+      if (rows.length < PAGE_SIZE) setHasMore(false)
+      setAllSessions(prev => page === 0 ? rows : [...prev, ...rows])
+      return rows
     },
     enabled: !!user,
   })
 
   // Grouper par mois
   const grouped: Record<string, SessionRow[]> = {}
-  sessions.forEach(s => {
+  allSessions.forEach(s => {
     const key = new Date(s.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })
     if (!grouped[key]) grouped[key] = []
     grouped[key].push(s)
@@ -68,15 +77,15 @@ const History = () => {
           <h1 className="font-display text-2xl text-foreground mt-0.5">Historique</h1>
           {!isLoading && (
             <p className="text-sm text-muted-foreground mt-1">
-              {sessions.length} séance{sessions.length !== 1 ? "s" : ""} complétée{sessions.length !== 1 ? "s" : ""}
+              {allSessions.length} séance{allSessions.length !== 1 ? "s" : ""} complétée{allSessions.length !== 1 ? "s" : ""}
             </p>
           )}
         </header>
 
         <div className="px-6 space-y-6 mt-2">
 
-          {/* Loading */}
-          {isLoading && (
+          {/* Loading initial */}
+          {isLoading && page === 0 && (
             <div className="space-y-3">
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="h-16 rounded-xl bg-muted/60 animate-pulse" />
@@ -85,7 +94,7 @@ const History = () => {
           )}
 
           {/* Vide */}
-          {!isLoading && sessions.length === 0 && (
+          {!isLoading && allSessions.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -175,6 +184,23 @@ const History = () => {
               </div>
             </motion.div>
           ))}
+
+          {/* Charger plus */}
+          {!isLoading && allSessions.length > 0 && hasMore && (
+            <div className="flex justify-center pb-2">
+              <button
+                onClick={() => setPage(p => p + 1)}
+                disabled={isFetching}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all disabled:opacity-50"
+              >
+                {isFetching ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" />Chargement…</>
+                ) : (
+                  "Charger les séances précédentes"
+                )}
+              </button>
+            </div>
+          )}
 
         </div>
       </div>

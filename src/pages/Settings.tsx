@@ -5,21 +5,32 @@ import { supabase } from "@/integrations/supabase/client"
 import { motion } from "framer-motion"
 import {
   User, Mail, LogOut, ChevronRight, Shield,
-  Bell, HelpCircle, Wind, Copy, CheckCheck
+  Bell, HelpCircle, Wind, Copy, CheckCheck, RefreshCw
 } from "lucide-react"
 import { AppLayout } from "@/components/AppLayout"
 import { useToast } from "@/hooks/use-toast"
+import { usePatientProgram } from "@/hooks/usePatientProgram"
 
 // ─────────────────────────────────────────────
 // Settings
 // ─────────────────────────────────────────────
 
+const PROFILE_OPTIONS = [
+  { key: "adult_saos_mild",   emoji: "😴", label: "SAOS léger",   sub: "Apnées légères à modérées" },
+  { key: "adult_saos_severe", emoji: "🌙", label: "SAOS sévère",  sub: "Apnées sévères, traitement actif" },
+  { key: "adult_tmof",        emoji: "👅", label: "TMOF",         sub: "Troubles myofonctionnels" },
+  { key: "adult_mixed",       emoji: "🔀", label: "Profil mixte", sub: "SAOS + myofonctionnel" },
+]
+
 const Settings = () => {
   const navigate = useNavigate()
   const { profile, isTherapist, isSoloPatient, signOut } = useAuth()
   const { toast } = useToast()
-  const [signingOut, setSigningOut] = useState(false)
-  const [codeCopied, setCodeCopied] = useState(false)
+  const { program, createProgram } = usePatientProgram()
+  const [signingOut,       setSigningOut]       = useState(false)
+  const [codeCopied,       setCodeCopied]       = useState(false)
+  const [showProfilePicker, setShowProfilePicker] = useState(false)
+  const [selectedProfile,  setSelectedProfile]  = useState<string | null>(null)
 
   const handleSignOut = async () => {
     setSigningOut(true)
@@ -130,6 +141,92 @@ const Settings = () => {
                 onClick={() => navigate("/pro/subscription/manage")}
               />
             </div>
+          </motion.div>
+        )}
+
+        {/* ── Mon programme (patients) ──────── */}
+        {!isTherapist && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.07 }}
+          >
+            <SectionTitle>Mon programme</SectionTitle>
+            <div className="card-rf overflow-hidden divide-y divide-border">
+              {program ? (
+                <SettingsRow
+                  icon={<RefreshCw className="w-4 h-4" />}
+                  label="Changer de profil pathologique"
+                  sublabel={PROFILE_OPTIONS.find(p => p.key === program.profile_type)?.label ?? program.profile_type}
+                  onClick={() => { setSelectedProfile(program.profile_type ?? null); setShowProfilePicker(true) }}
+                />
+              ) : (
+                <SettingsRow
+                  icon={<User className="w-4 h-4" />}
+                  label="Configurer mon profil"
+                  sublabel="Aucun programme actif"
+                  onClick={() => navigate("/dashboard")}
+                />
+              )}
+            </div>
+
+            {/* Picker de profil inline */}
+            {showProfilePicker && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="mt-3 card-rf p-4 space-y-3"
+              >
+                <p className="text-sm font-semibold text-foreground">Choisir un profil</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {PROFILE_OPTIONS.map(({ key, emoji, label, sub }) => (
+                    <button
+                      key={key}
+                      onClick={() => setSelectedProfile(key)}
+                      className={`flex items-start gap-2 p-3 rounded-xl border-2 text-left transition-all ${
+                        selectedProfile === key
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/40"
+                      }`}
+                    >
+                      <span className="text-lg shrink-0">{emoji}</span>
+                      <div>
+                        <p className="text-xs font-semibold text-foreground leading-tight">{label}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <button
+                    onClick={() => setShowProfilePicker(false)}
+                    className="flex-1 py-2.5 rounded-xl border border-border text-sm text-muted-foreground hover:bg-muted transition-colors"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    disabled={!selectedProfile || createProgram.isPending}
+                    onClick={async () => {
+                      if (!selectedProfile) return
+                      if (program) {
+                        // Mettre à jour le profil existant
+                        await supabase
+                          .from("patient_programs")
+                          .update({ profile_type: selectedProfile as any })
+                          .eq("id", program.id)
+                        toast({ description: "Profil mis à jour" })
+                      } else {
+                        createProgram.mutate(selectedProfile)
+                      }
+                      setShowProfilePicker(false)
+                    }}
+                    className="flex-1 btn-forest py-2.5 text-sm disabled:opacity-50"
+                  >
+                    {createProgram.isPending ? "…" : "Confirmer"}
+                  </button>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         )}
 

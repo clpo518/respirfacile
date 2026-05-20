@@ -104,6 +104,31 @@ const Dashboard = () => {
   const totalMinutes = Math.round(recentSessions.reduce((acc, s) => acc + (s.duration_seconds ?? 0), 0) / 60)
   const profileMeta  = program?.profile_type ? PROFILE_LABELS[program.profile_type] : null
 
+  // Calcul du streak (jours consécutifs avec au moins 1 séance)
+  const streak = (() => {
+    if (!recentSessions.length) return 0
+    const sessionDays = new Set(
+      recentSessions.map(s => {
+        const d = new Date(s.created_at)
+        d.setHours(0, 0, 0, 0)
+        return d.getTime()
+      })
+    )
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    let count = 0
+    let current = new Date(today)
+    // Si aujourd'hui est vide, on commence quand même à hier
+    if (!sessionDays.has(current.getTime())) {
+      current.setDate(current.getDate() - 1)
+    }
+    while (sessionDays.has(current.getTime())) {
+      count++
+      current.setDate(current.getDate() - 1)
+    }
+    return count
+  })()
+
   // Exercices vedettes d'accueil (intro soigneusement choisie)
   const onboardingExercises = ["pause_decouverte", "coherence_5_5", "nasale_consciente"]
     .map(id => EXERCISES.find(e => e.id === id))
@@ -414,10 +439,10 @@ const Dashboard = () => {
                 className="grid grid-cols-4 gap-2"
               >
                 {[
-                  { value: `${stats.currentWeek}/8`, label: "Semaine",      color: "text-forest" },
-                  { value: stats.sessionsThisWeek,   label: "Cette sem.",   color: "text-primary" },
-                  { value: stats.totalSessions,      label: "Total séances", color: "text-primary" },
-                  { value: `${totalMinutes}min`,     label: "Pratiqué",     color: "text-amber-600" },
+                  { value: `${stats.currentWeek}/8`,                      label: "Semaine",    color: "text-forest" },
+                  { value: stats.sessionsThisWeek,                         label: "Cette sem.", color: "text-primary" },
+                  { value: streak > 0 ? `${streak}🔥` : "0",              label: "Jours streak", color: streak >= 7 ? "text-orange-500" : streak >= 3 ? "text-amber-500" : "text-muted-foreground" },
+                  { value: `${totalMinutes}min`,                            label: "Pratiqué",   color: "text-amber-600" },
                 ].map(({ value, label, color }) => (
                   <div key={label} className="card-rf p-2.5 text-center">
                     <p className={`font-display text-lg font-bold leading-tight ${color}`}>{value}</p>

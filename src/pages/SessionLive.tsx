@@ -85,8 +85,9 @@ const SessionLive = () => {
   const { user }       = useAuth()
   const { saveSession } = usePatientProgram()
 
-  const exerciseId = searchParams.get("exercise") ?? ""
-  const exercise   = getExerciseById(exerciseId)
+  const exerciseId   = searchParams.get("exercise") ?? ""
+  const assignmentId = searchParams.get("assignment") ?? null
+  const exercise     = getExerciseById(exerciseId)
 
   const [phase,              setPhase]             = useState<SessionPhase>("intro")
   const [elapsed,            setElapsed]           = useState(0)
@@ -232,6 +233,19 @@ const SessionLive = () => {
         durationSeconds:  elapsed,
         score: selectedStars > 0 ? selectedStars * 20 : undefined,
       })
+
+      // Marquer la prescription comme réalisée si la séance vient d'un assignment
+      if (assignmentId) {
+        try {
+          await (supabase as any)
+            .from("assignments")
+            .update({ status: "done" })
+            .eq("id", assignmentId)
+        } catch (assignErr) {
+          console.warn("Could not update assignment status:", assignErr)
+        }
+      }
+
       navigate(`/session/${saved.id}`)
     } catch (e) { console.error(e); navigate("/dashboard") }
     finally { setIsSaving(false) }
