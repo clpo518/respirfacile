@@ -46,7 +46,11 @@ const Settings      = lazy(() => import("./pages/Settings"));
 const Admin = lazy(() => import("./pages/Admin"));
 
 // Preview éphémère (à retirer après validation visuelle)
-const PreviewClinicalBadges = lazy(() => import("./pages/PreviewClinicalBadges"));
+const PreviewClinicalBadges = lazy(() => import("./pages/PreviewClinicalBadges"))
+
+// Pages publiques SEO
+const BilanSommeil      = lazy(() => import("@/pages/BilanSommeil"))
+const RonflementLanding = lazy(() => import("@/pages/RonflementLanding"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -80,6 +84,8 @@ const App = () => (
               <Route path="/legal/privacy"        element={<Privacy />} />
               <Route path="/blog"                 element={<Blog />} />
               <Route path="/blog/:slug"           element={<BlogArticle />} />
+              <Route path="/bilan-sommeil"        element={<BilanSommeil />} />
+              <Route path="/ronflement"           element={<RonflementLanding />} />
 
               {/* ── Preview éphémère (à retirer après validation) ── */}
               <Route path="/preview/clinical-badges" element={<PreviewClinicalBadges />} />

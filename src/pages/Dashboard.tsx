@@ -1,5 +1,5 @@
 import { useNavigate, Link, Navigate } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { usePatientProgram } from "@/hooks/usePatientProgram"
 import { supabase } from "@/integrations/supabase/client"
@@ -12,8 +12,9 @@ import {
   Play, ChevronRight, Settings, Clock,
   TrendingUp, Calendar, ArrowRight,
   Dumbbell, CheckCircle2, Award, Activity,
-  Stethoscope, Star,
+  Stethoscope, Star, Moon, Timer, Zap, Brain,
 } from "lucide-react"
+import { ActivityHeatmap } from "@/components/pro/ActivityHeatmap"
 
 // ─────────────────────────────────────────────
 // Dashboard Patient — expérience premium
@@ -65,6 +66,17 @@ const CAT_LABEL: Record<string, string> = {
   relaxation:          "Relaxation",
 }
 
+const PRE_SLEEP_EXERCISES = ['elevation_voile_palais', 'tenue_levres', 'scan_corporel']
+
+const ESS_QUESTIONS = [
+  "Regarder la télévision",
+  "Lire assis",
+  "Dans les transports en commun",
+  "Allongé pour vous reposer l'après-midi",
+  "En voiture à l'arrêt quelques minutes",
+]
+const ESS_OPTIONS = ["Jamais", "Rarement", "Parfois", "Souvent"]
+
 // ─────────────────────────────────────────────
 
 const Dashboard = () => {
@@ -78,20 +90,61 @@ const Dashboard = () => {
   } = usePatientProgram()
 
   const [therapistName,    setTherapistName]    = useState<string | null>(null)
+  const [therapistMessage, setTherapistMessage] = useState<string | null>(null)
   const [selectedProfile,  setSelectedProfile]  = useState<string | null>(null)
+
+  // BOLT test
+  const [boltRunning, setBoltRunning] = useState(false)
+  const [boltSeconds, setBoltSeconds] = useState(0)
+  const [boltHistory, setBoltHistory] = useState<Array<{score: number; date: string}>>([])
+
+  useEffect(() => {
+    if (!user) return
+    try {
+      const stored = localStorage.getItem(`bolt_${user.id}`)
+      if (stored) setBoltHistory(JSON.parse(stored))
+    } catch { /* ignore */ }
+  }, [user])
+
+  const boltIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const startBolt = () => {
+    setBoltSeconds(0)
+    setBoltRunning(true)
+    boltIntervalRef.current = setInterval(() => setBoltSeconds(s => s + 1), 1000)
+  }
+
+  const stopBolt = () => {
+    if (boltIntervalRef.current) clearInterval(boltIntervalRef.current)
+    setBoltRunning(false)
+    if (boltSeconds < 3) return // ignore accidental clicks
+    const entry = { score: boltSeconds, date: new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" }) }
+    const updated = [entry, ...boltHistory].slice(0, 5)
+    setBoltHistory(updated)
+    if (user) localStorage.setItem(`bolt_${user.id}`, JSON.stringify(updated))
+    setBoltSeconds(0)
+  }
+
+  useEffect(() => () => { if (boltIntervalRef.current) clearInterval(boltIntervalRef.current) }, [])
+
+  // ESS quiz
+  const [showEss, setShowEss] = useState(false)
+  const [essAnswers, setEssAnswers] = useState<number[]>(Array(5).fill(-1))
 
   // Récupère le nom du praticien lié
   useEffect(() => {
     if (!user) return
     supabase
       .from("therapist_patients")
-      .select("profiles!therapist_patients_therapist_id_fkey(full_name)")
+      .select("notes, profiles!therapist_patients_therapist_id_fkey(full_name)")
       .eq("patient_id", user.id)
       .eq("is_active", true)
       .maybeSingle()
       .then(({ data }) => {
         const name = (data as any)?.profiles?.full_name
+        const msg  = (data as any)?.notes
         if (name) setTherapistName(name)
+        if (msg)  setTherapistMessage(msg)
       })
   }, [user])
 
@@ -129,6 +182,16 @@ const Dashboard = () => {
     return count
   })()
 
+  const preSleepExos = PRE_SLEEP_EXERCISES
+    .map(id => EXERCISES.find(e => e.id === id))
+    .filter(Boolean) as typeof EXERCISES
+
+  const essScore = essAnswers.every(a => a >= 0) ? essAnswers.reduce((s, a) => s + a, 0) : null
+  const essRecommendedProfile = essScore === null ? null
+    : essScore >= 13 ? "adult_saos_severe"
+    : essScore >= 8  ? "adult_saos_mild"
+    : "adult_tmof"
+
   // Exercices vedettes d'accueil (intro soigneusement choisie)
   const onboardingExercises = ["pause_decouverte", "coherence_5_5", "nasale_consciente"]
     .map(id => EXERCISES.find(e => e.id === id))
@@ -158,6 +221,22 @@ const Dashboard = () => {
         {/* ── Prescriptions orthophoniste ─────── */}
         <div className="px-6">
           <PatientHomeworkSection />
+          {/* Message motivant orthophoniste */}
+          {therapistMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-3 flex items-start gap-3 rounded-2xl bg-amber-50 border border-amber-200/60 px-4 py-3"
+            >
+              <span className="text-xl shrink-0 mt-0.5">💬</span>
+              <div>
+                <p className="text-xs font-semibold text-amber-700 mb-0.5">
+                  Message de {therapistName ?? "votre orthophoniste"}
+                </p>
+                <p className="text-sm text-amber-900 leading-relaxed">{therapistMessage}</p>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* ═══════════════════════════════════════
@@ -355,6 +434,69 @@ const Dashboard = () => {
               <p className="text-sm font-semibold text-foreground mb-0.5">Démarrer en autonomie</p>
               <p className="text-xs text-muted-foreground mb-4">Choisissez votre profil pour lancer votre programme personnalisé.</p>
 
+              {/* Lien vers le quiz ESS */}
+              {!showEss && (
+                <button
+                  onClick={() => setShowEss(true)}
+                  className="flex items-center gap-2 text-xs text-primary font-medium hover:underline mb-3"
+                >
+                  <Brain className="w-3.5 h-3.5" />
+                  Vous ne savez pas quel profil choisir ? Faites le test (30 sec)
+                </button>
+              )}
+
+              {/* Quiz ESS */}
+              {showEss && (
+                <div className="mb-4 rounded-xl bg-muted/60 p-4 space-y-4">
+                  <p className="text-xs font-semibold text-foreground">Quelle est la probabilité que vous vous endormiez dans ces situations ?</p>
+                  {ESS_QUESTIONS.map((q, qi) => (
+                    <div key={qi}>
+                      <p className="text-xs text-muted-foreground mb-2">{q}</p>
+                      <div className="flex gap-1.5">
+                        {ESS_OPTIONS.map((opt, oi) => (
+                          <button
+                            key={oi}
+                            onClick={() => setEssAnswers(prev => { const n = [...prev]; n[qi] = oi; return n })}
+                            className={`flex-1 py-1.5 rounded-lg text-[10px] font-medium border transition-all ${
+                              essAnswers[qi] === oi
+                                ? "bg-primary text-white border-primary"
+                                : "bg-card border-border text-muted-foreground hover:border-primary/40"
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {essScore !== null && (
+                    <div className={`rounded-xl p-3 ${
+                      essScore >= 13 ? "bg-amber-50 border border-amber-200" :
+                      essScore >= 8  ? "bg-sky-50 border border-sky-200" :
+                      "bg-green-50 border border-green-200"
+                    }`}>
+                      <p className="text-xs font-semibold">
+                        Score ESS : {essScore}/15 →{" "}
+                        <span className="font-bold">
+                          {essScore >= 13 ? "Somnolence excessive — profil SAOS sévère recommandé"
+                            : essScore >= 8 ? "Somnolence légère — profil SAOS léger recommandé"
+                            : "Somnolence normale — profil TMOF recommandé"}
+                        </span>
+                      </p>
+                      <button
+                        onClick={() => {
+                          if (essRecommendedProfile) setSelectedProfile(essRecommendedProfile)
+                          setShowEss(false)
+                        }}
+                        className="mt-2 text-xs text-primary font-semibold hover:underline"
+                      >
+                        Appliquer cette recommandation →
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-2.5 mb-4">
                 {[
                   { key: "adult_saos_mild",   emoji: "😴", label: "SAOS léger",    sub: "Apnées légères à modérées" },
@@ -523,6 +665,42 @@ const Dashboard = () => {
                 </motion.div>
               )}
 
+              {/* ── Mode Pré-sommeil ──────────────── */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.14 }}
+                className="card-rf p-4"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center">
+                      <Moon className="w-4 h-4 text-indigo-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground leading-tight">Mode pré-sommeil</p>
+                      <p className="text-[10px] text-muted-foreground">3 exercices · 15 min · idéal avant le coucher</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {preSleepExos.map((ex, i) => (
+                    <button
+                      key={ex.id}
+                      onClick={() => navigate(`/session-live?exercise=${ex.id}`)}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-50/50 hover:bg-indigo-50 border border-indigo-100/50 transition-all text-left group"
+                    >
+                      <span className="text-lg w-7 text-center shrink-0">{ex.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-foreground truncate">{ex.name_fr}</p>
+                        <p className="text-[10px] text-muted-foreground">{formatDuration(ex.duration_seconds)}</p>
+                      </div>
+                      <span className="text-[10px] text-indigo-500 font-medium shrink-0">{i + 1}</span>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+
               {/* Tracker semaine */}
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
@@ -593,6 +771,96 @@ const Dashboard = () => {
                 <p className="text-sm text-foreground leading-relaxed">
                   {getDailyTip(stats.currentWeek)}
                 </p>
+              </motion.div>
+
+              {/* Heatmap activité patient */}
+              {user && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.18 }}
+                  className="card-rf p-4"
+                >
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                    Votre activité
+                  </p>
+                  <ActivityHeatmap userId={user.id} days={84} />
+                </motion.div>
+              )}
+
+              {/* Test BOLT */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.22 }}
+                className="card-rf p-4"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center">
+                    <Timer className="w-3.5 h-3.5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-foreground leading-tight">Test BOLT</p>
+                    <p className="text-[10px] text-muted-foreground">Tolérance CO₂ · objectif ≥ 20 sec</p>
+                  </div>
+                  {boltHistory[0] && (
+                    <span className={`ml-auto text-xs font-bold px-2 py-0.5 rounded-full ${
+                      boltHistory[0].score >= 20 ? "bg-green-100 text-green-700" :
+                      boltHistory[0].score >= 10 ? "bg-amber-100 text-amber-700" :
+                      "bg-red-100 text-red-700"
+                    }`}>
+                      {boltHistory[0].score}s
+                    </span>
+                  )}
+                </div>
+
+                {boltRunning ? (
+                  <div className="text-center py-3">
+                    <p className="font-display text-4xl font-bold text-primary tabular-nums">{boltSeconds}s</p>
+                    <p className="text-[10px] text-muted-foreground mt-1 mb-3">Retenez votre souffle · arrêtez à la 1ère envie</p>
+                    <button
+                      onClick={stopBolt}
+                      className="w-full py-2.5 rounded-xl bg-primary text-white text-sm font-semibold"
+                    >
+                      Arrêter
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {boltHistory.length > 0 ? (
+                      <div className="mb-3 space-y-1.5">
+                        {boltHistory.map((h, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <div
+                              className={`h-2 rounded-full transition-all ${
+                                h.score >= 20 ? "bg-green-400" :
+                                h.score >= 10 ? "bg-amber-400" : "bg-red-400"
+                              }`}
+                              style={{ width: `${Math.min(100, (h.score / 40) * 100)}%`, minWidth: "4px" }}
+                            />
+                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">{h.score}s · {h.date}</span>
+                          </div>
+                        ))}
+                        <div className="flex justify-between text-[10px] text-muted-foreground pt-1">
+                          <span>0s</span>
+                          <span className="text-emerald-600 font-medium">Objectif : 20s</span>
+                          <span>40s+</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                        Expirez doucement, arrêtez de respirer, chronométrez jusqu'à la première envie de respirer.
+                      </p>
+                    )}
+                    <button
+                      onClick={startBolt}
+                      className="w-full py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-xs font-semibold hover:bg-emerald-100 transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <Zap className="w-3 h-3" />
+                      Faire le test maintenant
+                    </button>
+                  </>
+                )}
               </motion.div>
 
               {/* Liste programme */}

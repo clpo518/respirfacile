@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { motion } from "framer-motion"
 import {
   ArrowLeft, Calendar, Clock, TrendingUp, Activity,
-  FileText, Star, Send, Mail, CheckCircle2, Mic
+  FileText, Star, Send, Mail, CheckCircle2, Mic, Download
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { SessionRow } from "@/integrations/supabase/types"
@@ -25,6 +25,9 @@ const PatientDetail = () => {
   }, [isPatient])
 
   const [prescribeOpen, setPrescribeOpen] = useState(false)
+  const [motivMessage, setMotivMessage] = useState("")
+  const [savingMsg, setSavingMsg] = useState(false)
+  const [msgSaved, setMsgSaved] = useState(false)
 
   if (isPatient) return <Navigate to="/dashboard" replace />
 
@@ -116,6 +119,36 @@ const PatientDetail = () => {
     },
     enabled: !!patientId,
   })
+
+  const handleSaveMessage = async () => {
+    if (!patientId || !motivMessage.trim()) return
+    setSavingMsg(true)
+    await (supabase as any)
+      .from("therapist_patients")
+      .update({ notes: motivMessage.trim() })
+      .eq("patient_id", patientId)
+    setSavingMsg(false)
+    setMsgSaved(true)
+    setTimeout(() => setMsgSaved(false), 2500)
+  }
+
+  const handleExportCSV = () => {
+    const header = "Date,Exercice,Durée (min),Note (/100)\n"
+    const rows = sessions.map(s => {
+      const ex  = getExerciseById(s.exercise_id)
+      const d   = new Date(s.created_at).toLocaleDateString("fr-FR")
+      const dur = s.duration_seconds ? (s.duration_seconds / 60).toFixed(1) : "0"
+      const score = s.score != null ? s.score : ""
+      return `"${d}","${ex?.name_fr ?? s.exercise_id}","${dur}","${score}"`
+    }).join("\n")
+    const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement("a")
+    a.href     = url
+    a.download = `compliance_${patient?.full_name?.replace(/\s+/g, "_") ?? "patient"}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   const handleExportPDF = () => {
     const dateStr = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
@@ -237,6 +270,10 @@ const PatientDetail = () => {
                   <FileText className="w-4 h-4" />
                   Bilan PDF
                 </Button>
+                <Button variant="outline" className="gap-2" onClick={handleExportCSV}>
+                  <Download className="w-4 h-4" />
+                  CSV
+                </Button>
               </div>
             </div>
 
@@ -271,6 +308,44 @@ const PatientDetail = () => {
                 <p className="text-xs text-muted-foreground mt-0.5">Programme</p>
               </div>
             </div>
+          </motion.div>
+
+          {/* ── Message motivant pour le patient ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08 }}
+            className="card-rf p-5 mb-6"
+          >
+            <p className="text-sm font-semibold text-foreground mb-1">Message motivant</p>
+            <p className="text-xs text-muted-foreground mb-3">
+              Ce message s'affiche dans le tableau de bord du patient, sous ses prescriptions.
+            </p>
+            <div className="flex gap-2">
+              <textarea
+                value={motivMessage}
+                onChange={e => setMotivMessage(e.target.value)}
+                placeholder="Bravo pour votre régularité cette semaine ! Je vois de vrais progrès sur la pause contrôlée."
+                maxLength={200}
+                rows={2}
+                className="flex-1 text-sm border border-border rounded-xl px-3 py-2.5 bg-background text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <Button
+                onClick={handleSaveMessage}
+                disabled={savingMsg || !motivMessage.trim()}
+                className="shrink-0 gap-1.5"
+                size="sm"
+              >
+                {savingMsg ? (
+                  <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                ) : msgSaved ? (
+                  <><CheckCircle2 className="w-3.5 h-3.5" /> Envoyé</>
+                ) : (
+                  <><Send className="w-3.5 h-3.5" /> Envoyer</>
+                )}
+              </Button>
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1.5 text-right">{motivMessage.length}/200</p>
           </motion.div>
 
           {/* ── Body 2 colonnes ── */}

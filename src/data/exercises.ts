@@ -432,6 +432,25 @@ export const EXERCISES: Exercise[] = [
     voice_exercise: true,
   },
 
+  {
+    id: 'chin_tuck',
+    category: 'myofonctionnel' as ExerciseCategory,
+    name_fr: 'Rétraction cervicale',
+    duration_seconds: 120,
+    difficulty: 1,
+    description_fr: 'Renforce les fléchisseurs profonds du cou — réduit de −15 % la résistance pharyngée. Le seul exercice postural validé qui améliore directement le passage des voies aériennes (Weiss et al., 2013).',
+    instructions_fr: [
+      'Assis ou debout, regard droit devant, épaules détendues',
+      'Sans incliner la tête, rentrez le menton vers la nuque ("double menton")',
+      'Maintenez 5 secondes en respirant normalement par le nez',
+      'Relâchez complètement, revenez à la position de départ',
+      '15 répétitions · 2 séries avec 15 secondes de repos entre chaque série',
+    ],
+    metrics_tracked: ['reps_completed'] as const,
+    target_profile: ['adult_saos_mild', 'adult_saos_severe', 'adult_tmof', 'adult_mixed'] as const,
+    icon: '🧘',
+  },
+
   // Cohérence cardiaque — exercices complémentaires
   {
     id: 'box_breathing',
@@ -616,6 +635,7 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
       'nasale_consciente',
       'respiration_diaphragmatique',
       'scan_corporel',
+      'chin_tuck',               // Weiss 2013: −15 % résistance pharyngée (semaine 5)
     ],
   },
   adult_saos_severe: {
@@ -631,6 +651,7 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
       'nasale_consciente',
       'respiration_diaphragmatique',
       'scan_corporel',
+      'chin_tuck',               // Weiss 2013: −15 % résistance pharyngée (semaine 3)
     ],
   },
   adult_tmof: {
@@ -647,6 +668,7 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
       'gargarisme',
       'phonemes_kaga',
       'nasale_consciente',
+      'chin_tuck',               // Weiss 2013: −15 % résistance pharyngée (semaine 2)
     ],
   },
   adult_mixed: {
@@ -662,6 +684,7 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
       'nasale_consciente',
       'respiration_diaphragmatique',
       'scan_corporel',
+      'chin_tuck',               // Weiss 2013: −15 % résistance pharyngée (semaine 3)
     ],
   },
 };
