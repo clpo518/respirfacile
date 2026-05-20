@@ -13,7 +13,7 @@ interface Stats {
 }
 
 const PLAN_LABELS: Record<string, string> = {
-  starter: "Starter — 3 patients",
+  starter: "Démarrage — 3 patients",
   pro:     "Pro — 10 patients",
   clinic:  "Clinique — 30 patients",
 };
