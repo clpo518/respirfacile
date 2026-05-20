@@ -95,6 +95,7 @@ const SessionLive = () => {
   const [cycleCount,         setCycleCount]        = useState(0)
   const [stepIndex,          setStepIndex]         = useState(0)
   const [isSaving,           setIsSaving]          = useState(false)
+  const [selectedStars,      setSelectedStars]     = useState<number>(0)
   const [therapistName,      setTherapistName]     = useState<string | null>(null)
   const [voiceUploaded,      setVoiceUploaded]     = useState(false)
 
@@ -229,6 +230,7 @@ const SessionLive = () => {
         exerciseId:       exercise.id,
         exerciseCategory: exercise.category,
         durationSeconds:  elapsed,
+        score: selectedStars > 0 ? selectedStars * 20 : undefined,
       })
       navigate(`/session/${saved.id}`)
     } catch (e) { console.error(e); navigate("/dashboard") }
@@ -543,15 +545,27 @@ const SessionLive = () => {
                     </p>
                   </div>
 
-                  {/* Étoiles Duolingo */}
-                  <div className="flex justify-center gap-2">
-                    {[0, 1, 2].map(i => (
-                      <motion.div key={i}
-                        initial={{ scale: 0 }} animate={{ scale: 1 }}
-                        transition={{ delay: 0.3 + i * 0.12, type: "spring" }}>
-                        <Star className="w-8 h-8 fill-amber-400 text-amber-400" />
-                      </motion.div>
-                    ))}
+                  {/* Auto-évaluation */}
+                  <div className="space-y-1.5">
+                    <p className="text-xs text-muted-foreground">Comment s'est passée cette séance ?</p>
+                    <div className="flex justify-center gap-2">
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <motion.button
+                          key={star}
+                          onClick={() => setSelectedStars(star)}
+                          whileTap={{ scale: 0.85 }}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 0.3 + star * 0.08, type: "spring" }}
+                        >
+                          <Star className={`w-8 h-8 transition-colors ${
+                            star <= selectedStars
+                              ? "fill-amber-400 text-amber-400"
+                              : "text-muted-foreground/30"
+                          }`} />
+                        </motion.button>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Stats */}

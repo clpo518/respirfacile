@@ -166,6 +166,21 @@ const PatientDetail = () => {
     ? patient.full_name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
     : "??"
 
+  const lastSessionDaysAgo = sessions[0]
+    ? Math.floor((Date.now() - new Date(sessions[0].created_at).getTime()) / 86_400_000)
+    : null
+
+  const lastSessionLabel =
+    lastSessionDaysAgo === null ? "Aucune séance" :
+    lastSessionDaysAgo === 0   ? "Aujourd'hui" :
+    lastSessionDaysAgo === 1   ? "Hier" :
+    `Il y a ${lastSessionDaysAgo} j`
+
+  const complianceColor =
+    weekCount >= 3 ? { dot: "bg-green-500",  text: "text-green-700", badge: "bg-green-50 border-green-200 text-green-700",  label: "Actif" } :
+    weekCount >= 1 ? { dot: "bg-amber-500",  text: "text-amber-700", badge: "bg-amber-50 border-amber-200 text-amber-700",  label: "Partiel" } :
+                     { dot: "bg-red-500",    text: "text-red-700",   badge: "bg-red-50 border-red-200 text-red-700",        label: "Inactif" }
+
   const profileTypeLabel = program?.profile_type
     ? PROFILE_TYPE_LABELS[program.profile_type] ?? program.profile_type
     : null
@@ -225,26 +240,35 @@ const PatientDetail = () => {
               </div>
             </div>
 
-            {/* Ligne 2 : stats */}
+            {/* Ligne 2 : compliance + stats */}
             <div className="flex items-center gap-0 mt-5 pt-5 border-t border-border/60">
+              {/* Compliance — colorée */}
               <div className="flex-1 text-center">
-                <p className="font-display text-2xl text-foreground">{weekCount}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Cette semaine</p>
+                <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${complianceColor.dot}`} />
+                  <p className={`font-display text-2xl ${complianceColor.text}`}>{weekCount}</p>
+                </div>
+                <p className="text-xs text-muted-foreground">séances cette sem.</p>
+                <span className={`mt-1 inline-block text-[10px] font-medium px-2 py-0.5 rounded-full border ${complianceColor.badge}`}>
+                  {complianceColor.label}
+                </span>
               </div>
-              <div className="w-px h-10 bg-border" />
+              <div className="w-px h-12 bg-border" />
               <div className="flex-1 text-center">
                 <p className="font-display text-2xl text-foreground">{totalCount}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Total séances</p>
               </div>
-              <div className="w-px h-10 bg-border" />
+              <div className="w-px h-12 bg-border" />
               <div className="flex-1 text-center">
-                <p className="font-display text-2xl text-foreground">{program?.week_number ?? "—"}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Semaine programme</p>
-              </div>
-              <div className="w-px h-10 bg-border" />
-              <div className="flex-1 text-center">
-                <p className="font-display text-2xl text-foreground">{sessions[0] ? formatDate(sessions[0].created_at) : "—"}</p>
+                <p className="font-display text-2xl text-foreground">{lastSessionLabel}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">Dernière séance</p>
+              </div>
+              <div className="w-px h-12 bg-border" />
+              <div className="flex-1 text-center">
+                <p className="font-display text-2xl text-foreground">
+                  {program?.week_number ? `S${program.week_number}/8` : "—"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">Programme</p>
               </div>
             </div>
           </motion.div>

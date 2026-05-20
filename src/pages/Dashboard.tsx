@@ -7,6 +7,7 @@ import { EXERCISES } from "@/data/exercises"
 import { AppLayout } from "@/components/AppLayout"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
+import PatientHomeworkSection from "@/components/assignments/PatientHomeworkSection"
 import {
   Play, ChevronRight, Settings, Clock,
   TrendingUp, Calendar, ArrowRight,
@@ -73,9 +74,11 @@ const Dashboard = () => {
     program, programLoading,
     todayExercises, weekDays, stats,
     recentSessions, weekSessions,
+    createProgram,
   } = usePatientProgram()
 
-  const [therapistName, setTherapistName] = useState<string | null>(null)
+  const [therapistName,    setTherapistName]    = useState<string | null>(null)
+  const [selectedProfile,  setSelectedProfile]  = useState<string | null>(null)
 
   // Récupère le nom du praticien lié
   useEffect(() => {
@@ -126,6 +129,11 @@ const Dashboard = () => {
             <Settings className="w-5 h-5 text-muted-foreground" />
           </Link>
         </header>
+
+        {/* ── Prescriptions orthophoniste ─────── */}
+        <div className="px-6">
+          <PatientHomeworkSection />
+        </div>
 
         {/* ═══════════════════════════════════════
             PAS DE PROGRAMME — état d'accueil premium
@@ -311,18 +319,54 @@ const Dashboard = () => {
               </motion.div>
             )}
 
-            {/* CTA explorer */}
+            {/* Sélecteur de profil — démarrage autonome */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.36 }}
+              className="card-rf p-5"
             >
+              <p className="text-sm font-semibold text-foreground mb-0.5">Je connais mon diagnostic</p>
+              <p className="text-xs text-muted-foreground mb-4">Démarrez votre programme personnalisé en autonomie :</p>
+
+              <div className="grid grid-cols-2 gap-2.5 mb-4">
+                {[
+                  { key: "adult_saos_mild",   emoji: "😴", label: "SAOS léger",    sub: "Apnées légères à modérées" },
+                  { key: "adult_saos_severe",  emoji: "🌙", label: "SAOS sévère",   sub: "Apnées sévères, traitement actif" },
+                  { key: "adult_tmof",         emoji: "👅", label: "TMOF",          sub: "Troubles myofonctionnels" },
+                  { key: "adult_mixed",        emoji: "🔀", label: "Profil mixte",  sub: "SAOS + myofonctionnel" },
+                ].map(({ key, emoji, label, sub }) => {
+                  const isSelected = selectedProfile === key
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setSelectedProfile(key)}
+                      className={`flex items-start gap-3 p-3 rounded-xl border-2 text-left transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/5 shadow-sm"
+                          : "border-border hover:border-primary/40 bg-card"
+                      }`}
+                    >
+                      <span className="text-xl shrink-0 mt-0.5">{emoji}</span>
+                      <div className="min-w-0">
+                        <p className={`text-sm font-semibold leading-tight ${isSelected ? "text-primary" : "text-foreground"}`}>{label}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">{sub}</p>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+
               <Button
-                className="w-full btn-forest py-3.5 gap-2"
-                onClick={() => navigate("/practice")}
+                className="w-full btn-forest py-3 gap-2"
+                disabled={!selectedProfile || createProgram.isPending}
+                onClick={() => selectedProfile && createProgram.mutate(selectedProfile)}
               >
-                <Dumbbell className="w-4 h-4" />
-                Explorer les 13 exercices du programme
+                {createProgram.isPending ? (
+                  <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />Création en cours…</>
+                ) : (
+                  <><Dumbbell className="w-4 h-4" />Commencer mon programme</>
+                )}
               </Button>
             </motion.div>
 

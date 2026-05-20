@@ -84,8 +84,11 @@ const PatientHomeworkSection = () => {
   }, [user]);
 
   const handleStartExercise = (assignment: Assignment) => {
-    // Navigate to practice with the assignment context
-    navigate(`/practice?category=${assignment.exercise_category}&assignment=${assignment.id}`);
+    if (assignment.exercise_id) {
+      navigate(`/session-live?exercise=${assignment.exercise_id}`)
+    } else {
+      navigate(`/practice?category=${assignment.exercise_category}&assignment=${assignment.id}`)
+    }
   };
 
   const formatDate = (dateString: string) => {
