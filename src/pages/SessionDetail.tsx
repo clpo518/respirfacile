@@ -12,10 +12,10 @@ import type { SessionRow } from "@/integrations/supabase/types"
 // ─────────────────────────────────────────────
 
 const CAT_BENEFITS: Record<string, string> = {
-  pause_controlee:     "Améliore votre tolérance naturelle au CO₂ — le marqueur clé de la respiration nasale et de la réduction des apnées.",
+  pause_controlee:     "Améliore la tolérance au CO₂ — objectif : pause confortable ≥ 20 secondes (score BOLT ≥ 20), marqueur validé d'une bonne respiration nasale.",
   coherence_cardiaque: "Synchronise rythme cardiaque et respiration. Réduit le cortisol, améliore la qualité du sommeil en 4 semaines.",
   respiration_nasale:  "Réhabilite la respiration nasale exclusive : filtre l'air, réchauffe, réduit la résistance des voies aériennes supérieures.",
-  myofonctionnel:      "Renforce les muscles oropharyngés qui maintiennent les voies aériennes ouvertes pendant le sommeil.",
+  myofonctionnel:      "Renforce les muscles oropharyngés — 13 essais randomisés confirment −50 % d'apnées en 3 mois avec des exercices quotidiens (Pisoni et al., 2024).",
   diaphragmatique:     "Active le diaphragme, améliore la ventilation alvéolaire et réduit la respiration thoracique superficielle.",
   relaxation:          "Réduit l'activation du système nerveux sympathique pour favoriser un endormissement plus rapide.",
 }

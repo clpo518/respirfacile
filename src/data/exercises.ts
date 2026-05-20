@@ -179,7 +179,7 @@ export const EXERCISES: Exercise[] = [
       '3 séries avec 30 secondes de repos',
     ],
     metrics_tracked: ['reps_completed'],
-    target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
+    target_profile: ['adult_saos_mild', 'adult_saos_severe', 'adult_tmof', 'adult_mixed'],
     icon: '👅',
   },
   {
@@ -189,7 +189,7 @@ export const EXERCISES: Exercise[] = [
     duration_seconds: 150,
     difficulty: 2,
     description_fr:
-      'Renforce toute la langue contre le palais dur — l\'un des exercices OMT les plus efficaces selon la littérature.',
+      'Renforce toute la langue contre le palais dur — présent dans tous les protocoles OMT validés. L\'étude AirwayGym (2020) obtient −53 % d\'IAH avec ce type d\'exercice pratiqué quotidiennement.',
     instructions_fr: [
       'Collez toute la langue contre le palais',
       'Ouvrez la bouche le plus possible sans décoller la langue',
@@ -215,7 +215,7 @@ export const EXERCISES: Exercise[] = [
       'Idéal le matin après le brossage',
     ],
     metrics_tracked: ['duration_completed'],
-    target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
+    target_profile: ['adult_saos_mild', 'adult_saos_severe', 'adult_tmof', 'adult_mixed'],
     icon: '🗣️',
     voice_exercise: true,
   },
@@ -234,7 +234,7 @@ export const EXERCISES: Exercise[] = [
       'Répétez 3 séries',
     ],
     metrics_tracked: ['reps_completed'],
-    target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
+    target_profile: ['adult_saos_mild', 'adult_saos_severe', 'adult_tmof', 'adult_mixed'],
     icon: '🗣️',
     voice_exercise: true,
   },
@@ -271,7 +271,7 @@ export const EXERCISES: Exercise[] = [
     duration_seconds: 300,
     difficulty: 2,
     description_fr:
-      'Technique de pranayama — débouche les narines et équilibre la respiration.',
+      'Technique de pranayama — désencombre les narines et rééduque la respiration nasale exclusive. Réduit la résistance des voies aériennes supérieures.',
     instructions_fr: [
       'Bouchez la narine droite avec le pouce',
       'Inspirez par la narine gauche pendant 4 secondes',
@@ -280,7 +280,7 @@ export const EXERCISES: Exercise[] = [
       'Répétez en alternant pendant 5 minutes',
     ],
     metrics_tracked: ['cycles_completed'],
-    target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
+    target_profile: ['adult_saos_mild', 'adult_saos_severe', 'adult_tmof', 'adult_mixed'],
     icon: '👃',
   },
 
@@ -328,7 +328,7 @@ export const EXERCISES: Exercise[] = [
       'Répétez 5 fois chaque direction',
     ],
     metrics_tracked: ['reps_completed'],
-    target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
+    target_profile: ['adult_saos_mild', 'adult_saos_severe', 'adult_tmof', 'adult_mixed'],
     icon: '👅',
   },
   {
@@ -347,7 +347,7 @@ export const EXERCISES: Exercise[] = [
       'Répétez 5 fois avec 15 secondes de repos entre chaque',
     ],
     metrics_tracked: ['hold_duration', 'reps_completed'],
-    target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
+    target_profile: ['adult_saos_mild', 'adult_saos_severe', 'adult_tmof', 'adult_mixed'],
     icon: '🗣️',
     voice_exercise: true,
   },
@@ -370,6 +370,66 @@ export const EXERCISES: Exercise[] = [
     metrics_tracked: ['reps_completed'],
     target_profile: ['adult_tmof', 'adult_mixed', 'adult_saos_mild'],
     icon: '👅',
+  },
+
+  // Myofonctionnel — exercices lèvres & voile (validés Guimarães 2009, PMC5699856)
+  {
+    id: 'tenue_levres',
+    category: 'myofonctionnel',
+    name_fr: 'Fermeture labiale',
+    duration_seconds: 120,
+    difficulty: 1,
+    description_fr:
+      'Renforce les muscles des lèvres (orbicularis oris) — corrige la respiration buccale nocturne. Essai clinique : IAH de 12,2 à 3,9 avec cet exercice seul.',
+    instructions_fr: [
+      'Fermez les lèvres en les pressant légèrement l\'une contre l\'autre',
+      'Maintenez sans contracter les joues ni le menton',
+      'Respirez uniquement par le nez tout au long',
+      'Tenez 30 secondes puis relâchez complètement',
+      'Répétez 10 fois',
+    ],
+    metrics_tracked: ['hold_duration', 'reps_completed'],
+    target_profile: ['adult_saos_mild', 'adult_saos_severe', 'adult_tmof', 'adult_mixed'],
+    icon: '👄',
+  },
+  {
+    id: 'balayage_palais',
+    category: 'myofonctionnel',
+    name_fr: 'Balayage du palais',
+    duration_seconds: 120,
+    difficulty: 1,
+    description_fr:
+      'Mobilise la langue sur toute la voûte palatine — améliore l\'indépendance langue-mâchoire. Inclus dans le protocole de Guimarães (2009, AJRCCM), essai fondateur du traitement OMT du SAOS.',
+    instructions_fr: [
+      'Placez la pointe de la langue contre le palais, juste derrière les incisives',
+      'Faites glisser lentement la langue vers l\'arrière, aussi loin que possible',
+      'Revenez vers l\'avant en frottant fermement le palais',
+      '15 allers-retours consécutifs',
+      '3 séries avec 20 secondes de repos',
+    ],
+    metrics_tracked: ['reps_completed'],
+    target_profile: ['adult_saos_mild', 'adult_tmof', 'adult_mixed'],
+    icon: '👅',
+  },
+  {
+    id: 'elevation_voile_palais',
+    category: 'myofonctionnel',
+    name_fr: 'Élévation du voile du palais',
+    duration_seconds: 120,
+    difficulty: 1,
+    description_fr:
+      'Renforce le voile du palais mou — exercice central du protocole Guimarães 2009 (−50 % IAH). Tonifie les muscles vélaires qui s\'affaissent pendant le sommeil.',
+    instructions_fr: [
+      'Devant un miroir, ouvrez la bouche en grand',
+      'Prononcez lentement "Aaa" 20 fois : observez la luette qui monte',
+      'Enchaînez "E-I-E-I-E" 10 fois en accentuant le mouvement',
+      'La luette doit remonter nettement à chaque voyelle',
+      '3 séries avec 20 secondes de repos',
+    ],
+    metrics_tracked: ['reps_completed'],
+    target_profile: ['adult_saos_mild', 'adult_saos_severe', 'adult_tmof', 'adult_mixed'],
+    icon: '🗣️',
+    voice_exercise: true,
   },
 
   // Cohérence cardiaque — exercices complémentaires
@@ -542,6 +602,7 @@ export const EXERCISES_BY_CATEGORY: Record<ExerciseCategory, Exercise[]> = {
 };
 
 // PROGRAM_TEMPLATES: used by usePatientProgram
+// Protocols enriched from Guimarães 2009, AirwayGym app RCT (2020), Pisoni 2024 overview
 export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
   adult_saos_mild: {
     exerciseIds: [
@@ -549,6 +610,9 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
       'coherence_5_5',
       'box_breathing',
       'langue_repos',
+      'aspiration_langue',       // AirwayGym: IAH −53 %
+      'tenue_levres',            // PMC5699856: IAH 12,2 → 3,9
+      'elevation_voile_palais',  // Guimarães 2009: −50 % IAH
       'nasale_consciente',
       'respiration_diaphragmatique',
       'scan_corporel',
@@ -560,7 +624,11 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
       'coherence_4_6',
       'respiration_478',
       'langue_repos',
-      'aspiration_langue',
+      'aspiration_langue',       // AirwayGym: IAH −53 %
+      'elevation_voile_palais',  // Guimarães 2009: −50 % IAH
+      'tenue_levres',            // Fermeture buccale nocturne
+      'gargarisme',              // Voile du palais vibration
+      'nasale_consciente',
       'respiration_diaphragmatique',
       'scan_corporel',
     ],
@@ -571,6 +639,9 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
       'claquement_langue',
       'aspiration_langue',
       'protrusion_langue',
+      'balayage_palais',         // Guimarães 2009 protocol
+      'tenue_levres',            // Orbicularis oris
+      'elevation_voile_palais',  // Voile du palais
       'son_ah_tenu',
       'deglutition_correcte',
       'gargarisme',
@@ -582,10 +653,12 @@ export const PROGRAM_TEMPLATES: Record<string, { exerciseIds: string[] }> = {
     exerciseIds: [
       'pause_decouverte',
       'coherence_5_5',
-      'box_breathing',
       'langue_repos',
       'protrusion_langue',
       'aspiration_langue',
+      'balayage_palais',         // Guimarães 2009
+      'tenue_levres',            // Fermeture labiale
+      'elevation_voile_palais',  // Voile du palais
       'nasale_consciente',
       'respiration_diaphragmatique',
       'scan_corporel',

@@ -206,8 +206,8 @@ const Dashboard = () => {
                 <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/15">
                   {[
                     { value: "−50%",  label: "IAH en moyenne",      icon: TrendingUp },
-                    { value: "15 min", label: "par jour",            icon: Clock },
-                    { value: "9",      label: "études cliniques",    icon: Award },
+                    { value: "20 min", label: "par jour",            icon: Clock },
+                    { value: "13",     label: "essais randomisés",   icon: Award },
                   ].map(({ value, label, icon: Icon }) => (
                     <div key={label} className="text-center">
                       <Icon className="w-3.5 h-3.5 text-white/40 mx-auto mb-1" />
@@ -338,7 +338,7 @@ const Dashboard = () => {
                     {recentSessions.length} séance{recentSessions.length > 1 ? "s" : ""} déjà effectuée{recentSessions.length > 1 ? "s" : ""}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {totalMinutes} min de rééducation · votre praticien voit votre progression
+                    {totalMinutes} min de rééducation{therapistName ? " · votre praticien voit votre progression" : " · continuez, chaque séance compte"}
                   </p>
                 </div>
                 <Activity className="w-4 h-4 text-primary shrink-0" />
@@ -512,7 +512,7 @@ const Dashboard = () => {
                   <span className="text-4xl block">🎉</span>
                   <h2 className="font-display text-xl text-primary">Programme du jour terminé !</h2>
                   <p className="text-sm text-muted-foreground">
-                    Tous vos exercices du jour sont complétés. Votre orthophoniste voit votre progression en temps réel.
+                    Tous vos exercices du jour sont complétés.{therapistName ? " Votre orthophoniste voit votre progression en temps réel." : " Revenez demain pour continuer votre progression."}
                   </p>
                   <button
                     onClick={() => navigate("/practice")}

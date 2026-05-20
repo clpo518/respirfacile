@@ -58,12 +58,12 @@ const CAT_BENEFITS: Record<string, string> = {
 
 // Message court affiché sur l'écran de fin
 const DONE_MESSAGES: Record<string, string> = {
-  pause_controlee:     "Votre tolérance CO₂ s'améliore à chaque séance.",
-  coherence_cardiaque: "Votre système nerveux s'est régulé. Votre sommeil en bénéficiera.",
-  respiration_nasale:  "Respirer par le nez devient plus naturel chaque jour.",
-  myofonctionnel:      "Vos muscles oropharyngés se renforcent progressivement.",
-  diaphragmatique:     "Votre diaphragme s'active et votre respiration se stabilise.",
-  relaxation:          "Votre corps a réduit son niveau de stress.",
+  pause_controlee:     "Votre tolérance CO₂ progresse. Objectif à terme : 20 secondes de pause confortable (score BOLT ≥ 20).",
+  coherence_cardiaque: "Votre système nerveux s'est régulé. Pratiqué 3× par jour, cet exercice améliore la qualité du sommeil dès 4 semaines.",
+  respiration_nasale:  "Respirer par le nez devient plus naturel chaque jour. La respiration nasale nocturne réduit les micro-éveils.",
+  myofonctionnel:      "Vos muscles oropharyngés se renforcent. Les méta-analyses montrent −50 % d'apnées en 3 mois avec ces exercices réguliers.",
+  diaphragmatique:     "Votre diaphragme s'active et votre respiration se stabilise. Continuer réduit la respiration thoracique superficielle.",
+  relaxation:          "Votre système nerveux parasympathique s'est activé. La détente musculaire avant le coucher améliore l'architecture du sommeil.",
 }
 
 const CAT_COLORS: Record<string, { ring: string; bg: string; text: string }> = {
