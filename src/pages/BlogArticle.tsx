@@ -25,6 +25,7 @@ type Block =
   | { t: "info";          icon: string; title: string; text: string; variant?: "green" | "blue" | "amber" | "violet" | "rose" }
   | { t: "cta-patient" }
   | { t: "cta-pro" }
+  | { t: "cta-bilan" }
   | { t: "divider" }
   | { t: "key-numbers";   numbers: { value: string; label: string; sub?: string }[] };
 
@@ -329,6 +330,34 @@ function CtaPatient() {
   );
 }
 
+function CtaBilanSommeil() {
+  const navigate = useNavigate();
+  return (
+    <div className="my-10 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/60 p-6">
+      <div className="flex items-start gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center shrink-0 text-2xl">
+          😴
+        </div>
+        <div className="flex-1">
+          <p className="font-semibold text-foreground text-lg">Évaluez votre somnolence en 3 minutes</p>
+          <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+            Le test d'Épworth est l'outil utilisé par les praticiens du sommeil. Obtenez votre score maintenant et découvrez si vos symptômes méritent une consultation.
+          </p>
+          <div className="flex items-center gap-3 mt-4 flex-wrap">
+            <button
+              onClick={() => navigate("/bilan-sommeil")}
+              className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors"
+            >
+              Tester ma somnolence
+            </button>
+            <span className="text-xs text-muted-foreground">Gratuit · Résultat immédiat · Validé cliniquement</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CtaPro() {
   const navigate = useNavigate();
   return (
@@ -438,6 +467,9 @@ function renderBlocks(blocks: Block[], insertCtaAt?: number, ctaTarget?: "patien
         break;
       case "cta-pro":
         elements.push(<CtaPro key={i} />);
+        break;
+      case "cta-bilan":
+        elements.push(<CtaBilanSommeil key={i} />);
         break;
       case "divider":
         elements.push(<hr key={i} className="my-8 border-border/50" />);
@@ -634,6 +666,7 @@ const ARTICLES: Record<string, Article> = {
         role: "Étude transversale sur l'orientation des patients adultes SAOS",
       },
       { t: "p", text: "L'application RespirFacile a été conçue pour combler l'espace entre les séances : les exercices prescrits par l'orthophoniste sont accessibles au patient 7j/7, guidés par animation, et leur compliance est visible en temps réel par le praticien." },
+      { t: "cta-bilan" },
     ],
   },
 
@@ -698,6 +731,7 @@ const ARTICLES: Record<string, Article> = {
       { t: "h2", text: "Ce que vous pouvez attendre — et en combien de temps" },
       { t: "p", text: "Les premiers effets perceptibles arrivent **à partir de 4 semaines** : moins de bouche sèche le matin, légère réduction du ronflement signalée par le partenaire, amélioration de l'énergie diurne. À 3 mois, les études mesurent en moyenne −50% d'IAH avec un programme complet." },
       { t: "info", icon: "🌿", variant: "green", title: "Pas de résultats sans régularité", text: "5 séances de 20 minutes par semaine pendant 12 semaines valent infiniment mieux que 3 séances intenses pendant 2 semaines. Le muscle se renforce à l'usage répété, pas à l'intensité ponctuelle. Comme pour la rééducation post-opératoire." },
+      { t: "cta-bilan" },
     ],
   },
 
@@ -768,6 +802,7 @@ const ARTICLES: Record<string, Article> = {
         "**Commencez les exercices** en autonomie pendant que vous attendez votre rendez-vous — ils ne contre-indiquent rien et peuvent déjà faire effet",
       ]},
       { t: "info", icon: "📋", variant: "blue", title: "À dire à votre médecin", text: "« Je voudrais exclure un syndrome d'apnées obstructives du sommeil. J'ai des symptômes atypiques : fatigue, céphalées matinales, réveils. Je voudrais une oxymétrie nocturne. » Cette phrase précise évite de repartir avec un simple bilan hormonal." },
+      { t: "cta-bilan" },
     ],
   },
 

@@ -1,9 +1,10 @@
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
 import { useAuth } from "@/contexts/AuthContext"
+import { usePatientProgram } from "@/hooks/usePatientProgram"
 import { supabase } from "@/integrations/supabase/client"
 import { motion } from "framer-motion"
-import { ArrowLeft, Clock, Star, RotateCcw, History, BookOpen } from "lucide-react"
+import { ArrowLeft, Clock, Star, RotateCcw, History, BookOpen, Play } from "lucide-react"
 import { getExerciseById } from "@/data/exercises"
 import type { SessionRow } from "@/integrations/supabase/types"
 
@@ -46,6 +47,7 @@ const SessionDetail = () => {
   const { id: sessionId } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { todayExercises } = usePatientProgram()
 
   const { data: session, isLoading } = useQuery({
     queryKey: ["session", sessionId],
@@ -89,6 +91,9 @@ const SessionDetail = () => {
   const benefit = exercise ? CAT_BENEFITS[exercise.category] : null
   const catLabel = exercise ? (CAT_LABEL[exercise.category] ?? exercise.category) : null
   const catChip  = exercise ? (CAT_CHIP[exercise.category]  ?? "bg-muted text-muted-foreground") : null
+
+  // Prochain exercice non complété dans le programme du jour
+  const nextIncomplete = todayExercises.find(e => !e.completed && e.id !== session.exercise_id)
 
   return (
     <div className="min-h-screen bg-organic pb-10">
@@ -213,6 +218,34 @@ const SessionDetail = () => {
                 </div>
               ))}
             </div>
+          </motion.div>
+        )}
+
+        {/* ── Exercice suivant ─────────────── */}
+        {nextIncomplete && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18 }}
+            className="card-rf p-4"
+          >
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
+              Exercice suivant
+            </p>
+            <button
+              onClick={() => navigate(`/session-live?exercise=${nextIncomplete.id}`)}
+              className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/15 hover:bg-primary/10 transition-all text-left group"
+            >
+              <span className="text-2xl shrink-0">{nextIncomplete.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground leading-tight">{nextIncomplete.name_fr}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{nextIncomplete.description_fr}</p>
+              </div>
+              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Play className="w-4 h-4 fill-white text-white" />
+              </div>
+            </button>
           </motion.div>
         )}
 

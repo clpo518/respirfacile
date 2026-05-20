@@ -47,6 +47,7 @@ export const Navbar = () => {
   const navLinks = [
     { href: "/#patients", label: "Patients" },
     { href: "/#orthophonistes", label: "Orthophonistes" },
+    { href: "/bilan-sommeil", label: "Bilan du sommeil" },
     { href: "/pricing", label: "Tarifs" },
     { href: "/about", label: "À propos" },
   ];

@@ -1,11 +1,11 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { supabase } from "@/integrations/supabase/client"
 import { motion } from "framer-motion"
 import {
   User, Mail, LogOut, ChevronRight, Shield,
-  Bell, HelpCircle, Wind, Copy, CheckCheck, RefreshCw
+  Bell, BellOff, HelpCircle, Wind, Copy, CheckCheck, RefreshCw
 } from "lucide-react"
 import { AppLayout } from "@/components/AppLayout"
 import { useToast } from "@/hooks/use-toast"
@@ -31,6 +31,31 @@ const Settings = () => {
   const [codeCopied,       setCodeCopied]       = useState(false)
   const [showProfilePicker, setShowProfilePicker] = useState(false)
   const [selectedProfile,  setSelectedProfile]  = useState<string | null>(null)
+  const [notifPermission,  setNotifPermission]  = useState<NotificationPermission | "unsupported">(
+    typeof Notification !== "undefined" ? Notification.permission : "unsupported"
+  )
+
+  const handleRequestNotifications = async () => {
+    if (typeof Notification === "undefined") {
+      toast({ description: "Les notifications ne sont pas supportées par votre navigateur." })
+      return
+    }
+    if (Notification.permission === "granted") {
+      toast({ description: "Les rappels sont déjà activés." })
+      return
+    }
+    const result = await Notification.requestPermission()
+    setNotifPermission(result)
+    if (result === "granted") {
+      new Notification("RespirFacile", {
+        body: "Parfait. Ouvrez l'application chaque soir pour votre séance.",
+        icon: "/favicon.png",
+      })
+      toast({ description: "Notifications activées." })
+    } else if (result === "denied") {
+      toast({ description: "Accès refusé. Modifiez les autorisations dans les réglages de votre navigateur." })
+    }
+  }
 
   const handleSignOut = async () => {
     setSigningOut(true)
@@ -238,12 +263,28 @@ const Settings = () => {
         >
           <SectionTitle>Préférences</SectionTitle>
           <div className="card-rf overflow-hidden divide-y divide-border">
-            <SettingsRow
-              icon={<Bell className="w-4 h-4" />}
-              label="Notifications"
-              sublabel="Rappels quotidiens d'exercices"
-              onClick={() => toast({ description: "Bientôt disponible" })}
-            />
+            {notifPermission === "granted" ? (
+              <SettingsRow
+                icon={<Bell className="w-4 h-4 text-green-600" />}
+                label="Notifications activées"
+                sublabel="Le navigateur peut vous envoyer des rappels"
+                onClick={() => toast({ description: "Pour désactiver, modifiez les autorisations du site dans votre navigateur." })}
+              />
+            ) : notifPermission === "denied" ? (
+              <SettingsRow
+                icon={<BellOff className="w-4 h-4 text-destructive" />}
+                label="Notifications bloquées"
+                sublabel="Autorisez les notifications dans les réglages du navigateur"
+                onClick={() => toast({ description: "Ouvrez les paramètres du site dans votre navigateur pour débloquer les notifications." })}
+              />
+            ) : (
+              <SettingsRow
+                icon={<Bell className="w-4 h-4" />}
+                label="Activer les notifications"
+                sublabel="Recevez un rappel pour ne pas oublier vos exercices"
+                onClick={handleRequestNotifications}
+              />
+            )}
           </div>
         </motion.div>
 

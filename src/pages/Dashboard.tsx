@@ -127,9 +127,57 @@ const Dashboard = () => {
 
   useEffect(() => () => { if (boltIntervalRef.current) clearInterval(boltIntervalRef.current) }, [])
 
-  // ESS quiz
+  // ESS quiz (onboarding)
   const [showEss, setShowEss] = useState(false)
   const [essAnswers, setEssAnswers] = useState<number[]>(Array(5).fill(-1))
+
+  // ESS mensuel re-test
+  const [showEssRetest, setShowEssRetest] = useState(false)
+  const [essRetestAnswers, setEssRetestAnswers] = useState<number[]>(Array(5).fill(-1))
+  const [essRetestDismissed, setEssRetestDismissed] = useState(false)
+
+  // Journal de sommeil
+  const [showSleepJournal, setShowSleepJournal] = useState(false)
+  const [sleepQuality, setSleepQuality] = useState(0)     // 1-5
+  const [sleepHours, setSleepHours] = useState("")        // "6h", "7h", etc.
+  const [morningEnergy, setMorningEnergy] = useState(0)   // 1-5
+  const [journalSaved, setJournalSaved] = useState(() => {
+    // Déjà rempli aujourd'hui ?
+    if (typeof localStorage === "undefined") return false
+    const key = user ? `journal_today_${user.id}` : ""
+    if (!key) return false
+    const last = localStorage.getItem(key)
+    if (!last) return false
+    return new Date(Number(last)).toDateString() === new Date().toDateString()
+  })
+
+  const handleSaveJournal = async () => {
+    if (!user || sleepQuality === 0 || !sleepHours || morningEnergy === 0) return
+    const score = Math.round(((sleepQuality + morningEnergy) / 10) * 100)
+    await supabase.from("sessions").insert({
+      user_id:           user.id,
+      exercise_id:       "sleep_journal",
+      exercise_category: "relaxation",
+      duration_seconds:  60,
+      completed:         true,
+      score,
+    })
+    localStorage.setItem(`journal_today_${user.id}`, String(Date.now()))
+    setJournalSaved(true)
+    setShowSleepJournal(false)
+    setSleepQuality(0); setSleepHours(""); setMorningEnergy(0)
+  }
+
+  // Vérifier si le re-test ESS mensuel doit s'afficher (programme > 4 sem + dernière fois > 28j)
+  useEffect(() => {
+    if (!program || !user) return
+    const programAge = (Date.now() - new Date(program.created_at ?? "").getTime()) / 86_400_000
+    if (programAge < 28) return
+    const lastEssKey = `ess_last_${user.id}`
+    const last = localStorage.getItem(lastEssKey)
+    if (last && Date.now() - Number(last) < 28 * 86_400_000) return
+    setShowEssRetest(true)
+  }, [program, user])
 
   // Récupère le nom du praticien lié
   useEffect(() => {
@@ -700,6 +748,188 @@ const Dashboard = () => {
                   ))}
                 </div>
               </motion.div>
+
+              {/* ── Journal de sommeil ──────────── */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.16 }}
+                className="card-rf p-4"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-sky-50 flex items-center justify-center">
+                      <span className="text-base">📓</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground leading-tight">Journal de sommeil</p>
+                      <p className="text-[10px] text-muted-foreground">3 questions · 30 sec</p>
+                    </div>
+                  </div>
+                  {!showSleepJournal && !journalSaved && (
+                    <button
+                      onClick={() => setShowSleepJournal(true)}
+                      className="text-xs text-primary font-semibold hover:underline"
+                    >
+                      Remplir
+                    </button>
+                  )}
+                </div>
+
+                {journalSaved && !showSleepJournal && (
+                  <p className="text-xs text-green-600 font-medium flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Nuit enregistrée
+                  </p>
+                )}
+
+                {showSleepJournal && (
+                  <div className="space-y-4">
+                    {/* Qualité du sommeil */}
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-2">Qualité de votre nuit</p>
+                      <div className="flex gap-1.5">
+                        {[1,2,3,4,5].map(n => (
+                          <button
+                            key={n}
+                            onClick={() => setSleepQuality(n)}
+                            className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${
+                              sleepQuality === n ? "bg-primary text-white border-primary" : "bg-card border-border text-muted-foreground hover:border-primary/40"
+                            }`}
+                          >
+                            {["😣","😕","😐","🙂","😄"][n-1]}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Heures de sommeil */}
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-2">Heures dormies</p>
+                      <div className="flex gap-1.5 flex-wrap">
+                        {["<5h","5h","6h","7h","8h","9h+"].map(h => (
+                          <button
+                            key={h}
+                            onClick={() => setSleepHours(h)}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${
+                              sleepHours === h ? "bg-primary text-white border-primary" : "bg-card border-border text-muted-foreground hover:border-primary/40"
+                            }`}
+                          >
+                            {h}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Énergie au réveil */}
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-2">Énergie au réveil</p>
+                      <div className="flex gap-1.5">
+                        {(["😫","😕","😐","🙂","😊"] as const).map((emoji, idx) => {
+                          const n = idx + 1
+                          return (
+                            <button
+                              key={n}
+                              onClick={() => setMorningEnergy(n)}
+                              className={`flex-1 py-1.5 rounded-lg text-base border transition-all ${
+                                morningEnergy === n ? "bg-primary border-primary scale-110" : "bg-card border-border hover:border-primary/40"
+                              }`}
+                            >
+                              {emoji}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowSleepJournal(false)}
+                        className="flex-1 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:bg-muted transition-colors"
+                      >
+                        Annuler
+                      </button>
+                      <button
+                        onClick={handleSaveJournal}
+                        disabled={sleepQuality === 0 || !sleepHours || morningEnergy === 0}
+                        className="flex-1 btn-forest py-2 text-sm disabled:opacity-50"
+                      >
+                        Enregistrer
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+
+              {/* ── ESS re-test mensuel ──────────── */}
+              {showEssRetest && !essRetestDismissed && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-4"
+                >
+                  {(() => {
+                    const retestScore = essRetestAnswers.reduce((s, a) => s + a, 0)
+                    const retestDone  = essRetestAnswers.every(a => a >= 0)
+                    const dismissRetest = () => {
+                      setEssRetestDismissed(true)
+                      if (user) localStorage.setItem(`ess_last_${user.id}`, String(Date.now()))
+                    }
+                    return (
+                      <>
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <p className="text-sm font-semibold text-amber-800">Bilan mensuel</p>
+                            <p className="text-xs text-amber-700 mt-0.5">Un mois s'est écoulé. Refaites le test pour mesurer vos progrès.</p>
+                          </div>
+                          <button onClick={dismissRetest} className="text-amber-500 hover:text-amber-700 text-xs ml-2 p-1">✕</button>
+                        </div>
+                        {retestDone ? (
+                          <div className={`rounded-xl p-3 ${
+                            retestScore >= 13 ? "bg-red-50 border border-red-200" :
+                            retestScore >= 8  ? "bg-amber-50 border border-amber-200" :
+                            "bg-green-50 border border-green-200"
+                          }`}>
+                            <p className={`text-xs font-semibold ${retestScore >= 13 ? "text-red-700" : retestScore >= 8 ? "text-amber-700" : "text-green-700"}`}>
+                              Score ESS : {retestScore}/15
+                            </p>
+                            <p className="text-xs mt-1 leading-relaxed">
+                              {retestScore < 8
+                                ? "Somnolence normale. Vos exercices portent leurs fruits."
+                                : retestScore < 13
+                                ? "Somnolence légère. Continuez votre programme."
+                                : "Somnolence élevée. Parlez-en à votre praticien."}
+                            </p>
+                            <button onClick={dismissRetest} className="mt-2 text-xs text-primary font-semibold hover:underline">
+                              Fermer
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {ESS_QUESTIONS.map((q, qi) => (
+                              <div key={qi}>
+                                <p className="text-xs text-amber-700 mb-1.5">{q}</p>
+                                <div className="flex gap-1.5">
+                                  {ESS_OPTIONS.map((opt, oi) => (
+                                    <button
+                                      key={oi}
+                                      onClick={() => setEssRetestAnswers(prev => { const n = [...prev]; n[qi] = oi; return n })}
+                                      className={`flex-1 py-1 rounded-lg text-[10px] font-medium border transition-all ${
+                                        essRetestAnswers[qi] === oi
+                                          ? "bg-amber-600 text-white border-amber-600"
+                                          : "bg-white border-amber-200 text-amber-700 hover:border-amber-400"
+                                      }`}
+                                    >
+                                      {opt}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )
+                  })()}
+                </motion.div>
+              )}
 
               {/* Tracker semaine */}
               <motion.div

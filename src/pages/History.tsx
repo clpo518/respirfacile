@@ -5,8 +5,9 @@ import { useAuth } from "@/contexts/AuthContext"
 import { supabase } from "@/integrations/supabase/client"
 import { AppLayout } from "@/components/AppLayout"
 import { getExerciseById } from "@/data/exercises"
+import { ActivityHeatmap } from "@/components/pro/ActivityHeatmap"
 import { motion } from "framer-motion"
-import { Clock, ChevronRight, Calendar, Loader2 } from "lucide-react"
+import { Clock, ChevronRight, Calendar, Loader2, Star } from "lucide-react"
 import type { SessionRow } from "@/integrations/supabase/types"
 
 // ─────────────────────────────────────────────
@@ -59,9 +60,18 @@ const History = () => {
     enabled: !!user,
   })
 
-  // Grouper par mois
+  // Score moyen calculé hors JSX
+  const scoredSessions = allSessions.filter(s => s.score != null && s.exercise_id !== "sleep_journal")
+  const avgStars = scoredSessions.length > 0
+    ? Math.round(scoredSessions.reduce((acc, s) => acc + (s.score ?? 0), 0) / scoredSessions.length / 20)
+    : null
+
+  // Séances affichables (masquer les entrées de journal de sommeil)
+  const displaySessions = allSessions.filter(s => s.exercise_id !== "sleep_journal")
+
+  // Regrouper les séances affichables par mois
   const grouped: Record<string, SessionRow[]> = {}
-  allSessions.forEach(s => {
+  displaySessions.forEach(s => {
     const key = new Date(s.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })
     if (!grouped[key]) grouped[key] = []
     grouped[key].push(s)
@@ -76,13 +86,35 @@ const History = () => {
           <p className="text-sm text-muted-foreground">Mon parcours</p>
           <h1 className="font-display text-2xl text-foreground mt-0.5">Historique</h1>
           {!isLoading && (
-            <p className="text-sm text-muted-foreground mt-1">
-              {allSessions.length} séance{allSessions.length !== 1 ? "s" : ""} complétée{allSessions.length !== 1 ? "s" : ""}
-            </p>
+            <div className="flex items-center gap-3 mt-1 flex-wrap">
+              <p className="text-sm text-muted-foreground">
+                {displaySessions.length} séance{displaySessions.length !== 1 ? "s" : ""} complétée{displaySessions.length !== 1 ? "s" : ""}
+              </p>
+              {avgStars != null && (
+                <span className="flex items-center gap-1 text-xs text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded-full">
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                  {avgStars}/5 en moyenne
+                </span>
+              )}
+            </div>
           )}
         </header>
 
         <div className="px-6 space-y-6 mt-2">
+
+          {/* ── Heatmap activité ──────────────── */}
+          {!isLoading && user && displaySessions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="card-rf p-4"
+            >
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                Votre régularité
+              </p>
+              <ActivityHeatmap userId={user.id} days={84} />
+            </motion.div>
+          )}
 
           {/* Loading initial */}
           {isLoading && page === 0 && (
@@ -94,7 +126,7 @@ const History = () => {
           )}
 
           {/* Vide */}
-          {!isLoading && allSessions.length === 0 && (
+          {!isLoading && displaySessions.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -173,9 +205,16 @@ const History = () => {
                         </div>
                       </div>
 
-                      {/* Date + flèche */}
+                      {/* Date + étoiles + flèche */}
                       <div className="text-right shrink-0">
                         <p className="text-xs text-muted-foreground">{day}</p>
+                        {s.score != null && (
+                          <div className="flex items-center justify-end gap-0.5 mt-1">
+                            {[1,2,3,4,5].map(n => (
+                              <Star key={n} className={`w-2.5 h-2.5 ${n <= Math.round(s.score! / 20) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/20"}`} />
+                            ))}
+                          </div>
+                        )}
                         <ChevronRight className="w-4 h-4 text-muted-foreground/40 mt-1 ml-auto group-hover:text-primary transition-colors" />
                       </div>
                     </motion.button>
@@ -186,7 +225,7 @@ const History = () => {
           ))}
 
           {/* Charger plus */}
-          {!isLoading && allSessions.length > 0 && hasMore && (
+          {!isLoading && displaySessions.length > 0 && hasMore && (
             <div className="flex justify-center pb-2">
               <button
                 onClick={() => setPage(p => p + 1)}

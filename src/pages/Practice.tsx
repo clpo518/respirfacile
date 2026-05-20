@@ -2,10 +2,12 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { usePatientProgram } from "@/hooks/usePatientProgram"
+import { useQuery } from "@tanstack/react-query"
+import { supabase } from "@/integrations/supabase/client"
 import { EXERCISES, EXERCISES_BY_CATEGORY } from "@/data/exercises"
 import { AppLayout } from "@/components/AppLayout"
 import { motion } from "framer-motion"
-import { Clock, Play, Mic } from "lucide-react"
+import { Clock, Play, Mic, CheckCircle2 } from "lucide-react"
 import type { ExerciseCategory } from "@/data/exercises"
 
 // ─────────────────────────────────────────────
@@ -24,11 +26,52 @@ const CATEGORIES: { id: ExerciseCategory | "all"; label: string; emoji: string; 
 
 const Practice = () => {
   const navigate = useNavigate()
-  const { isTherapist } = useAuth()
+  const { user, isTherapist } = useAuth()
   const { todayExercises } = usePatientProgram()
   const [activeCategory, setActiveCategory] = useState<ExerciseCategory | "all">("all")
 
   const programExerciseIds = new Set(todayExercises.map(e => e.id))
+
+  // Sessions d'aujourd'hui + compteurs par exercice (30 derniers jours)
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+
+  const { data: todaySessions = [] } = useQuery({
+    queryKey: ["today_sessions", user?.id],
+    queryFn: async () => {
+      if (!user) return []
+      const { data } = await supabase
+        .from("sessions")
+        .select("exercise_id")
+        .eq("user_id", user.id)
+        .eq("completed", true)
+        .gte("created_at", todayStart.toISOString())
+      return (data ?? []) as { exercise_id: string }[]
+    },
+    enabled: !!user,
+  })
+
+  const { data: frequencyMap = {} } = useQuery({
+    queryKey: ["exercise_frequency", user?.id],
+    queryFn: async () => {
+      if (!user) return {}
+      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+      const { data } = await supabase
+        .from("sessions")
+        .select("exercise_id")
+        .eq("user_id", user.id)
+        .eq("completed", true)
+        .gte("created_at", since)
+      const map: Record<string, number> = {}
+      for (const s of data ?? []) {
+        map[s.exercise_id] = (map[s.exercise_id] ?? 0) + 1
+      }
+      return map
+    },
+    enabled: !!user,
+  })
+
+  const doneTodayIds = new Set(todaySessions.map(s => s.exercise_id))
 
   const filteredExercises = activeCategory === "all"
     ? EXERCISES
@@ -77,6 +120,8 @@ const Practice = () => {
             {filteredExercises.map((ex, i) => {
               const catMeta   = CATEGORIES.find(c => c.id === ex.category)
               const inProgram = programExerciseIds.has(ex.id)
+              const doneToday = doneTodayIds.has(ex.id)
+              const freq      = frequencyMap[ex.id] ?? 0
 
               return (
                 <motion.button
@@ -94,8 +139,14 @@ const Practice = () => {
                     <span className="text-4xl group-hover:scale-110 transition-transform duration-300 relative z-10">
                       {ex.icon}
                     </span>
+                    {/* Badge fait aujourd'hui */}
+                    {doneToday && (
+                      <span className="absolute top-2 right-2 flex items-center gap-1 text-[9px] font-semibold bg-green-500 text-white px-2 py-0.5 rounded-full">
+                        <CheckCircle2 className="w-2.5 h-2.5" /> Fait aujourd'hui
+                      </span>
+                    )}
                     {/* Badge programme */}
-                    {inProgram && (
+                    {inProgram && !doneToday && (
                       <span className="absolute top-2 right-2 text-[9px] font-semibold bg-primary text-white px-2 py-0.5 rounded-full">
                         Programme
                       </span>
@@ -126,6 +177,12 @@ const Practice = () => {
                       <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${catMeta?.chip ?? "bg-muted text-muted-foreground"}`}>
                         {catMeta?.label ?? ex.category}
                       </span>
+                      {/* Fréquence 30j */}
+                      {freq > 0 && (
+                        <span className="text-[9px] text-muted-foreground font-medium bg-muted px-1.5 py-0.5 rounded-full">
+                          {freq}× ce mois
+                        </span>
+                      )}
                       {/* Niveau */}
                       <span className="ml-auto">
                         <DifficultyBadge level={ex.difficulty} />
