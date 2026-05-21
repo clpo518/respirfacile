@@ -237,8 +237,8 @@ export default function TherapistDashboardClient() {
   return (
     <main className="max-w-7xl mx-auto px-4 py-8 lg:px-6">
 
-        {/* Banner trial, visible si trialing et < 14j restants */}
-        {trialDaysLeft !== null && trialDaysLeft <= 14 && (
+        {/* Banner trial, visible si trialing et < 20j restants */}
+        {trialDaysLeft !== null && trialDaysLeft <= 20 && (
           <div className={`mb-6 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 ${
             trialDaysLeft <= 3
               ? 'bg-red-50 border border-red-200'

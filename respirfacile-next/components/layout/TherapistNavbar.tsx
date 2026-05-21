@@ -33,9 +33,13 @@ export async function TherapistNavbar() {
             {isTrialing && daysLeft > 0 && (
               <Link
                 href="/pricing"
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold bg-copper-500/10 border border-copper-500/30 text-copper-700 px-3 py-1.5 rounded-full hover:bg-copper-500/20 transition-colors"
+                className={`hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors border ${
+                  daysLeft <= 7
+                    ? "bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+                    : "bg-copper-500/10 border-copper-500/30 text-copper-700 hover:bg-copper-500/20"
+                }`}
               >
-                ⏳ Essai, {daysLeft}j restants
+                ⏳ 30j offerts · {daysLeft}j restants
               </Link>
             )}
             <Link
