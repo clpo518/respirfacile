@@ -38,7 +38,7 @@ export default async function PatientDetailPage({ params }: Props) {
   // Vérifier que ce patient appartient à ce thérapeute
   const { data: link } = await supabase
     .from("therapist_patients")
-    .select("id, linked_at")
+    .select("id, created_at")
     .eq("therapist_id", user.id)
     .eq("patient_id", id)
     .single();
@@ -331,7 +331,7 @@ export default async function PatientDetailPage({ params }: Props) {
             <div className="bg-beige-100 rounded-2xl border border-beige-200 p-4 text-center">
               <p className="text-xs text-forest-400">
                 Patient ajouté le{" "}
-                {new Date(link.linked_at ?? Date.now()).toLocaleDateString("fr-FR", {
+                {new Date(link.created_at ?? Date.now()).toLocaleDateString("fr-FR", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
