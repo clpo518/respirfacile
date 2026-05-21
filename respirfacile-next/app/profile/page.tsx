@@ -59,6 +59,25 @@ export default async function ProfilePage() {
     day: "numeric",
   });
 
+  // Emojis et labels pour les badges
+  const BADGE_META: Record<string, { emoji: string; label: string }> = {
+    first_session:   { emoji: "🎯", label: "Première séance" },
+    sessions_5:      { emoji: "🌱", label: "5 séances" },
+    sessions_10:     { emoji: "💪", label: "10 séances" },
+    sessions_25:     { emoji: "⚡", label: "25 séances" },
+    sessions_50:     { emoji: "🏆", label: "50 séances" },
+    sessions_100:    { emoji: "💎", label: "100 séances" },
+    streak_3:        { emoji: "🔥", label: "3 jours de suite" },
+    streak_7:        { emoji: "🔥🔥", label: "7 jours de suite" },
+    streak_14:       { emoji: "🌟", label: "14 jours de suite" },
+    streak_30:       { emoji: "👑", label: "30 jours de suite" },
+    pause_20:        { emoji: "🫁", label: "Pause 20 pas" },
+    pause_40:        { emoji: "🫁", label: "Pause 40 pas" },
+    pause_60:        { emoji: "🫁", label: "Pause 60 pas" },
+    perfect_week:    { emoji: "🗓️", label: "Semaine parfaite" },
+    early_bird:      { emoji: "🌅", label: "Lève-tôt" },
+  };
+
   // Mapper les IDs de diagnostiques
   const diagnosticLabel = {
     adult_saos_mild: "SAOS léger/modéré",
@@ -166,20 +185,24 @@ export default async function ProfilePage() {
           <div className="bg-beige-100 rounded-3xl border border-beige-300 shadow-beige p-8">
             <h2 className="text-lg font-semibold text-forest-800 mb-6">🏆 Mes badges</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {badges.map((badge) => (
-                <div
-                  key={badge.badge_id}
-                  className="bg-gradient-to-br from-copper-100 to-copper-50 rounded-2xl border border-copper-200 p-4 text-center hover:shadow-md transition-shadow"
-                >
-                  <div className="text-3xl mb-2">*</div>
-                  <p className="text-xs font-semibold text-copper-700 capitalize">
-                    {badge.badge_id.replace(/_/g, " ")}
-                  </p>
-                  <p className="text-xs text-forest-500 mt-1">
-                    {new Date(badge.earned_at).toLocaleDateString("fr-FR")}
-                  </p>
-                </div>
-              ))}
+              {badges.map((badge) => {
+                const meta = BADGE_META[badge.badge_id] ?? {
+                  emoji: "🏅",
+                  label: badge.badge_id.replace(/_/g, " "),
+                };
+                return (
+                  <div
+                    key={badge.badge_id}
+                    className="bg-gradient-to-br from-copper-100 to-copper-50 rounded-2xl border border-copper-200 p-4 text-center hover:shadow-md transition-shadow"
+                  >
+                    <div className="text-3xl mb-2">{meta.emoji}</div>
+                    <p className="text-xs font-semibold text-copper-700">{meta.label}</p>
+                    <p className="text-xs text-forest-500 mt-1">
+                      {new Date(badge.earned_at).toLocaleDateString("fr-FR")}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

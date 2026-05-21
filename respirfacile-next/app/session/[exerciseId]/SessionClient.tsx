@@ -353,11 +353,49 @@ export default function SessionClient({ exercise, userId }: Props) {
   }
 
   // ── DONE ─────────────────────────────────────────────────────────────────────
+  const doneMinutes = Math.max(1, Math.round(Math.max(elapsed, exercise.duration_seconds) / 60));
+  const scoreLabel = stars > 0
+    ? ["", "Difficile", "Moyen", "Bien", "Très bien", "Excellent !"][stars]
+    : null;
+
   return (
-    <div className="min-h-screen bg-forest-700 flex flex-col items-center justify-center text-white gap-4">
-      <div className="text-6xl animate-bounce">✅</div>
-      <p className="text-xl font-bold">Bravo !</p>
-      <p className="text-white/70 text-sm">Séance enregistrée</p>
+    <div className="min-h-screen bg-beige-200 flex flex-col items-center justify-center px-6 gap-6 text-center">
+      {/* Confetti-style emoji burst */}
+      <div className="relative w-32 h-32 flex items-center justify-center">
+        <span className="absolute text-4xl animate-ping opacity-30">🎉</span>
+        <span className="text-6xl relative z-10">✅</span>
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-bold text-forest-800">Bravo !</h2>
+        <p className="text-forest-500 text-sm mt-1">Séance enregistrée avec succès</p>
+      </div>
+
+      {/* Résumé */}
+      <div className="w-full max-w-xs bg-beige-100 rounded-2xl border border-beige-300 p-5 space-y-3">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-forest-500">Exercice</span>
+          <span className="font-semibold text-forest-800">{exercise.emoji} {exercise.name_fr}</span>
+        </div>
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-forest-500">Durée</span>
+          <span className="font-semibold text-forest-800">{doneMinutes} min</span>
+        </div>
+        {stars > 0 && (
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-forest-500">Ressenti</span>
+            <span className="font-semibold text-copper-700">{"⭐".repeat(stars)} {scoreLabel}</span>
+          </div>
+        )}
+        {inputValue && (
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-forest-500">{exercise.inputLabel}</span>
+            <span className="font-semibold text-forest-800">{inputValue} {exercise.inputUnit}</span>
+          </div>
+        )}
+      </div>
+
+      <p className="text-xs text-forest-400 animate-pulse">Retour aux exercices…</p>
     </div>
   );
 }

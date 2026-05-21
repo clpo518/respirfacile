@@ -14,6 +14,7 @@ import { ActivityHeatmap } from "@/components/ActivityHeatmap";
 import { EXERCISES } from "@/lib/data/exercises";
 import CelebrationToast from "@/components/CelebrationToast";
 import Link from "next/link";
+import { MobileBottomNavClient } from "@/components/MobileBottomNavClient";
 
 export default async function DashboardPage({
   searchParams,
@@ -200,7 +201,7 @@ export default async function DashboardPage({
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8 page-enter">
+      <main className="max-w-4xl mx-auto px-4 py-8 pb-28 md:pb-8 page-enter">
         {/* Toast de célébration */}
         <Suspense fallback={null}>
           <CelebrationToast />
@@ -411,6 +412,8 @@ export default async function DashboardPage({
         {/* Dashboard Shortcuts */}
         <DashboardShortcuts />
       </main>
+
+      <MobileBottomNavClient />
     </div>
   );
 }
