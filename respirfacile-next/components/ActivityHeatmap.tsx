@@ -142,46 +142,48 @@ export function ActivityHeatmap({ userId }: ActivityHeatmapProps) {
       </div>
 
       {/* Grille */}
-      <div className="overflow-x-auto">
-        <div className="inline-block min-w-full">
+      <div className="w-full overflow-x-auto">
+        <div className="w-full min-w-[320px]">
           {/* Labels mois */}
-          <div className="flex mb-1 ml-7">
+          <div className="flex mb-1.5 pl-7">
             {weeks.map((_, i) => {
               const label = monthLabels.find((m) => m.col === i);
               return (
-                <div key={i} className="w-4 flex-shrink-0 text-center">
+                <div key={i} className="flex-1 text-center min-w-0">
                   {label ? <span className="text-xs text-forest-400">{label.label}</span> : null}
                 </div>
               );
             })}
           </div>
 
-          <div className="flex gap-1">
+          <div className="flex gap-0 w-full">
             {/* Labels jours */}
-            <div className="flex flex-col gap-1 mr-1">
+            <div className="flex flex-col justify-around w-7 flex-shrink-0">
               {DAYS_FR.map((d, i) => (
-                <div key={i} className="h-3 w-5 text-xs text-forest-300 flex items-center justify-end pr-1">
+                <div key={i} className="text-xs text-forest-300 flex items-center justify-end pr-1.5 leading-none" style={{height: '1.25rem'}}>
                   {i % 2 === 0 ? d : ''}
                 </div>
               ))}
             </div>
 
-            {/* Cellules */}
-            {weeks.map((week, wi) => (
-              <div key={wi} className="flex flex-col gap-1">
-                {week.map((day, di) => (
-                  <div
-                    key={di}
-                    title={day.count > 0 ? `${day.date} : ${day.count} séance${day.count > 1 ? 's' : ''}` : day.date}
-                    className={`w-3 h-3 rounded-sm transition-all cursor-default ${
-                      day.count === -1
-                        ? 'bg-transparent'
-                        : getColor(day.count)
-                    }`}
-                  />
-                ))}
-              </div>
-            ))}
+            {/* Cellules — flex-1 pour remplir la largeur */}
+            <div className="flex flex-1 gap-1">
+              {weeks.map((week, wi) => (
+                <div key={wi} className="flex flex-1 flex-col gap-1">
+                  {week.map((day, di) => (
+                    <div
+                      key={di}
+                      title={day.count > 0 ? `${day.date} : ${day.count} séance${day.count > 1 ? 's' : ''}` : day.date}
+                      className={`w-full aspect-square rounded-sm transition-all cursor-default ${
+                        day.count === -1
+                          ? 'bg-transparent'
+                          : getColor(day.count)
+                      }`}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
