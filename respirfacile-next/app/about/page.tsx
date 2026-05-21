@@ -6,7 +6,14 @@ import { Footer } from "@/components/landing/Footer";
 export const metadata: Metadata = {
   title: "Notre histoire | Respirfacile",
   description:
-    "L'histoire derriere Respirfacile : comment nous avons cree l'outil que les orthophonistes attendaient pour suivre leurs patients en therapie myofonctionnelle.",
+    "L'histoire de Respirfacile : comment Clément, ancien patient bredouilleur, a créé l'application que les orthophonistes attendaient pour suivre leurs patients en thérapie myofonctionnelle orofaciale.",
+  openGraph: {
+    title: "Notre histoire | Respirfacile",
+    description:
+      "Créé par un ancien patient, conçu avec des orthophonistes. L'app de rééducation respiratoire qui met la science à portée de tous.",
+    url: "https://respirfacile.fr/about",
+  },
+  alternates: { canonical: "https://respirfacile.fr/about" },
 };
 
 export default function AboutPage() {

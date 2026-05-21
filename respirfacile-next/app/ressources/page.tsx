@@ -3,8 +3,16 @@ import { PatientNavbar } from "@/components/layout/PatientNavbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Ressources, Vos questions, nos réponses",
-  description: "Tout ce que vous devez savoir pour pratiquer vos exercices avec confiance.",
+  title: "FAQ et ressources — exercices respiratoires | Respirfacile",
+  description:
+    "Questions fréquentes sur les exercices de rééducation respiratoire : Pause Contrôlée, apnée du sommeil, SAOS, CPAP, TMOF. Conseils pratiques pour progresser en autonomie.",
+  openGraph: {
+    title: "FAQ exercices respiratoires | Respirfacile",
+    description:
+      "Combien de temps avant de voir des résultats ? Peut-on pratiquer avec un CPAP ? Toutes les réponses sur la rééducation respiratoire.",
+    url: "https://respirfacile.fr/ressources",
+  },
+  alternates: { canonical: "https://respirfacile.fr/ressources" },
 };
 
 const faqs = [
@@ -70,9 +78,23 @@ const explainers = [
 ];
 
 export default function RessourcesPage() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map((faq) => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": { "@type": "Answer", "text": faq.a },
+    })),
+  };
+
   return (
-    <main className="min-h-screen bg-[#F5F0E8] pb-24 md:pb-0">
-      <div className="bg-[#2D5016] text-white px-4 py-10 text-center">
+    <main className="min-h-screen bg-beige-200 pb-24 md:pb-0">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <div className="bg-forest-800 text-white px-4 py-10 text-center">
         <h1 className="text-3xl font-bold mb-2">Vos questions, nos réponses 📚</h1>
         <p className="text-white/80 max-w-xl mx-auto">Tout ce que vous devez savoir pour pratiquer avec confiance</p>
       </div>

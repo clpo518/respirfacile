@@ -5,8 +5,15 @@ import { Footer } from "@/components/landing/Footer";
 import { ContactForm } from "./ContactForm";
 
 export const metadata: Metadata = {
-  title: "Contact | Respirfacile",
-  description: "Contactez l'equipe Respirfacile. Reponse sous 24h.",
+  title: "Nous contacter | Respirfacile",
+  description:
+    "Contactez Respirfacile pour toute question sur l'abonnement, un problème technique ou un partenariat. Réponse sous 24h ouvrées. Email : contact@respirfacile.fr",
+  openGraph: {
+    title: "Contacter Respirfacile",
+    description: "Une question ? Nous répondons sous 24h. contact@respirfacile.fr",
+    url: "https://respirfacile.fr/contact",
+  },
+  alternates: { canonical: "https://respirfacile.fr/contact" },
 };
 
 export default function ContactPage() {

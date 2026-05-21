@@ -4,8 +4,16 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 
 export const metadata: Metadata = {
-  title: "Tarification | Respirfacile",
-  description: "Plans d'abonnement pour orthophonistes et kinésithérapeutes. 30 jours gratuits sans carte bancaire.",
+  title: "Tarifs abonnement orthophoniste — 30 jours gratuits | Respirfacile",
+  description:
+    "Abonnement Respirfacile pour orthophonistes et kinésithérapeutes : Starter 15€/mois (5 patients), Pro 30€/mois (20 patients), Cabinet 55€/mois (illimité). 30 jours gratuits, sans carte bancaire.",
+  openGraph: {
+    title: "Tarifs Respirfacile — 30 jours offerts pour les orthophonistes",
+    description:
+      "Plans Starter, Pro et Cabinet. Suivi patients SAOS & TMOF, bilans PDF, historique, support. Essai gratuit 30 jours.",
+    url: "https://respirfacile.fr/pricing",
+  },
+  alternates: { canonical: "https://respirfacile.fr/pricing" },
 };
 
 const plans = [
@@ -67,8 +75,36 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
   const params = await searchParams;
   const isExpired = params.expired === "1";
 
+  const pricingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Plans d'abonnement Respirfacile",
+    "itemListElement": plans.map((plan, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "item": {
+        "@type": "Offer",
+        "name": plan.name,
+        "description": plan.features.join(", "),
+        "price": plan.price,
+        "priceCurrency": "EUR",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": plan.price,
+          "priceCurrency": "EUR",
+          "unitText": "MONTH",
+        },
+        "url": "https://respirfacile.fr/pricing",
+      },
+    })),
+  };
+
   return (
     <div className="w-full">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }}
+      />
       <Navbar />
       <main className="w-full">
         {/* Expired Banner */}

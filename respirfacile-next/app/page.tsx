@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Navbar } from "@/components/landing/Navbar";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { AppPreview } from "@/components/landing/AppPreview";
@@ -10,9 +11,75 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 
+export const metadata: Metadata = {
+  title: "Respirfacile — Rééducation respiratoire pour l'apnée du sommeil",
+  description:
+    "Application de rééducation respiratoire prescrite par les orthophonistes et kinésithérapeutes. Exercices myofonctionnels guidés, Pause Contrôlée, cohérence cardiaque. −50% d'IAH en 8 semaines. Essai 30 jours gratuit.",
+  openGraph: {
+    title: "Respirfacile — Rééducation respiratoire pour l'apnée du sommeil",
+    description:
+      "Exercices myofonctionnels, cohérence cardiaque, Pause Contrôlée. −50% d'IAH (Camacho 2015). Prescrit par orthophonistes et kinésithérapeutes. Essai 30j gratuit.",
+    url: "https://respirfacile.fr",
+    type: "website",
+    images: [{ url: "/icon-512.png", width: 512, height: 512, alt: "Respirfacile" }],
+  },
+  alternates: { canonical: "https://respirfacile.fr" },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://respirfacile.fr/#website",
+      "url": "https://respirfacile.fr",
+      "name": "Respirfacile",
+      "description": "Application de rééducation respiratoire pour l'apnée du sommeil",
+      "inLanguage": "fr-FR",
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://respirfacile.fr/#app",
+      "name": "Respirfacile",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "description":
+        "Application de thérapie myofonctionnelle orofaciale prescrite par les orthophonistes. Réduction de l'IAH de 50% en 8 semaines.",
+      "offers": {
+        "@type": "Offer",
+        "price": "15",
+        "priceCurrency": "EUR",
+        "description": "Abonnement mensuel orthophoniste",
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "POCLE SAS",
+        "url": "https://respirfacile.fr",
+      },
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://respirfacile.fr/#org",
+      "name": "Respirfacile",
+      "url": "https://respirfacile.fr",
+      "logo": "https://respirfacile.fr/icon-512.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "contact@respirfacile.fr",
+        "contactType": "customer service",
+        "availableLanguage": "French",
+      },
+    },
+  ],
+};
+
 export default function HomePage() {
   return (
     <div className="w-full">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
       <main className="w-full">
         <HeroSection />

@@ -4,8 +4,16 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 
 export const metadata: Metadata = {
-  title: "Blog | Respirfacile",
-  description: "Ressources et articles sur la rééducation respiratoire, l'apnée du sommeil et la thérapie myofonctionnelle.",
+  title: "Blog — rééducation respiratoire et apnée du sommeil | Respirfacile",
+  description:
+    "Articles scientifiques et guides pratiques sur la rééducation respiratoire, l'apnée du sommeil (SAOS), la thérapie myofonctionnelle orofaciale. Références cliniques validées.",
+  openGraph: {
+    title: "Blog Respirfacile — Science, SAOS et thérapie myofonctionnelle",
+    description:
+      "Études cliniques, protocoles et conseils pratiques pour orthophonistes et patients. IAH, Pause Contrôlée, exercices oropharyngés.",
+    url: "https://respirfacile.fr/blog",
+  },
+  alternates: { canonical: "https://respirfacile.fr/blog" },
 };
 
 const articles = [

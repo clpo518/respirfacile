@@ -4,6 +4,10 @@ import { Footer } from "@/components/landing/Footer";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité | Respirfacile",
+  description:
+    "Politique de confidentialité Respirfacile. Données hébergées en France, conformité RGPD. Aucune revente de données. Droit d'accès et de suppression sur demande.",
+  robots: { index: false, follow: false },
+  alternates: { canonical: "https://respirfacile.fr/privacy" },
 };
 
 export default function PrivacyPage() {

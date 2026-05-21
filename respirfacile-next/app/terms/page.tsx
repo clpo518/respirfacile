@@ -4,6 +4,10 @@ import { Footer } from "@/components/landing/Footer";
 
 export const metadata: Metadata = {
   title: "Conditions générales d'utilisation | Respirfacile",
+  description:
+    "CGU Respirfacile — conditions d'abonnement pour orthophonistes et kinésithérapeutes, droits et obligations, résiliation, données personnelles. Éditeur : POCLE SAS, Paris.",
+  robots: { index: false, follow: false },
+  alternates: { canonical: "https://respirfacile.fr/terms" },
 };
 
 const sections = [
