@@ -1,0 +1,85 @@
+import { Navbar } from "@/components/landing/Navbar";
+import { HeroSection } from "@/components/landing/HeroSection";
+import { AppPreview } from "@/components/landing/AppPreview";
+import { ScreeningQuiz } from "@/components/landing/ScreeningQuiz";
+import { ProblemSection } from "@/components/landing/ProblemSection";
+import { MethodSection } from "@/components/landing/MethodSection";
+import { ProSection } from "@/components/landing/ProSection";
+import { FounderSection } from "@/components/landing/FounderSection";
+import { FAQSection } from "@/components/landing/FAQSection";
+import { CTASection } from "@/components/landing/CTASection";
+import { Footer } from "@/components/landing/Footer";
+
+export default function HomePage() {
+  return (
+    <div className="w-full">
+      <Navbar />
+      <main className="w-full">
+        <HeroSection />
+
+        {/* MODULE 1 : MINI TEST */}
+        <section className="w-full py-20 px-4 sm:px-6 lg:px-8 bg-beige-100">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 rounded-full bg-forest-500/10 border border-forest-500/20 px-4 py-2 text-sm font-medium text-forest-700 mb-5">
+                60 secondes
+              </div>
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-forest-800 mb-4 text-balance">
+                Êtes-vous concerné par le SAOS
+                <br />
+                ou la rééducation respiratoire?
+              </h2>
+              <p className="text-forest-500 max-w-xl mx-auto">
+                6 questions pour savoir si Respirfacile est fait pour vous — ou pour vos patients.
+              </p>
+            </div>
+            <ScreeningQuiz />
+          </div>
+        </section>
+
+        {/* MODULE 2 : APP PREVIEW */}
+        <section className="w-full py-20 px-4 sm:px-6 lg:px-8 bg-forest-800">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-copper-500/20 border border-copper-500/30 px-4 py-2 text-sm font-medium text-copper-300 mb-6">
+                  Application
+                </div>
+                <h2 className="font-display text-3xl md:text-4xl font-bold text-beige-100 mb-5 leading-tight">
+                  Tout ce dont patient
+                  <br />
+                  et ortho ont besoin.
+                </h2>
+                <div className="space-y-4 mb-8">
+                  {[
+                    { emoji: "🎯", title: "Séances guidées pas à pas", desc: "Timer intégré, instructions claires, score enregistré automatiquement." },
+                    { emoji: "📈", title: "Progression visible", desc: "Graphiques, scores de pause, observance semaine par semaine." },
+                    { emoji: "📄", title: "Bilan PDF en 1 clic", desc: "L'ortho exporte un rapport complet pour le médecin du sommeil." },
+                    { emoji: "💬", title: "Message de l'ortho", desc: "L'ortho peut laisser des notes personnalisées visibles du patient." },
+                  ].map((f) => (
+                    <div key={f.title} className="flex gap-3">
+                      <span className="text-xl flex-shrink-0 mt-0.5">{f.emoji}</span>
+                      <div>
+                        <p className="font-semibold text-beige-100 text-sm" dangerouslySetInnerHTML={{ __html: f.title }} />
+                        <p className="text-sm text-forest-300 mt-0.5" dangerouslySetInnerHTML={{ __html: f.desc }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <AppPreview />
+            </div>
+          </div>
+        </section>
+
+        <ProblemSection />
+        <MethodSection />
+        <ProSection />
+        <FounderSection />
+        <FAQSection />
+        <CTASection />
+      </main>
+      <Footer />
+    </div>
+  );
+}

@@ -1,0 +1,93 @@
+=== RESPIRFACILE NEXT.JS — FICHIERS CRÉÉS ===
+
+Date: 2026-04-26
+Session: respirfacile-next
+
+RÉSUMÉ:
+Création de pages patient (profile), améliorations settings, layouts pour patient/thérapeute,
+composants réutilisables pour navigation et banneau trial, formulaires pour diagnostic et mot de passe.
+
+=== FICHIERS CRÉÉS ===
+
+1. PAGES PATIENT:
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/app/profile/page.tsx
+     → Page profil public patient avec avatar, stats, badges
+   
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/app/settings/page-improved.tsx
+     → Version améliorée de settings avec sections complètes (profil, diagnostic, notifications, sécurité, compte)
+
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/app/dashboard/page-enhanced.tsx
+     → Dashboard avec bottom nav mobile intégrée
+
+2. LAYOUTS:
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/components/layout/PatientLayout.tsx
+     → Wrapper layout patient: navbar desktop + nav mobile
+   
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/components/layout/TherapistLayout.tsx
+     → Wrapper layout thérapeute: sidebar + top navbar mobile + trial banner
+
+3. COMPOSANTS RÉUTILISABLES:
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/components/MobileBottomNavClient.tsx
+     → Navigation bottom mobile (use client) avec indicateur de page active
+   
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/components/MobileBottomNav.tsx
+     → Navigation bottom mobile (server component, statique)
+   
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/components/TrialBanner.tsx
+     → Banneau essai gratuit réutilisable pour pages thérapeute
+
+4. FORMULAIRES (SETTINGS):
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/app/settings/SettingsPasswordForm.tsx
+     → Formulaire pour changer le mot de passe (ancien + nouveau + confirmation)
+   
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/app/settings/SettingsDiagnosticForm.tsx
+     → Formulaire pour sélectionner le diagnostic (SAOS léger, sévère, TMOF, mixte)
+
+5. DOCUMENTATION:
+   - /sessions/admiring-blissful-gauss/mnt/respirfacile-next/INTEGRATION_GUIDE.md
+     → Guide complet d'intégration (étapes à suivre)
+
+=== PROCHAINES ÉTAPES ===
+
+1. MERGING settings/page.tsx:
+   Option A (recommandé): Remplacer page.tsx par page-improved.tsx
+   Option B: Copier les sections manquantes de page-improved.tsx
+
+2. AJOUTER BOTTOM NAV à chaque page patient:
+   - app/exercises/page.tsx
+   - app/journal/page.tsx
+   - app/ressources/page.tsx
+   - app/history/page.tsx
+   
+   Ajouter avant fermeture du main:
+   ```tsx
+   <MobileBottomNavClient />
+   ```
+   
+   Wrapper main avec `pb-28 md:pb-0`
+
+3. TESTER les composants:
+   - Navigation mobile sur tous les appareils
+   - Dropdown menu patient layout
+   - Trial banner sur pages thérapeute
+   - Formulaires password et diagnostic
+
+4. VÉRIFIER:
+   - AuthContext existe et export useAuth()
+   - diagnostic_type champ existe dans DB profiles
+   - Uses_cpap champ existe dans DB profiles
+
+=== PALETTE COULEURS ===
+
+Forest (vert): #2D5016
+Copper (cuivre): #8B4513
+Beige (clair): #F5F0E8
+
+=== NOTES ===
+
+- Tous les fichiers utilisent "use client" où nécessaire (formulaires, menus interactifs)
+- Les pages server component pour SEO optimal
+- Bottom nav mobile en position fixed avec z-40
+- Styles Tailwind v3 compatibles
+- Responsive: desktop (hidden md:) / mobile (md:hidden)
+

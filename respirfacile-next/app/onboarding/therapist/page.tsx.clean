@@ -1,0 +1,385 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
+import { Copy, Check } from "lucide-react";
+
+type TherapistOnboardingStep = 1 | 2 | 3 | 4;
+
+interface TherapistData {
+  speciality: string;
+  therapistCode: string;
+  patientEmail: string;
+  onboardingComplete: boolean;
+}
+
+const SPECIALITY_OPTIONS = [
+  { value: "orthophonie", label: "Orthophonie", icon: "🎤", desc: "Rééducation de la parole et de la respiration" },
+  { value: "kinesitherapie", label: "Kinésithérapie", icon: "💪", desc: "Thérapie myofonctionnelle et respiration" },
+  { value: "other", label: "Autre profession", icon: "⚕️", desc: "Médecin, dentiste, autre spécialiste" },
+];
+
+export default function TherapistOnboardingPage() {
+  const router = useRouter();
+  const supabase = createClient();
+  const [step, setStep] = useState<TherapistOnboardingStep>(1);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
+  const [data, setData] = useState<TherapistData>({
+    speciality: "",
+    therapistCode: "",
+    patientEmail: "",
+    onboardingComplete: false,
+  });
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) {
+        router.push("/auth");
+        return;
+      }
+
+      // Vérifier que c'est bien un thérapeute
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (!profile || (profile.role !== "therapist" && profile.role !== "kine")) {
+        router.push("/dashboard");
+        return;
+      }
+
+      setUser(currentUser);
+
+      // Récupérer le code PRO
+      if (profile.therapist_code) {
+        setData((prev) => ({ ...prev, therapistCode: profile.therapist_code }));
+      }
+
+      setLoading(false);
+    };
+
+    checkUser();
+  }, []);
+
+  const handleNext = async () => {
+    if (step === 4) {
+      // Mark onboarding as complete
+      setSaving(true);
+      try {
+        const { error } = await supabase
+          .from("profiles")
+          .update({ onboarding_complete: true })
+          .eq("id", user.id);
+
+        if (error) throw error;
+
+        router.push("/therapist");
+      } catch (error) {
+        console.error("Erreur lors de la sauvegarde:", error);
+        setSaving(false);
+      }
+    } else {
+      setStep((step + 1) as TherapistOnboardingStep);
+    }
+  };
+
+  const handleBack = () => {
+    if (step > 1) setStep((step - 1) as TherapistOnboardingStep);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const getInvitationLink = () => {
+    if (typeof window !== "undefined") {
+      return `${window.location.origin}/auth?code=${data.therapistCode}`;
+    }
+    return "";
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-beige-200 bg-texture flex items-center justify-center">
+        <div className="bg-beige-100 rounded-3xl border border-beige-300 p-10 animate-pulse">
+          <div className="h-8 bg-beige-300 rounded-xl mb-4 w-3/4" />
+          <div className="h-4 bg-beige-300 rounded-xl w-1/2" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-beige-200 bg-texture flex flex-col">
+      {/* Header */}
+      <header className="w-full px-6 py-5 max-w-7xl mx-auto w-full">
+        <Link href="/" className="inline-flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full bg-forest-500 flex items-center justify-center shadow-sm">
+            <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 text-beige-100" stroke="currentColor" strokeWidth="2">
+              <path d="M12 2C8 2 5 6 5 10c0 3 1.5 5.5 4 7l3 2 3-2c2.5-1.5 4-4 4-7 0-4-3-8-7-8z" strokeLinecap="round"/>
+              <path d="M12 8v8M9 11h6" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <span className="font-semibold text-lg text-forest-800">
+            Respir<span className="text-copper-500">facile</span>
+          </span>
+        </Link>
+      </header>
+
+      {/* Content */}
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-2xl">
+          {/* Stepper */}
+          <div className="flex items-center justify-between mb-12 px-2">
+            {[1, 2, 3, 4].map((s) => (
+              <div key={s} className="flex items-center flex-1">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${
+                    s === step
+                      ? "bg-forest-500 text-beige-100 ring-2 ring-forest-500/30"
+                      : s < step
+                      ? "bg-forest-500/20 text-forest-700"
+                      : "bg-beige-300 text-beige-600"
+                  }`}
+                >
+                  {s < step ? "✓" : s}
+                </div>
+                {s < 4 && (
+                  <div
+                    className={`flex-1 h-1 mx-3 rounded-full transition-all ${
+                      s < step ? "bg-forest-500/30" : "bg-beige-300"
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Step 1: Spécialité */}
+          {step === 1 && (
+            <div className="bg-beige-100 rounded-4xl border border-beige-300 p-8 shadow-beige">
+              <h2 className="font-display text-2xl font-bold text-forest-800 mb-2">Bienvenue, Thérapeute!</h2>
+              <p className="text-forest-500 mb-8">Étape 1 sur 4 — Configurons votre profil professionnel</p>
+
+              <div className="space-y-3 mb-8">
+                {SPECIALITY_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setData({ ...data, speciality: option.value })}
+                    className={`w-full p-4 rounded-2xl border-2 transition-all text-left flex items-start gap-4 ${
+                      data.speciality === option.value
+                        ? "border-forest-500 bg-forest-500/5"
+                        : "border-beige-300 hover:border-forest-300 bg-beige-50"
+                    }`}
+                  >
+                    <span className="text-2xl flex-shrink-0 mt-1">{option.icon}</span>
+                    <div>
+                      <p className="font-semibold text-forest-800">{option.label}</p>
+                      <p className="text-sm text-forest-500 mt-0.5">{option.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleNext}
+                  disabled={!data.speciality}
+                  className="flex-1 px-6 py-3 rounded-2xl font-semibold transition-all bg-forest-500 text-beige-100 hover:bg-forest-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Suivant →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Code PRO */}
+          {step === 2 && (
+            <div className="bg-beige-100 rounded-4xl border border-beige-300 p-8 shadow-beige">
+              <h2 className="font-display text-2xl font-bold text-forest-800 mb-2">Votre Code PRO</h2>
+              <p className="text-forest-500 mb-8">Étape 2 sur 4</p>
+
+              <div className="bg-forest-500/5 border border-forest-500/20 rounded-3xl p-6 mb-8">
+                <p className="text-sm text-forest-600 mb-3">Ce code unique vous identifie comme thérapeute :</p>
+                <div className="flex items-center gap-2 bg-beige-100 rounded-2xl p-4 border border-forest-500/30">
+                  <code className="text-xl font-bold text-forest-800 flex-1">{data.therapistCode}</code>
+                  <button
+                    onClick={() => copyToClipboard(data.therapistCode)}
+                    className="p-2 hover:bg-beige-200 rounded-lg transition-colors flex-shrink-0"
+                  >
+                    {copied ? (
+                      <Check className="w-5 h-5 text-forest-500" />
+                    ) : (
+                      <Copy className="w-5 h-5 text-forest-500" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-forest-500 mt-3">
+                  Partagez ce code avec vos patients — ils l'utiliseront pour rejoindre votre programme.
+                </p>
+              </div>
+
+              <div className="bg-copper-500/5 border border-copper-500/20 rounded-2xl p-4 mb-8">
+                <p className="text-sm font-medium text-copper-700 mb-2">💡 Astuce</p>
+                <p className="text-sm text-copper-600">
+                  Vous pouvez générer un lien d'invitation unique pour chaque patient et le partager par email.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleBack}
+                  className="px-6 py-3 rounded-2xl font-semibold transition-all border-2 border-beige-300 text-forest-700 hover:border-forest-300 hover:bg-beige-50"
+                >
+                  ← Retour
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="flex-1 px-6 py-3 rounded-2xl font-semibold transition-all bg-forest-500 text-beige-100 hover:bg-forest-600 hover:shadow-md"
+                >
+                  Suivant →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Inviter le premier patient */}
+          {step === 3 && (
+            <div className="bg-beige-100 rounded-4xl border border-beige-300 p-8 shadow-beige">
+              <h2 className="font-display text-2xl font-bold text-forest-800 mb-2">Inviter votre premier patient</h2>
+              <p className="text-forest-500 mb-8">Étape 3 sur 4 — optionnel</p>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold text-forest-700 mb-2">Email du patient</label>
+                  <input
+                    type="email"
+                    value={data.patientEmail}
+                    onChange={(e) => setData({ ...data, patientEmail: e.target.value })}
+                    placeholder="patient@example.com"
+                    className="w-full px-4 py-3 rounded-2xl border border-beige-300 bg-beige-50 text-forest-800 placeholder-forest-400 focus:outline-none focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
+                  />
+                </div>
+
+                <div className="bg-forest-500/5 border border-forest-500/20 rounded-2xl p-4">
+                  <p className="text-sm text-forest-700 mb-3">Lien d'invitation personnalisé :</p>
+                  <div className="flex items-center gap-2 bg-beige-100 rounded-xl p-3 border border-forest-500/30 overflow-hidden">
+                    <code className="text-xs font-mono text-forest-600 flex-1 truncate">
+                      {getInvitationLink()}
+                    </code>
+                    <button
+                      onClick={() => copyToClipboard(getInvitationLink())}
+                      className="p-1.5 hover:bg-beige-200 rounded transition-colors flex-shrink-0"
+                    >
+                      {copied ? (
+                        <Check className="w-4 h-4 text-forest-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-forest-500" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-copper-500/5 border border-copper-500/20 rounded-2xl p-4">
+                  <p className="text-sm font-medium text-copper-700">📧 À envoyer par email</p>
+                  <p className="text-sm text-copper-600 mt-2">
+                    Copiez le lien ci-dessus et envoyez-le par email à votre patient. Il pourra alors créer son compte et commencer son programme immédiatement.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3 mt-6 pt-6 border-t border-beige-300">
+                  <button
+                    onClick={handleBack}
+                    className="px-6 py-3 rounded-2xl font-semibold transition-all border-2 border-beige-300 text-forest-700 hover:border-forest-300 hover:bg-beige-50"
+                  >
+                    ← Passer
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    className="flex-1 px-6 py-3 rounded-2xl font-semibold transition-all bg-forest-500 text-beige-100 hover:bg-forest-600 hover:shadow-md"
+                  >
+                    Suivant →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Abonnement Stripe */}
+          {step === 4 && (
+            <div className="bg-beige-100 rounded-4xl border border-beige-300 p-8 shadow-beige">
+              <h2 className="font-display text-2xl font-bold text-forest-800 mb-2">Configurez votre abonnement</h2>
+              <p className="text-forest-500 mb-8">Étape 4 sur 4 — dernière étape !</p>
+
+              <div className="bg-forest-500/5 border border-forest-500/20 rounded-3xl p-6 mb-8">
+                <div className="flex items-start gap-3 mb-4">
+                  <span className="text-2xl">🎁</span>
+                  <div>
+                    <p className="font-semibold text-forest-800">Essai gratuit de 30 jours</p>
+                    <p className="text-sm text-forest-600 mt-1">
+                      Accès complet à tous les plans pendant 30 jours sans frais. Nous vous demanderons un moyen de paiement à la fin de la période d'essai.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-8">
+                <div className="bg-beige-50 rounded-2xl p-4 border border-beige-300">
+                  <p className="font-semibold text-forest-800 text-sm mb-2">📌 Plan Starter</p>
+                  <p className="text-sm text-forest-600">Jusqu'à 5 patients • 15€/mois</p>
+                </div>
+                <div className="bg-beige-50 rounded-2xl p-4 border border-beige-300">
+                  <p className="font-semibold text-forest-800 text-sm mb-2">🎯 Plan Pro</p>
+                  <p className="text-sm text-forest-600">Jusqu'à 20 patients • 30€/mois</p>
+                </div>
+                <div className="bg-beige-50 rounded-2xl p-4 border border-beige-300">
+                  <p className="font-semibold text-forest-800 text-sm mb-2">🏢 Plan Cabinet</p>
+                  <p className="text-sm text-forest-600">Illimité • 55€/mois</p>
+                </div>
+              </div>
+
+              <div className="bg-copper-500/5 border border-copper-500/20 rounded-2xl p-4 mb-8">
+                <p className="text-sm text-copper-700 font-medium mb-2">Vous pourrez changer de plan à tout moment</p>
+                <p className="text-sm text-copper-600">
+                  Adaptez votre abonnement selon vos besoins. Pas d'engagement long terme.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleBack}
+                  className="px-6 py-3 rounded-2xl font-semibold transition-all border-2 border-beige-300 text-forest-700 hover:border-forest-300 hover:bg-beige-50"
+                >
+                  ← Retour
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={saving}
+                  className="flex-1 px-6 py-3 rounded-2xl font-semibold transition-all bg-forest-500 text-beige-100 hover:bg-forest-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {saving ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-beige-100/30 border-t-beige-100 rounded-full animate-spin" />
+                      Finalisation...
+                    </>
+                  ) : (
+                    <>
+                      ✨ Finaliser
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <p className="text-xs text-forest-500 text-center mt-6">
+                Vous serez redirigé vers la page de paiement Stripe pour finaliser votre abonnement.
+              </p>

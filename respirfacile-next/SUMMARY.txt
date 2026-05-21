@@ -1,0 +1,158 @@
+RESPIRFACILE NEXT.JS — RÉSUMÉ DE CRÉATION
+==========================================
+
+Date: 2026-04-26
+Dossier: /sessions/admiring-blissful-gauss/mnt/respirfacile-next/
+
+TÂCHE:
+------
+Créer les pages patient (/profile, /settings amélioré), les layouts patient/thérapeute,
+ajouter navigation mobile bottom, banneau trial, formulaires.
+
+FICHIERS CRÉÉS (12 total):
+---------------------------
+
+PAGES (3):
+✓ app/profile/page.tsx (avatar initiales, stats séances/badges/semaines, diagnostic)
+✓ app/settings/page-improved.tsx (profil, diagnostic, notifications, sécurité, compte)
+✓ app/dashboard/page-enhanced.tsx (même dashboard + bottom nav mobile)
+
+LAYOUTS (2):
+✓ components/layout/PatientLayout.tsx (navbar desktop + dropdown + nav mobile bottom)
+✓ components/layout/TherapistLayout.tsx (sidebar desktop + navbar mobile + trial banner)
+
+COMPOSANTS (3):
+✓ components/MobileBottomNavClient.tsx (use client, active state, 5 icônes)
+✓ components/MobileBottomNav.tsx (server component version, statique)
+✓ components/TrialBanner.tsx (server component, affiche jours restants)
+
+FORMULAIRES (2):
+✓ app/settings/SettingsPasswordForm.tsx (ancien + nouveau + confirmation)
+✓ app/settings/SettingsDiagnosticForm.tsx (4 options SAOS/TMOF, radio buttons)
+
+DOCUMENTATION (2):
+✓ INTEGRATION_GUIDE.md (étapes intégration, code samples)
+✓ FICHIERS_CREES.txt (inventaire + notes)
+
+ARCHITECTURE:
+---------------
+app/
+  profile/
+    └── page.tsx (★ NOUVEAU)
+  settings/
+    ├── page-improved.tsx (★ NOUVEAU)
+    ├── SettingsPasswordForm.tsx (★ NOUVEAU)
+    ├── SettingsDiagnosticForm.tsx (★ NOUVEAU)
+    └── page.tsx (existing, à merger)
+  dashboard/
+    ├── page-enhanced.tsx (★ NOUVEAU)
+    └── page.tsx (existing)
+  exercises/page.tsx (ajouter MobileBottomNavClient)
+  journal/page.tsx (ajouter MobileBottomNavClient)
+  ressources/page.tsx (ajouter MobileBottomNavClient)
+  history/page.tsx (ajouter MobileBottomNavClient)
+
+components/
+  layout/
+    ├── PatientLayout.tsx (★ NOUVEAU)
+    └── TherapistLayout.tsx (★ NOUVEAU)
+  MobileBottomNavClient.tsx (★ NOUVEAU)
+  MobileBottomNav.tsx (★ NOUVEAU)
+  TrialBanner.tsx (★ NOUVEAU)
+  [existing components]
+
+STYLES & PALETTE:
+------------------
+Forest: #2D5016 (vert foncé)
+Copper: #8B4513 (cuivre/marron)
+Beige: #F5F0E8 (beige clair)
+
+Desktop: hidden md:flex (Tailwind)
+Mobile: md:hidden (Tailwind)
+Bottom nav: fixed bottom-0 left-0 right-0 z-40
+Padding pour nav mobile: pb-28 md:pb-0
+
+COMPOSANTS "use client":
+-------------------------
+- SettingsPasswordForm.tsx (formulaire interactif)
+- SettingsDiagnosticForm.tsx (formulaire interactif)
+- MobileBottomNavClient.tsx (usePathname())
+- PatientLayout.tsx (menu dropdown)
+- TherapistLayout.tsx (sidebar toggle)
+
+COMPOSANTS SERVER:
+-------------------
+- app/profile/page.tsx (données depuis DB)
+- app/settings/page-improved.tsx (données depuis DB)
+- components/TrialBanner.tsx (affichage simple)
+
+CHAMPS DB REQUIS:
+------------------
+profiles table:
+- diagnostic_type (TEXT): adult_saos_mild, adult_saos_severe, adult_tmof, adult_mixed
+- uses_cpap (BOOLEAN): oui/non
+- subscription_status (TEXT): trialing, active, canceled, past_due
+- trial_ends_at (TIMESTAMPTZ): date expiration trial
+
+CONTEXTE REQUIS:
+-----------------
+- AuthContext.tsx avec useAuth() hook
+  Returns: { user, userProfile, signOut }
+
+PROCHAINES ÉTAPES (À FAIRE):
+------------------------------
+
+1. MERGE settings/page.tsx (15 min):
+   - Copier page-improved.tsx → page.tsx
+   - Vérifier imports formulaires
+
+2. AJOUTER BOTTOM NAV (30 min):
+   - exercises/page.tsx
+   - journal/page.tsx
+   - ressources/page.tsx
+   - history/page.tsx
+   Template: import MobileBottomNavClient + <MobileBottomNavClient /> + pb-28
+
+3. VÉRIFIER DB (5 min):
+   - diagnostic_type champ existe dans profiles
+   - uses_cpap champ existe dans profiles
+
+4. TESTER (15 min):
+   npm run dev
+   - /profile (nouveau)
+   - /settings (amélioré)
+   - /dashboard (mobile nav)
+   - /exercises (mobile nav)
+   - Formulaires: password, diagnostic
+
+5. OPTIONNEL - Utiliser layouts:
+   PatientLayout sur pages patient
+   TherapistLayout sur pages thérapeute
+   (Améliore l'UX desktop avec navbar + sidebar)
+
+STATS:
+------
+Total fichiers créés: 12
+Total lignes de code: ~2000
+Temps estimé intégration: 1-2 heures
+
+COMPATIBILITÉ:
+---------------
+✓ Next.js 14+
+✓ React 18+
+✓ TypeScript
+✓ Tailwind v3
+✓ Supabase
+✓ Server Components + Client Components
+
+NOTES IMPORTANTES:
+-------------------
+1. MobileBottomNavClient DOIT être utilisé (pas la version server)
+2. Ajouter pb-28 md:pb-0 au main pour espace bottom nav
+3. TrialBanner affiche auto (si trialing + trialEndsAt)
+4. Formulaires avec toast notifications (sonner library requis)
+5. Diagnostic form fait update direct dans DB à chaque sélection
+
+=====================================================
+✅ PRÊT À INTÉGRER — Voir INTEGRATION_GUIDE.md
+=====================================================

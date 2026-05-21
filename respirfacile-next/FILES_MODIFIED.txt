@@ -1,0 +1,63 @@
+RESPIRFACILE — FICHIERS COMPLÉTÉS (26 avril 2026)
+
+=== FICHIERS CRÉÉS ===
+
+1. /public/icon.svg
+   - Logo PWA SVG (poumons stylisés)
+   - Couleurs : #2D5016 (vert forêt) + #F5F0E8 (beige)
+   - Gradient linéaire pour effet profondeur
+   - Dimensions : viewBox 0 0 192 192 (scalable)
+
+=== FICHIERS MODIFIÉS ===
+
+2. /public/manifest.json
+   - Icons array simplifié : pointe vers /icon.svg (SVG, any/maskable)
+   - Supprimé les PNG 192x192 et 512x512 qui n'existaient pas
+   - Rest inchangé : nom, description, theme_color, shortcuts
+
+3. /app/components/StripeSetupForm.tsx
+   - Complètement réécrit avec implémentation réelle
+   - Props : plan ("starter"|"pro"|"cabinet"), therapistId
+   - État : loading (boolean), error (string|null)
+   - Fetch POST vers /api/setup-intent avec { plan, therapist_id }
+   - Gestion erreur robuste
+   - UI responsive : bouton, plan display, error toast
+   - Couleurs respirfacile (#2D5016, #F5F0E8)
+   - Pas de dépendances nouvelles
+
+4. /app/ressources/page.tsx
+   - Entièrement récrit (ancien fichier était un stub)
+   - Métadonnées : Metadata export pour SEO
+   - Contenu structuré :
+     * Header avec titre + description
+     * 4 sections explainers (SAOS, nasale, pause, CPAP+réé)
+     * CTA vers /exercises
+     * 8 FAQ collapsibles (<details>)
+     * Section contact avec lien /dashboard
+   - Tailwind CSS : couleurs cohérentes, layout responsive
+   - Messages français complets
+
+=== VALIDATION ===
+
+✓ Tous les fichiers existent et sont lisibles
+✓ Syntaxe TypeScript/TSX validée
+✓ Imports corrects (next/link, next/navigation)
+✓ Pas de dépendances manquantes (fetch API native)
+✓ Coloration cohérente avec CLAUDE.md
+
+=== PROCHAINES ÉTAPES ===
+
+1. Git commit (voir instructions dans COMPLETION_REPORT.md)
+2. Tester les trois éléments en dev server (npm run dev)
+3. Vérifier les liens internes (/exercises, /dashboard)
+4. Tester StripeSetupForm avec /api/setup-intent mock
+
+=== GIT COMMIT ===
+
+cd /sessions/admiring-blissful-gauss/mnt/respirfacile-next
+git add public/icon.svg public/manifest.json \
+        app/components/StripeSetupForm.tsx \
+        app/ressources/page.tsx
+git commit -m "feat: StripeSetupForm reel, page ressources complete, icone PWA SVG"
+git push origin main
+
