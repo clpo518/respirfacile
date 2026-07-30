@@ -2,10 +2,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import {
-  EXERCISES,
   CATEGORY_LABELS,
   DIFFICULTY_LABELS,
   formatDuration,
+  getVisibleExercises,
   type PatientProfileType,
 } from "@/lib/data/exercises";
 import { MobileBottomNavClient } from "@/components/MobileBottomNavClient";
@@ -71,9 +71,9 @@ export default async function ExercisesPage() {
   );
 
   const patientProfile = (program?.profile_type as PatientProfileType) || null;
-  const exercises = patientProfile
-    ? EXERCISES.filter((e) => e.target_profile.includes(patientProfile))
-    : EXERCISES;
+  // Sans profil prescrit, la liste est volontairement restreinte : les exercices
+  // d'apnée volontaire attendent la prescription du praticien.
+  const exercises = getVisibleExercises(patientProfile);
 
   const byCategory = exercises.reduce((acc, ex) => {
     if (!acc[ex.category]) acc[ex.category] = [];
@@ -143,6 +143,17 @@ export default async function ExercisesPage() {
           </p>
         </div>
 
+        {!patientProfile && (
+          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-start gap-3">
+            <span className="text-lg mt-0.5">🩺</span>
+            <p className="text-sm text-amber-800 leading-relaxed">
+              <strong>Votre programme n&apos;est pas encore configuré.</strong> En attendant, seuls les exercices sans
+              apnée volontaire vous sont proposés. Les exercices de Pause Contrôlée demandent une retenue du souffle :
+              votre praticien décide s&apos;ils vous conviennent avant de vous les ouvrir.
+            </p>
+          </div>
+        )}
+
         {program?.custom_notes && (
           <div className="mb-6 bg-copper-500/10 border border-copper-500/20 rounded-2xl px-5 py-4 flex items-start gap-3 hover:shadow-md transition-shadow">
             <span className="text-lg mt-0.5">🩺</span>
@@ -155,7 +166,7 @@ export default async function ExercisesPage() {
         <div className="mb-8 bg-forest-500/10 border border-forest-500/20 rounded-2xl px-5 py-4 flex items-start gap-3 hover:shadow-md transition-shadow">
           <span className="text-xl mt-0.5">💡</span>
           <p className="text-sm text-forest-700 leading-relaxed">
-            <strong>Pour de meilleurs résultats :</strong> Fais la cohérence cardiaque 3&times;/jour. Les autres exercices 1 à 2&times;/jour. Maximum 20 minutes au total.
+            <strong>Pour de meilleurs résultats :</strong> faites la cohérence cardiaque 3 fois par jour, les autres exercices 1 à 2 fois par jour. Maximum 20 minutes au total : au-delà, le bénéfice ne progresse plus.
           </p>
         </div>
 

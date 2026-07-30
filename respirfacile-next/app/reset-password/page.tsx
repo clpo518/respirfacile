@@ -35,7 +35,7 @@ export default function ResetPasswordPage() {
               🔐 Réinitialiser votre mot de passe
             </h1>
             <p className="text-forest-500 text-sm mb-8">
-              Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+              Entrez votre adresse électronique : vous recevrez un lien pour réinitialiser votre mot de passe.
             </p>
 
             {/* Form */}

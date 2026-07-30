@@ -2,10 +2,12 @@
 import Link from "next/link"
 
 export function HeroSection() {
+  // Uniquement des faits produit vérifiables. Les chiffres cliniques vivent
+  // dans EvidenceSection, rattachés à leur source. Ne pas mélanger les deux.
   const stats = [
-    { value: "15 min", label: "par jour suffisent" },
-    { value: "8 sem.", label: "pour les premiers résultats" },
-    { value: "30 j.", label: "d'essai gratuit" },
+    { value: "15 min", label: "par jour dans l'application" },
+    { value: "0 €", label: "pour vos patients" },
+    { value: "30 j.", label: "d'essai sans carte bancaire" },
   ]
   return (
     <section className="relative pt-16 pb-24 px-4 overflow-hidden" style={{background: "linear-gradient(160deg, #F5F0E8 0%, #EDE5D4 100%)"}}>
@@ -60,7 +62,12 @@ export function HeroSection() {
             </div>
           ))}
         </div>
-        <p className="text-xs text-forest-500 text-center">*Source : étude clinique publiée dans CHEST (2009)</p>
+        <p className="text-xs text-forest-500 text-center">
+          Complément aux soins. Respirfacile ne pose pas de diagnostic et ne remplace pas un traitement médical.{" "}
+          <a href="#preuves" className="underline underline-offset-2 hover:text-forest-700">
+            Voir les références cliniques
+          </a>
+        </p>
       </div>
     </section>
   )

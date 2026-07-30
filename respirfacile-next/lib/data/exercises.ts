@@ -70,6 +70,11 @@ export const EXERCISES: Exercise[] = [
     therapist_note_fr: "Équivalent clinique du BOLT (Body Oxygen Level Test) adapté au contexte FR, ne pas utiliser ce terme avec le patient. Score < 10 = hyperventilation chronique probable, investiguer la fréquence respiratoire au repos. Suivre l'évolution hebdomadaire : un gain de 5 pas/semaine est un bon rythme. Attention : ne pas faire après un effort ou un repas.",
     duration_seconds: 300,
     difficulty: 1,
+    // Apnée volontaire : contre-indiquée en SAOS sévère non traité (risque
+    // d'hypoxie). La contre-indication est déclarée explicitement, pas
+    // seulement déduite de target_profile, car c'est elle qui fait foi côté
+    // filtrage (voir getExercisesForProfile).
+    contraindications: ["adult_saos_severe"],
     instructions_fr: [
       "Asseyez-vous et respirez normalement par le nez pendant 30 secondes.",
       "Expirez doucement, pas à fond, juste naturellement.",
@@ -107,6 +112,7 @@ export const EXERCISES: Exercise[] = [
     therapist_note_fr: "Observer la reprise respiratoire après la pause : si le patient respire par la bouche en reprenant, la pause est trop longue ou le patient pousse trop fort. La reprise doit toujours être nasale et calme. Fréquence cible : quotidienne les 2 premières semaines.",
     duration_seconds: 600,
     difficulty: 2,
+    contraindications: ["adult_saos_severe"],
     instructions_fr: [
       "Respirez calmement par le nez pendant 1 minute pour vous préparer.",
       "Expirez doucement et pincez le nez.",
@@ -632,7 +638,7 @@ export const EXERCISES: Exercise[] = [
     category: "relaxation",
     name_fr: "Respiration 4-6-8 (endormissement)",
     description_fr: "Inspirez 4 sec, retenez 6 sec, expirez 8 sec. Cet enchaînement ralentit profondément le système nerveux, à pratiquer dans le lit, avant de dormir.",
-    clinical_rationale_fr: "Le pattern 4-6-8 (Dr Weil) crée un ralentissement progressif du système nerveux sympathique. L'expiration prolongée (8 secondes) active fortement le nerf vague et le système parasympathique. La rétention (6 secondes) augmente légèrement le CO2 sanguin, ce qui contribue à la vasodilatation et à la réduction de la fréquence cardiaque. Utilisé en TCC-I (thérapie cognitivo-comportementale de l'insomnie) associée au SAOS, réduit la latence d'endormissement de 8 minutes en moyenne.",
+    clinical_rationale_fr: "Le pattern 4-6-8 (Dr Weil) crée un ralentissement progressif du système nerveux sympathique. L'expiration prolongée (8 secondes) active fortement le nerf vague et le système parasympathique. La rétention (6 secondes) augmente légèrement le CO2 sanguin, ce qui contribue à la vasodilatation et à la réduction de la fréquence cardiaque. Utilisé en accompagnement des approches cognitivo-comportementales de l'insomnie associée au SAOS. Aucune donnée chiffrée d'efficacité propre à ce pattern n'est disponible : à présenter comme une aide à l'endormissement, pas comme un traitement.",
     expected_benefits_fr: [
       "Endormissement plus rapide, l'effet se ressent dès la première semaine",
       "Système nerveux parasympathique activé : fréquence cardiaque et pression artérielle abaissées",
@@ -682,8 +688,42 @@ export function getExerciseById(id: string): Exercise | undefined {
   return EXERCISES.find((e) => e.id === id);
 }
 
+/**
+ * Catégories reposant sur une apnée volontaire prolongée. Tant qu'aucun profil
+ * clinique n'a été prescrit, elles ne sont pas proposées : retenir son souffle
+ * sans encadrement expose un patient en SAOS sévère non diagnostiqué à un
+ * risque d'hypoxie.
+ */
+const CATEGORIES_REQUIRING_PRESCRIBED_PROFILE: ExerciseCategory[] = ["pause_controlee"];
+
+/**
+ * Exercices autorisés pour un profil donné.
+ *
+ * Deux filtres, dans cet ordre :
+ *   1. la contre-indication explicite, qui prime toujours ;
+ *   2. le ciblage par profil.
+ *
+ * Ne jamais filtrer sur le seul `target_profile` : une contre-indication
+ * ajoutée sans mise à jour du ciblage passerait à travers.
+ */
 export function getExercisesForProfile(profile: PatientProfileType): Exercise[] {
-  return EXERCISES.filter((e) => e.target_profile.includes(profile));
+  return EXERCISES.filter(
+    (e) => !e.contraindications?.includes(profile) && e.target_profile.includes(profile),
+  );
+}
+
+/**
+ * Exercices proposés à un patient dont le praticien n'a pas encore prescrit de
+ * profil. Volontairement restreint : tout ce qui demande une apnée volontaire
+ * attend la prescription.
+ */
+export function getExercisesWithoutProfile(): Exercise[] {
+  return EXERCISES.filter((e) => !CATEGORIES_REQUIRING_PRESCRIBED_PROFILE.includes(e.category));
+}
+
+/** Point d'entrée unique côté écran patient. */
+export function getVisibleExercises(profile: PatientProfileType | null): Exercise[] {
+  return profile ? getExercisesForProfile(profile) : getExercisesWithoutProfile();
 }
 
 export function formatDuration(seconds: number): string {

@@ -8,6 +8,63 @@ interface JournalFormProps {
   userId: string;
 }
 
+const emojiScale = (value: number) => {
+  if (value <= 2) return "😔";
+  if (value <= 4) return "😐";
+  if (value <= 6) return "🙂";
+  if (value <= 8) return "😊";
+  return "😄";
+};
+
+/**
+ * Déclaré au niveau du module, et non dans le rendu de JournalForm : un
+ * composant recréé à chaque rendu remonte son <input>, ce qui interrompait le
+ * glissement du curseur dès le premier mouvement sur mobile.
+ *
+ * Les bornes sont explicites parce qu'elles s'inversent selon la question :
+ * 10 sur « anxiété » n'est pas un bon score.
+ */
+function ScaleControl({
+  label,
+  value,
+  onChange,
+  lowLabel,
+  highLabel,
+  invertEmoji = false,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  lowLabel: string;
+  highLabel: string;
+  invertEmoji?: boolean;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-semibold text-forest-800">{label}</label>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">{emojiScale(invertEmoji ? 11 - value : value)}</span>
+          <span className="text-sm font-bold text-forest-700 w-6 text-right">{value}</span>
+        </div>
+      </div>
+      <input
+        type="range"
+        min="1"
+        max="10"
+        value={value}
+        onChange={(e) => onChange(parseInt(e.target.value))}
+        className="w-full h-2 bg-beige-300 rounded-lg appearance-none cursor-pointer accent-forest-500"
+        aria-label={label}
+      />
+      <div className="flex justify-between text-xs text-forest-400 px-1">
+        <span>{lowLabel}</span>
+        <span>{highLabel}</span>
+      </div>
+    </div>
+  );
+}
+
 export function JournalForm({ userId }: JournalFormProps) {
   const router = useRouter();
   const [wellbeing, setWellbeing] = useState(5);
@@ -19,14 +76,6 @@ export function JournalForm({ userId }: JournalFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const emojiScale = (value: number) => {
-    if (value <= 2) return "😔";
-    if (value <= 4) return "😐";
-    if (value <= 6) return "🙂";
-    if (value <= 8) return "😊";
-    return "😄";
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,38 +126,6 @@ export function JournalForm({ userId }: JournalFormProps) {
     );
   }
 
-  const ScaleControl = ({
-    label,
-    value,
-    onChange,
-  }: {
-    label: string;
-    value: number;
-    onChange: (v: number) => void;
-  }) => (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <label className="text-sm font-semibold text-forest-800">{label}</label>
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">{emojiScale(value)}</span>
-          <span className="text-sm font-bold text-forest-700 w-6 text-right">{value}</span>
-        </div>
-      </div>
-      <input
-        type="range"
-        min="1"
-        max="10"
-        value={value}
-        onChange={(e) => onChange(parseInt(e.target.value))}
-        className="w-full h-2 bg-beige-300 rounded-lg appearance-none cursor-pointer accent-forest-500"
-      />
-      <div className="flex justify-between text-xs text-forest-400 px-1">
-        <span>Très mal</span>
-        <span>Très bien</span>
-      </div>
-    </div>
-  );
-
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <p className="text-sm text-forest-600 bg-beige-100 rounded-xl px-4 py-3 border border-beige-300">
@@ -121,17 +138,30 @@ export function JournalForm({ userId }: JournalFormProps) {
           label="🫁 Comment vous sentez-vous globalement ?"
           value={wellbeing}
           onChange={setWellbeing}
+          lowLabel="Très mal"
+          highLabel="Très bien"
         />
-        <ScaleControl label="😴 Qualité de votre sommeil cette semaine" value={sleep} onChange={setSleep} />
+        <ScaleControl
+          label="😴 Qualité de votre sommeil cette semaine"
+          value={sleep}
+          onChange={setSleep}
+          lowLabel="Très mauvaise"
+          highLabel="Très bonne"
+        />
         <ScaleControl
           label="😰 Niveau d'anxiété ressenti"
           value={anxietyLevel}
           onChange={setAnxietyLevel}
+          lowLabel="Aucune anxiété"
+          highLabel="Très anxieux"
+          invertEmoji
         />
         <ScaleControl
           label="👃 Facilité à respirer par le nez"
           value={nasalBreathing}
           onChange={setNasalBreathing}
+          lowLabel="Nez très bouché"
+          highLabel="Nez parfaitement libre"
         />
       </div>
 

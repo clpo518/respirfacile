@@ -2,18 +2,19 @@
 import Link from "next/link";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
+import { absoluteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Tarifs abonnement orthophoniste — 30 jours gratuits | Respirfacile",
+  title: "Tarifs abonnement orthophoniste, 30 jours gratuits",
   description:
     "Abonnement Respirfacile pour orthophonistes et kinésithérapeutes : Starter 15€/mois (5 patients), Pro 30€/mois (20 patients), Cabinet 55€/mois (illimité). 30 jours gratuits, sans carte bancaire.",
   openGraph: {
-    title: "Tarifs Respirfacile — 30 jours offerts pour les orthophonistes",
+    title: "Tarifs Respirfacile, 30 jours offerts pour les orthophonistes",
     description:
-      "Plans Starter, Pro et Cabinet. Suivi patients SAOS & TMOF, bilans PDF, historique, support. Essai gratuit 30 jours.",
-    url: "https://respirfacile.fr/pricing",
+      "Plans Starter, Pro et Cabinet. Suivi des patients, bilans PDF, historique, assistance. Essai gratuit 30 jours.",
+    url: absoluteUrl("/pricing"),
   },
-  alternates: { canonical: "https://respirfacile.fr/pricing" },
+  alternates: { canonical: absoluteUrl("/pricing") },
 };
 
 const plans = [
@@ -129,24 +130,15 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
           </div>
         </section>
 
-        {/* Social Proof */}
+        {/* Ce que couvre l'abonnement */}
         <section className="py-12 px-4 sm:px-6 lg:px-8 bg-beige-100 border-b border-beige-300">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-4 text-sm text-forest-700">
-              <div className="flex -space-x-2">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-full bg-forest-500/20 border-2 border-beige-100 flex items-center justify-center text-xs font-bold text-forest-700"
-                  >
-                    {String.fromCharCode(65 + i)}
-                  </div>
-                ))}
-              </div>
-              <span className="font-semibold">85 orthophonistes nous font confiance</span>
-            </div>
+            <p className="font-semibold text-forest-700">
+              Un seul abonnement, celui du praticien. Vos patients n&apos;entrent jamais de carte bancaire.
+            </p>
             <p className="text-xs text-forest-500 mt-3">
-              Vos patients accèdent complètement gratuitement via votre code Pro.
+              Ils accèdent à la totalité de l&apos;application avec le code que vous leur transmettez, aussi longtemps
+              que votre abonnement est actif.
             </p>
           </div>
         </section>
@@ -185,7 +177,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
 
                   <p className={`text-sm mb-6 ${plan.highlighted ? "text-beige-200" : "text-forest-600"}`}>
                     {plan.description === "Recommandé"
-                    ? "Choix populaire auprès des orthos actives"
+                    ? "Le bon volume pour une patientèle suivie régulièrement"
                     : plan.name === "Cabinet"
                     ? "Idéal pour un cabinet multi-praticiens"
                     : "Parfait pour démarrer"}
@@ -215,7 +207,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
                     {plan.cta}
                   </Link>
                   <p className={`text-center text-xs mt-3 ${plan.highlighted ? "text-beige-300" : "text-forest-400"}`}>
-                    30 jours gratuits · Sans CB
+                    30 jours gratuits · Sans carte bancaire
                   </p>
                 </div>
               ))}
@@ -298,23 +290,23 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
                 },
                 {
                   q: "Puis-je tester avant de m'engager ?",
-                  a: "Oui. 30 jours gratuits complets, sans carte bancaire à l'inscription. Vous créez votre espace, invitez vos premiers patients, prescrivez des programmes et voyez les résultats, avant de décider. La carte bancaire n'est demandée qu'à la fin du trial, si vous continuez.",
+                  a: "Oui. 30 jours gratuits complets, sans carte bancaire à l'inscription. Vous créez votre espace, invitez vos premiers patients, prescrivez des programmes et voyez les résultats, avant de décider. La carte bancaire n'est demandée qu'à la fin de l'essai, si vous continuez.",
                 },
                 {
                   q: "Combien de temps faut-il pour mettre en place Respirfacile avec un patient ?",
                   a: "Moins de 5 minutes pour la mise en place : vous copiez votre code Pro, le transmettez au patient, il s'inscrit et vous le retrouvez dans votre tableau de bord. Prescrire un programme prend 2 minutes supplémentaires. Après ça, l'application fait le travail entre les séances.",
                 },
                 {
-                  q: "Est-ce compatible avec les appareils CPAP et les orthèses ?",
-                  a: "Oui. Respirfacile n'est pas concurrent de ces traitements, il les complète. La rééducation myofonctionnelle améliore le tonus des muscles oropharyngés, ce qui renforce l'efficacité des appareils existants. Plusieurs études montrent une réduction de l'IAH significative lorsque les deux approches sont combinées.",
+                  q: "Est-ce compatible avec la pression positive continue et les orthèses ?",
+                  a: "Oui, en complément et jamais en remplacement. La revue Cochrane de 2020 est explicite : comparée à la pression positive continue, la rééducation myofonctionnelle fait moins bien. Respirfacile ne se substitue à aucun traitement en cours et aucune modification ne doit être décidée sans le médecin du patient.",
                 },
                 {
                   q: "Y a-t-il un engagement de durée ?",
-                  a: "Non. Mensuel, sans engagement minimum. Vous changez de plan ou annulez à la fin du mois courant, sans pénalité. Si vous annulez, les données de vos patients restent accessibles 60 jours, le temps de les exporter ou de les transférer si besoin.",
+                  a: "Non. Mensuel, sans engagement minimum. Vous changez de plan ou annulez à la fin du mois courant, sans pénalité. Les données de vos patients ne sont pas supprimées automatiquement à l'annulation : écrivez-moi pour en obtenir l'export.",
                 },
                 {
                   q: "Mes données et celles de mes patients sont-elles protégées ?",
-                  a: "Oui. Hébergement en Europe, chiffrement en transit et au repos, accès strictement limité praticien/patient, conformité RGPD complète. Vos données ne sont jamais partagées avec des tiers ni utilisées à des fins commerciales. En cas d'audit, nous pouvons fournir notre documentation de conformité.",
+                  a: "Hébergement en France, chiffrement en transit et au repos, cloisonnement appliqué directement dans la base de données : un praticien ne peut lire que les dossiers des patients qui lui sont rattachés. Vos données ne sont ni partagées avec des tiers ni utilisées à des fins commerciales.",
                 },
               ].map(({ q, a }) => (
                 <details key={q} className="group bg-beige-100 rounded-2xl border border-beige-300 overflow-hidden cursor-pointer">
@@ -352,7 +344,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
               </svg>
             </Link>
             <p className="text-xs text-beige-300 mt-4">
-              Sans CB · Annulable · RGPD · France
+              Sans carte bancaire · Annulable · RGPD · Hébergement en France
             </p>
           </div>
         </section>
@@ -370,11 +362,12 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
               href="/contact"
               className="inline-flex items-center justify-center rounded-full border-2 border-forest-500 px-8 py-3 text-forest-700 font-semibold hover:bg-forest-500 hover:text-beige-100 transition-colors text-sm"
             >
-              Nous contacter
+              Me contacter
             </Link>
           </div>
         </section>
       </main>
+      <Footer />
     </div>
   )
 }

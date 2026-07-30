@@ -2,33 +2,32 @@
 import Link from "next/link";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
+import { absoluteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Blog — rééducation respiratoire et apnée du sommeil | Respirfacile",
+  title: "Ressources",
   description:
-    "Articles scientifiques et guides pratiques sur la rééducation respiratoire, l'apnée du sommeil (SAOS), la thérapie myofonctionnelle orofaciale. Références cliniques validées.",
-  openGraph: {
-    title: "Blog Respirfacile — Science, SAOS et thérapie myofonctionnelle",
-    description:
-      "Études cliniques, protocoles et conseils pratiques pour orthophonistes et patients. IAH, Pause Contrôlée, exercices oropharyngés.",
-    url: "https://respirfacile.fr/blog",
-  },
-  alternates: { canonical: "https://respirfacile.fr/blog" },
+    "Les articles de fond sur la rééducation respiratoire, les troubles respiratoires du sommeil et la thérapie myofonctionnelle sont en préparation.",
+  // Aucun article n'est publié pour l'instant : laisser cette page indexable
+  // reviendrait à proposer une page vide à Google. À rebasculer en index dès
+  // le premier article en ligne.
+  robots: { index: false, follow: true },
+  alternates: { canonical: absoluteUrl("/blog") },
 };
 
 const articles = [
   {
     slug: "therapie-myofonctionnelle-apnee-sommeil",
-    title: "La thérapie myofonctionnelle réduit l'IAH de 50%, ce que dit la science",
-    excerpt: "La méta-analyse Camacho et al. 2015 (Stanford, n=120) est la référence mondiale. Voici ce qu'elle démontre et comment Respirfacile l'applique.",
+    title: "Thérapie myofonctionnelle et apnées du sommeil : ce que dit vraiment la littérature",
+    excerpt: "La méta-analyse de Camacho et al. (2015) rapporte une baisse d'environ 50 % de l'indice d'apnées-hypopnées. Ce qu'elle montre, ce qu'elle ne montre pas, et ce que la revue Cochrane vient nuancer.",
     date: "Avril 2026",
     readTime: "5 min",
     tag: "Science",
   },
   {
     slug: "exercices-respiration-nasale",
-    title: "Respiration nasale : pourquoi c'est la base de tout traitement SAOS",
-    excerpt: "80% des patients SAOS respirent par la bouche la nuit. La rééducation nasale est le premier levier thérapeutique, voici comment le travailler.",
+    title: "Respiration nasale : par où commence la rééducation",
+    excerpt: "La respiration buccale nocturne est fréquente chez les patients avec troubles respiratoires du sommeil. Comment la repérer, et comment travailler le passage au nasal sans braquer le patient.",
     date: "Avril 2026",
     readTime: "4 min",
     tag: "Exercices",
@@ -55,7 +54,8 @@ export default function BlogPage() {
               Ressources
             </h1>
             <p className="text-lg text-forest-600">
-              Science, protocoles et conseils pratiques sur la rééducation respiratoire.
+              Science, protocoles et conseils pratiques sur la rééducation respiratoire. Voici les trois premiers
+              articles en cours d&apos;écriture.
             </p>
           </div>
         </section>
@@ -94,13 +94,14 @@ export default function BlogPage() {
               Restez informé
             </h2>
             <p className="text-forest-600 text-sm mb-6">
-              Nouveaux articles, mises à jour protocoles, ressources orthos, directement dans votre boîte.
+              Nouveaux articles, mises à jour des protocoles, ressources pour les praticiens. Écrivez-moi pour que je
+              vous prévienne.
             </p>
             <Link
               href="/contact"
               className="inline-flex items-center justify-center rounded-full border-2 border-forest-500 px-8 py-3 text-forest-700 font-semibold hover:bg-forest-500 hover:text-beige-100 transition-colors text-sm"
             >
-              Nous contacter
+              Me contacter
             </Link>
           </div>
         </section>

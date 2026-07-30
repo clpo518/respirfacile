@@ -28,7 +28,7 @@ const DIAGNOSTIC_OPTIONS: Array<{
   {
     value: "adult_saos_severe",
     label: "SAOS sévère",
-    description: "Apnée du sommeil sévère, généralement sous CPAP",
+    description: "Apnée du sommeil sévère, généralement sous pression positive continue",
   },
   {
     value: "adult_tmof",
