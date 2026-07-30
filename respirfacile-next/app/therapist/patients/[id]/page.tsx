@@ -280,6 +280,7 @@ export default async function PatientDetailPage({ params }: Props) {
                   { href: `/therapist/patients/${id}/program`, icon: "📋", label: "Gérer le programme" },
                   { href: `/therapist/patients/${id}/notes`, icon: "✏️", label: "Notes de séance" },
                   { href: `/therapist/patients/${id}/journal`, icon: "📓", label: "Journal du patient" },
+                  { href: `/therapist/patients/${id}/bilan`, icon: "📄", label: "Bilan de suivi" },
                 ].map((action) => (
                   <Link
                     key={action.href}
