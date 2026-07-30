@@ -3,11 +3,11 @@ import { PatientNavbar } from "@/components/layout/PatientNavbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "FAQ et ressources — exercices respiratoires | Respirfacile",
+  title: "FAQ et ressources",
   description:
     "Questions fréquentes sur les exercices de rééducation respiratoire : Pause Contrôlée, apnée du sommeil, SAOS, CPAP, TMOF. Conseils pratiques pour progresser en autonomie.",
   openGraph: {
-    title: "FAQ exercices respiratoires | Respirfacile",
+    title: "FAQ exercices respiratoires",
     description:
       "Combien de temps avant de voir des résultats ? Peut-on pratiquer avec un CPAP ? Toutes les réponses sur la rééducation respiratoire.",
     url: "https://respirfacile.fr/ressources",

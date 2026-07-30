@@ -10,7 +10,7 @@ import { SignOutButton } from "./SignOutButton";
 import { CopyCodeButton } from "./CopyCodeButton";
 
 export const metadata: Metadata = {
-  title: "Paramètres | Respirfacile",
+  title: "Paramètres",
 };
 
 export default async function SettingsPage() {

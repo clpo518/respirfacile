@@ -98,19 +98,17 @@ export function JournalForm({ userId }: JournalFormProps) {
         },
       ]);
 
-      if (err) {
-        // Si la table n'existe pas encore, on indique quand même le succès
-        if (err.code === "42P01") {
-          setSuccess(true);
-          return;
-        }
-        throw err;
-      }
+      // Aucune exception ici : le formulaire affichait « Journal enregistré ! »
+      // même quand l'écriture échouait parce que la table n'existait pas. Le
+      // patient croyait avoir transmis son ressenti hebdomadaire à son
+      // praticien, et rien n'était sauvegardé. Un échec doit se voir.
+      if (err) throw err;
 
       setSuccess(true);
       router.refresh();
     } catch (err) {
-      setError("Une erreur est survenue. Réessayez dans quelques instants.");
+      console.error("Journal : échec de l'enregistrement", err);
+      setError("Votre journal n'a pas pu être enregistré. Réessayez dans quelques instants.");
     } finally {
       setIsLoading(false);
     }

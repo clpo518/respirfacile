@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Réinitialiser votre mot de passe | Respirfacile",
+  title: "Réinitialiser votre mot de passe",
 };
 
 export default function ResetPasswordPage() {

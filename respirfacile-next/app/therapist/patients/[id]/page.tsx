@@ -1,7 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { EXERCISES } from "@/lib/data/exercises";
+import { EXERCISES, formatScore } from "@/lib/data/exercises";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -252,8 +252,10 @@ export default async function PatientDetailPage({ params }: Props) {
                           {ex?.name_fr ?? s.exercise_id}
                         </p>
                         <div className="text-right flex-shrink-0">
-                          {s.score != null && (
-                            <p className="text-xs font-bold text-copper-600">{s.score}%</p>
+                          {formatScore(s.exercise_id, s.score) && (
+                            <p className="text-xs font-bold text-copper-600">
+                              {formatScore(s.exercise_id, s.score)}
+                            </p>
                           )}
                           <p className="text-xs text-forest-400">
                             {d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
@@ -305,14 +307,16 @@ export default async function PatientDetailPage({ params }: Props) {
                             {d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
                           </span>
                           <div className="flex items-center gap-1.5">
+                            {/* Le journal patient est saisi sur 1 à 10 : afficher
+                                « /5 » ici faisait lire un 8 comme un dépassement. */}
                             {entry.wellbeing_score != null && (
                               <span className="text-xs bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">
-                                😊 {entry.wellbeing_score}/5
+                                😊 {entry.wellbeing_score}/10
                               </span>
                             )}
                             {entry.anxiety_level != null && (
                               <span className="text-xs bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded font-medium">
-                                😰 {entry.anxiety_level}/5
+                                😰 {entry.anxiety_level}/10
                               </span>
                             )}
                           </div>

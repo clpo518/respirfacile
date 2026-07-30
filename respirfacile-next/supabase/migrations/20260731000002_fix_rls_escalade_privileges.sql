@@ -1,0 +1,34 @@
+-- ============================================================
+-- RESPIRFACILE — Fermeture de deux failles RLS
+-- ============================================================
+--
+-- Constat du 31/07/2026, remonté par le linter Supabase puis vérifié dans
+-- pg_policies. Les deux politiques ci-dessous s'appliquaient au rôle `public`,
+-- qui inclut `anon` et `authenticated`.
+--
+-- 1. profiles.admin_all_profiles
+--    Condition : auth.jwt() -> 'user_metadata' ->> 'role' = 'admin'.
+--    `user_metadata` est modifiable par l'utilisateur lui-même via
+--    supabase.auth.updateUser({ data: { role: 'admin' } }). N'importe quel
+--    compte pouvait donc s'octroyer un accès complet en lecture ET en écriture
+--    sur TOUS les profils : identités, adresses, statut d'abonnement, code
+--    praticien. Sur une base contenant des données de santé, c'est la faille
+--    la plus grave du projet.
+--    Aucun écran de l'application ne dépend de cette politique : la seule
+--    route /admin est un aperçu d'emails statique. Elle est donc supprimée
+--    plutôt que réécrite. Une administration réelle passera par le rôle
+--    service, qui n'est pas soumis à RLS.
+--
+-- 2. therapist_patients.service_role_all
+--    USING (true) WITH CHECK (true) pour ALL, sans clause TO : le nom laissait
+--    croire à une politique réservée au rôle service, mais elle s'appliquait à
+--    tout le monde. N'importe quel utilisateur connecté pouvait lire la table
+--    de liaison praticien-patient entière, et surtout s'y insérer comme
+--    praticien de n'importe quel patient. Toutes les politiques qui vérifient
+--    « ce patient est bien rattaché à ce praticien » (séances, journal, notes,
+--    prescriptions, messages) devenaient contournables.
+--    Le rôle service contourne RLS par construction : cette politique n'avait
+--    aucune utilité.
+
+DROP POLICY IF EXISTS "admin_all_profiles" ON profiles;
+DROP POLICY IF EXISTS "service_role_all" ON therapist_patients;

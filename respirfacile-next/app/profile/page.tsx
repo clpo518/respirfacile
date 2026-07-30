@@ -3,10 +3,11 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { BADGES } from "@/lib/badges";
 
 export const metadata: Metadata = {
-  title: "Mon Profil | Respirfacile",
-  description: "Profil patient Respirfacile",
+  title: "Mon profil",
+  description: "Votre profil, vos badges et votre praticien référent.",
 };
 
 export default async function ProfilePage() {
@@ -59,24 +60,12 @@ export default async function ProfilePage() {
     day: "numeric",
   });
 
-  // Emojis et labels pour les badges
-  const BADGE_META: Record<string, { emoji: string; label: string }> = {
-    first_session:   { emoji: "🎯", label: "Première séance" },
-    sessions_5:      { emoji: "🌱", label: "5 séances" },
-    sessions_10:     { emoji: "💪", label: "10 séances" },
-    sessions_25:     { emoji: "⚡", label: "25 séances" },
-    sessions_50:     { emoji: "🏆", label: "50 séances" },
-    sessions_100:    { emoji: "💎", label: "100 séances" },
-    streak_3:        { emoji: "🔥", label: "3 jours de suite" },
-    streak_7:        { emoji: "🔥🔥", label: "7 jours de suite" },
-    streak_14:       { emoji: "🌟", label: "14 jours de suite" },
-    streak_30:       { emoji: "👑", label: "30 jours de suite" },
-    pause_20:        { emoji: "🫁", label: "Pause 20 pas" },
-    pause_40:        { emoji: "🫁", label: "Pause 40 pas" },
-    pause_60:        { emoji: "🫁", label: "Pause 60 pas" },
-    perfect_week:    { emoji: "🗓️", label: "Semaine parfaite" },
-    early_bird:      { emoji: "🌅", label: "Lève-tôt" },
-  };
+  // Métadonnées dérivées du catalogue unique. Cette page listait auparavant
+  // des badges qui n'existaient nulle part ailleurs (streak_3, sessions_50,
+  // early_bird…) : ils n'étaient donc jamais attribuables.
+  const BADGE_META: Record<string, { emoji: string; label: string }> = Object.fromEntries(
+    BADGES.map((badge) => [badge.id, { emoji: badge.emoji, label: badge.name }]),
+  );
 
   // Mapper les IDs de diagnostiques
   const diagnosticLabel = {

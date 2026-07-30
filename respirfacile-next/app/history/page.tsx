@@ -2,11 +2,11 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import type { Metadata } from "next"
-import { EXERCISES } from "@/lib/data/exercises"
+import { EXERCISES, formatScore } from "@/lib/data/exercises"
 import { MobileBottomNavClient } from "@/components/MobileBottomNavClient"
 
 export const metadata: Metadata = {
-  title: "Mon historique | Respirfacile",
+  title: "Mon historique",
 }
 
 export default async function HistoryPage() {
@@ -132,9 +132,12 @@ export default async function HistoryPage() {
                             )}
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
-                            {session.score != null && (
+                            {/* L'unité vient de l'exercice. L'ancienne version
+                                affichait « % » au-dessus de 5 et « ★ » en
+                                dessous, ce qui inventait deux unités fausses. */}
+                            {formatScore(session.exercise_id, session.score) && (
                               <span className="text-xs font-semibold bg-copper-500/10 text-copper-700 px-2 py-0.5 rounded-full">
-                                {session.score > 5 ? `${session.score}%` : `${session.score}★`}
+                                {formatScore(session.exercise_id, session.score)}
                               </span>
                             )}
                             {session.completed && (

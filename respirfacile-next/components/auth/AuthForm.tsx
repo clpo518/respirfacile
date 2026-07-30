@@ -39,10 +39,10 @@ export function AuthForm() {
         router.refresh();
       } else {
         if (!fullName.trim()) {
-          throw new Error('Veuillez saisir votre prenom et nom.');
+          throw new Error('Veuillez saisir votre prénom et votre nom.');
         }
         if (role === 'patient' && !proCode.trim()) {
-          throw new Error('Vous avez besoin du code donne par votre praticien pour vous inscrire.');
+          throw new Error('Vous avez besoin du code donné par votre praticien pour vous inscrire.');
         }
 
         let therapistId: string | null = null;
@@ -109,9 +109,9 @@ export function AuthForm() {
       if (msg.includes('Invalid login credentials')) {
         setError('Email ou mot de passe incorrect.');
       } else if (msg.includes('Email already registered') || msg.includes('already been registered')) {
-        setError('Cet email est deja utilise. Connectez-vous ou reinitailisez votre mot de passe.');
+        setError('Cette adresse est déjà utilisée. Connectez-vous, ou réinitialisez votre mot de passe.');
       } else if (msg.includes('Password should be')) {
-        setError('Le mot de passe doit faire au moins 6 caracteres.');
+        setError('Le mot de passe doit faire au moins 6 caractères.');
       } else {
         setError(msg);
       }
@@ -143,14 +143,14 @@ export function AuthForm() {
                 : 'text-forest-500 hover:text-forest-700'
             }`}
           >
-            Creer un compte
+            Créer un compte
           </button>
         </div>
 
         {/* Title */}
         <div className="mb-6">
           <h1 className="font-display text-2xl font-bold text-forest-800 mb-1">
-            {mode === 'login' ? 'Bon retour !' : 'Creer votre compte'}
+            {mode === 'login' ? 'Bon retour !' : 'Créer votre compte'}
           </h1>
           <p className="text-sm text-forest-500">
             {mode === 'login'
@@ -162,7 +162,7 @@ export function AuthForm() {
         {/* Role selector (signup only) */}
         {mode === 'signup' && (
           <div className="mb-6">
-            <p className="text-sm font-semibold text-forest-700 mb-3">Qui etes-vous ?</p>
+            <p className="text-sm font-semibold text-forest-700 mb-3">Qui êtes-vous ?</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setRole('patient')}
@@ -174,7 +174,7 @@ export function AuthForm() {
               >
                 <div className="text-2xl mb-2">🫁</div>
                 <p className="font-bold text-forest-800 mb-0.5">Je suis patient</p>
-                <p className="text-xs text-forest-500 leading-snug">Mon praticien m&apos;a donne un code d&apos;acces</p>
+                <p className="text-xs text-forest-500 leading-snug">Mon praticien m&apos;a donné un code d&apos;accès</p>
               </button>
               <button
                 onClick={() => setRole('therapist')}
@@ -186,7 +186,7 @@ export function AuthForm() {
               >
                 <div className="text-2xl mb-2">🩺</div>
                 <p className="font-bold text-forest-800 mb-0.5">Je suis praticien</p>
-                <p className="text-xs text-forest-500 leading-snug">Orthophoniste ou kinesitherapeute</p>
+                <p className="text-xs text-forest-500 leading-snug">Orthophoniste ou kinésithérapeute</p>
               </button>
             </div>
           </div>
@@ -208,7 +208,7 @@ export function AuthForm() {
           {mode === 'signup' && (
             <div>
               <label className="block text-sm font-semibold text-forest-700 mb-1.5">
-                Votre prenom et nom
+                Votre prénom et votre nom
               </label>
               <input
                 type="text"
@@ -242,7 +242,7 @@ export function AuthForm() {
               </label>
               {mode === 'login' && (
                 <Link href="/reset-password" className="text-xs text-forest-500 hover:text-forest-700 transition-colors">
-                  Mot de passe oublie ?
+                  Mot de passe oublié ?
                 </Link>
               )}
             </div>
@@ -252,16 +252,16 @@ export function AuthForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              placeholder="Au moins 6 caracteres"
+              placeholder="Au moins 6 caractères"
               className="w-full px-4 py-3 rounded-2xl border border-beige-300 bg-white focus:outline-none focus:ring-2 focus:ring-forest-500/40 focus:border-forest-500 text-forest-800 placeholder-forest-400 transition-colors"
             />
           </div>
 
-          {/* Code acces (patient only) */}
+          {/* Code d'accès, patient uniquement */}
           {mode === 'signup' && role === 'patient' && (
             <div>
               <label className="block text-sm font-semibold text-forest-700 mb-1.5">
-                Code d&apos;acces de votre praticien
+                Code d&apos;accès de votre praticien
               </label>
               <input
                 type="text"
@@ -273,7 +273,7 @@ export function AuthForm() {
                 className="w-full px-4 py-3 rounded-2xl border border-beige-300 bg-white focus:outline-none focus:ring-2 focus:ring-forest-500/40 focus:border-forest-500 text-forest-800 placeholder-forest-400 font-mono uppercase transition-colors"
               />
               <p className="text-xs text-forest-400 mt-1.5">
-                Votre orthophoniste ou kinesitherapeute vous a transmis ce code par email ou lors de votre consultation.
+                Votre orthophoniste ou votre kinésithérapeute vous a transmis ce code, par courriel ou lors de votre consultation.
               </p>
             </div>
           )}
@@ -283,7 +283,7 @@ export function AuthForm() {
             <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
               <p className="text-xs font-semibold text-amber-800 mb-1">📋 Pas encore de code ?</p>
               <p className="text-xs text-amber-700 leading-relaxed">
-                L&apos;acces a Respirfacile se fait uniquement via votre praticien (orthophoniste ou kinesitherapeute). Demandez-lui votre code lors de votre prochaine seance, il vous le transmettra en 30 secondes.
+                L&apos;accès à Respirfacile passe uniquement par votre praticien, orthophoniste ou kinésithérapeute. Demandez-lui votre code lors de votre prochaine séance, il vous le transmettra en 30 secondes.
               </p>
             </div>
           )}
@@ -291,7 +291,7 @@ export function AuthForm() {
           {/* Therapist trial info */}
           {mode === 'signup' && role === 'therapist' && (
             <div className="bg-forest-500/5 border border-forest-500/20 rounded-2xl px-4 py-3 text-xs text-forest-600">
-              30 jours gratuits sans carte bancaire. Vous pourrez inviter vos patients des votre premiere connexion.
+              30 jours gratuits sans carte bancaire. Vous pourrez inviter vos patients dès votre première connexion.
             </div>
           )}
 
@@ -312,7 +312,7 @@ export function AuthForm() {
             ) : mode === 'login' ? (
               'Se connecter'
             ) : role === 'therapist' ? (
-              'Creer mon espace gratuitement'
+              'Créer mon espace gratuitement'
             ) : (
               'Rejoindre mon programme'
             )}
@@ -323,11 +323,11 @@ export function AuthForm() {
           {mode === 'login' ? (
             <>Pas encore de compte ?{' '}
               <button onClick={() => setMode('signup')} className="text-forest-600 font-semibold hover:underline">
-                Creer un compte
+                Créer un compte
               </button>
             </>
           ) : (
-            <>Deja un compte ?{' '}
+            <>Déjà un compte ?{' '}
               <button onClick={() => setMode('login')} className="text-forest-600 font-semibold hover:underline">
                 Se connecter
               </button>

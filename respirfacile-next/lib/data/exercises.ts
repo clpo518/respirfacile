@@ -726,6 +726,22 @@ export function getVisibleExercises(profile: PatientProfileType | null): Exercis
   return profile ? getExercisesForProfile(profile) : getExercisesWithoutProfile();
 }
 
+/**
+ * Score d'une séance, avec SON unité.
+ *
+ * L'unité change d'un exercice à l'autre : le test de découverte compte des
+ * pas, les paliers de pause comptent des secondes. Plusieurs écrans affichaient
+ * « 26 % », ce qui ne veut rien dire et laissait croire à un pourcentage
+ * d'observance. Passer systématiquement par cette fonction.
+ */
+export function formatScore(exerciseId: string | null | undefined, score: number | null | undefined): string | null {
+  if (score == null) return null;
+  const unit = exerciseId ? getExerciseById(exerciseId)?.inputUnit : undefined;
+  if (!unit) return `${score}`;
+  if (unit === "secondes") return `${score} s`;
+  return `${score} ${unit}`;
+}
+
 export function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;

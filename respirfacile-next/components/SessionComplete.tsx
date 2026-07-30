@@ -61,11 +61,9 @@ export default function SessionComplete({
 
       // Badges
       try {
-        const res = await fetch("/api/check-badges", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ exerciseId, score }),
-        });
+        // Aucun corps : les badges sont évalués côté serveur sur l'historique
+        // réel, jamais sur un score déclaré par le client.
+        const res = await fetch("/api/check-badges", { method: "POST" });
         if (res.ok) {
           const data = await res.json();
           if (data.new_badges?.length > 0) setNewBadges(data.new_badges);
