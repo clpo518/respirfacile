@@ -11,7 +11,7 @@ export function CTASection() {
       <div className="relative max-w-4xl mx-auto text-center">
         <div className="inline-flex items-center gap-2 rounded-full bg-copper-500/20 border border-copper-500/30 px-4 py-2 text-sm font-medium text-copper-300 mb-8">
           <span className="w-2 h-2 rounded-full bg-copper-400 animate-pulse" />
-          85 orthophonistes et kinés utilisent déjà Respirfacile
+          Ouvert aux orthophonistes et aux kinésithérapeutes
         </div>
 
         <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-beige-100 mb-6 text-balance leading-tight">
@@ -42,7 +42,7 @@ export function CTASection() {
         </div>
 
         <p className="text-sm text-beige-400">
-          Sans CB · Sans engagement · Résiliable à tout moment · RGPD · Hébergement France
+          Sans carte bancaire · Sans engagement · Résiliable à tout moment · RGPD · Hébergement en France
         </p>
       </div>
     </section>

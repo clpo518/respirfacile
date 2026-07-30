@@ -40,7 +40,7 @@ export function StreakDisplay({ userId }: StreakDisplayProps) {
         );
 
         let count = 0;
-        let check = new Date(today);
+        const check = new Date(today);
         while (days.has(check.getTime())) {
           count++;
           check.setDate(check.getDate() - 1);

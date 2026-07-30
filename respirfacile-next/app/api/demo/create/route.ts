@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
+import { createHash } from 'node:crypto';
 
 const DEMO_SESSIONS = [
   { exercise_id: 'pause_controlee_decouverte', exercise_category: 'pause_controlee', score: 12, duration_seconds: 280, metrics: { pause_steps: 12 }, completed: true, days_ago: 0 },
@@ -60,12 +61,14 @@ export async function POST(req: NextRequest) {
 
   // Créer un utilisateur fictif (sans vrai compte auth, on insère directement dans profiles)
   // On génère un UUID stable basé sur l'email
-  const crypto = require('crypto');
-  const patientId = crypto.createHash('sha256').update(demo_email).digest('hex').slice(0, 8)
-    + '-' + crypto.createHash('sha256').update(demo_email).digest('hex').slice(8, 12)
-    + '-4' + crypto.createHash('sha256').update(demo_email).digest('hex').slice(13, 16)
-    + '-' + crypto.createHash('sha256').update(demo_email).digest('hex').slice(16, 20)
-    + '-' + crypto.createHash('sha256').update(demo_email).digest('hex').slice(20, 32);
+  const digest = createHash('sha256').update(demo_email).digest('hex');
+  const patientId = [
+    digest.slice(0, 8),
+    digest.slice(8, 12),
+    `4${digest.slice(13, 16)}`,
+    digest.slice(16, 20),
+    digest.slice(20, 32),
+  ].join('-');
 
   // Créer le profil patient démo
   const { error: profileError } = await supabaseAdmin

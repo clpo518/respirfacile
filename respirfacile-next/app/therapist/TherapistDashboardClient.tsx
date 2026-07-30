@@ -141,7 +141,7 @@ export default function TherapistDashboardClient() {
           prescrByPatient[p.patient_id] = (prescrByPatient[p.patient_id] || 0) + 1;
         });
 
-        const patientsWithSessions = therapistPatients.map((tp: any) => ({
+        const patientsWithSessions: PatientData[] = therapistPatients.map((tp: any) => ({
           id: tp.patient_id,
           full_name: tp.patient?.full_name || 'Sans nom',
           email: tp.patient?.email || '',

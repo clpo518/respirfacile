@@ -7,36 +7,38 @@ type Profile = "apnees" | "respiration" | "both" | "unrelated" | null
 
 const QUESTIONS = [
   { id: "snoring",  text: "Votre entourage vous dit que vous ronflez fort la nuit ?" },
-  { id: "tired",    text: "Vous vous reveillez fatigue(e) meme apres une nuit entiere ?" },
-  { id: "mouth",    text: "Vous respirez surtout par la bouche (le jour ou la nuit) ?" },
-  { id: "jaw",      text: "Vous avez des douleurs a la machoire ou vous serrez les dents ?" },
-  { id: "pro",      text: "Un medecin ou specialiste vous a parle d'exercices de respiration ?" },
+  { id: "tired",    text: "Vous vous réveillez fatigué même après une nuit entière ?" },
+  { id: "mouth",    text: "Vous respirez surtout par la bouche, le jour ou la nuit ?" },
+  { id: "jaw",      text: "Vous avez des douleurs à la mâchoire ou vous serrez les dents ?" },
+  { id: "pro",      text: "Un médecin ou un spécialiste vous a parlé d'exercices de respiration ?" },
 ]
 
+// Ce questionnaire oriente, il ne dépiste pas. Aucun résultat ne doit être
+// formulé comme un diagnostic : seul un médecin peut poser celui d'un SAOS.
 const RESULTS: Record<NonNullable<Profile>, { title: string; desc: string; ctaPro: string; ctaPatient: string }> = {
   apnees: {
-    title: "Vous pourriez beneficier d'une reeducation respiratoire",
-    desc: "Vos reponses indiquent des signes d'apnees du sommeil. Un orthophoniste ou un kinesitherapeute peut vous prescrire un programme d'exercices guide. Parlez-en a votre medecin.",
+    title: "Une rééducation respiratoire pourrait vous être utile",
+    desc: "Vos réponses évoquent des signes fréquemment associés aux apnées du sommeil. Ce test ne pose aucun diagnostic : parlez-en à votre médecin. Si un orthophoniste ou un kinésithérapeute vous prescrit un programme d'exercices, Respirfacile vous guide au quotidien.",
     ctaPro: "Je suis praticien, essayer Respirfacile",
-    ctaPatient: "Mon praticien m'a deja donne un code",
+    ctaPatient: "Mon praticien m'a déjà donné un code",
   },
   respiration: {
     title: "Des exercices de respiration pourraient vous aider",
-    desc: "Vos reponses indiquent une respiration buccale ou une mauvaise posture. Un specialiste peut vous guider avec des exercices quotidiens simples.",
+    desc: "Vos réponses évoquent une respiration buccale ou des tensions oro-faciales. Un praticien peut vous guider avec des exercices quotidiens simples. Ce test ne remplace pas son évaluation.",
     ctaPro: "Je suis praticien, essayer Respirfacile",
-    ctaPatient: "Mon praticien m'a deja donne un code",
+    ctaPatient: "Mon praticien m'a déjà donné un code",
   },
   both: {
-    title: "Vous combinez plusieurs symptomes courants",
-    desc: "Ronflements, fatigue, respiration buccale : c'est fréquent et tout à fait traitable. Parlez-en à votre médecin ou consultez un orthophoniste.",
+    title: "Vous cumulez plusieurs signes courants",
+    desc: "Ronflements, fatigue, respiration buccale : c'est fréquent et cela se prend en charge. Parlez-en à votre médecin ou consultez un orthophoniste. Ce test ne pose aucun diagnostic.",
     ctaPro: "Je suis praticien, essayer Respirfacile",
-    ctaPatient: "Mon praticien m'a deja donne un code",
+    ctaPatient: "Mon praticien m'a déjà donné un code",
   },
   unrelated: {
-    title: "Respirfacile est peut-etre moins adapte",
-    desc: "Vos reponses n'indiquent pas clairement de probleme respiratoire. Consultez un medecin pour un bilan. Si un specialiste vous prescrit des exercices, revenez nous voir.",
+    title: "Respirfacile est peut-être moins adapté",
+    desc: "Vos réponses n'évoquent pas clairement de trouble respiratoire. Si vous avez un doute, consultez un médecin pour un bilan. Et si un praticien vous prescrit des exercices, revenez me voir.",
     ctaPro: "Je suis praticien, en savoir plus",
-    ctaPatient: "J'ai quand meme un code praticien",
+    ctaPatient: "J'ai quand même un code praticien",
   },
 }
 

@@ -82,8 +82,8 @@ export default function StripeSetupForm({ plan, therapistId }: Props) {
       <div className="flex items-start gap-3 text-sm text-stone-600">
         <span className="text-xl leading-none">🔒</span>
         <p>
-          <strong>30 jours gratuits, sans carte bancaire requise.</strong> Votre CB sera demandée
-          uniquement à l'expiration du trial si vous souhaitez continuer.
+          <strong>30 jours gratuits, sans carte bancaire.</strong> Votre carte ne vous sera demandée
+          qu&apos;à la fin de l&apos;essai, si vous souhaitez continuer.
         </p>
       </div>
 

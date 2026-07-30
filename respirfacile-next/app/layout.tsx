@@ -1,17 +1,16 @@
 ﻿import type { Metadata } from "next";
 import "./globals.css";
 import { InstallPWA } from "@/components/InstallPWA";
-
-const siteUrl = "https://respirfacile.fr";
+import { siteName, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Respirfacile, Rééducation respiratoire pour l'apnée du sommeil",
-    template: "%s | Respirfacile",
+    default: "Respirfacile, rééducation respiratoire pour l'apnée du sommeil",
+    template: `%s | ${siteName}`,
   },
   description:
-    "L'application de thérapie myofonctionnelle orofaciale prescrite par les orthophonistes et kinésithérapeutes. −50% d'IAH en 8 semaines (Camacho 2015). Essai 30 jours gratuit.",
+    "L'application de thérapie myofonctionnelle orofaciale prescrite par les orthophonistes et les kinésithérapeutes. Exercices guidés au quotidien, suivi du praticien entre les séances. Essai 30 jours sans carte bancaire.",
   keywords: [
     "apnée du sommeil",
     "SAOS",
@@ -26,9 +25,9 @@ export const metadata: Metadata = {
     "pause contrôlée",
     "cohérence cardiaque",
   ],
-  authors: [{ name: "Respirfacile", url: siteUrl }],
-  creator: "Respirfacile",
-  publisher: "Respirfacile",
+  authors: [{ name: siteName, url: siteUrl }],
+  creator: siteName,
+  publisher: siteName,
   robots: {
     index: true,
     follow: true,
@@ -37,9 +36,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: siteUrl,
-    title: "Respirfacile, Rééducation respiratoire",
-    description: "−50% d'IAH. Essai 30 jours gratuit.",
-    siteName: "Respirfacile",
+    title: "Respirfacile, rééducation respiratoire",
+    description:
+      "Prescrit par les orthophonistes et les kinésithérapeutes. Essai 30 jours sans carte bancaire.",
+    siteName,
   },
 };
 

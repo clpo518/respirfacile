@@ -80,17 +80,17 @@ export function MoodRing({ compact, userId }: MoodRingProps) {
       {saved ? (
         <div className="py-1">
           <p className="text-sm font-medium text-forest-700">
-            ✓ Noté ! Nous suivons votre humeur pour mesurer l&apos;impact de vos séances sur votre bien-être.
+            ✓ Noté. Votre humeur est suivie pour situer l&apos;effet de vos séances sur votre bien-être.
           </p>
           <p className="text-xs text-forest-400 mt-1">
-            Votre thérapeute peut aussi consulter cette évolution pour ajuster votre programme.
+            Votre praticien peut aussi consulter cette évolution pour ajuster votre programme.
           </p>
         </div>
       ) : (
         <>
           <p className="text-sm font-semibold text-forest-700 mb-0.5">Comment vous sentez-vous aujourd&apos;hui ?</p>
           <p className="text-xs text-forest-400 mb-3">
-            Nous comparons votre humeur les jours de séance vs les autres, ça mesure l&apos;impact réel sur votre bien-être.
+            Votre humeur des jours de séance est comparée à celle des autres jours : c&apos;est ce qui donne du sens à la courbe.
           </p>
           <div className="flex justify-center gap-3">
             {MOODS.map((mood) => (

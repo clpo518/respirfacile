@@ -7,7 +7,7 @@ type ViewKey = "patient_dashboard" | "session" | "therapist";
 const VIEWS: { key: ViewKey; label: string; emoji: string }[] = [
   { key: "patient_dashboard", label: "Vue patient", emoji: "🫁" },
   { key: "session", label: "Séance guidée", emoji: "⏱️" },
-  { key: "therapist", label: "Vue ortho", emoji: "🩺" },
+  { key: "therapist", label: "Vue praticien", emoji: "🩺" },
 ];
 
 function PatientDashboardPreview() {

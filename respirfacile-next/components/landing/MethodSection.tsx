@@ -11,7 +11,7 @@ export function MethodSection() {
       num: "02",
       emoji: "🫁",
       title: "Le patient pratique guidé chaque jour",
-      desc: "Timer, instructions vocales, retour immédiat. L'app sait quoi lui dire et quand. 15 minutes par jour, sans que vous ayez à relancer.",
+      desc: "Minuteur, consignes affichées étape par étape, score enregistré à la fin. 15 minutes par jour, sans que vous ayez à relancer.",
       color: "#8B4513",
     },
     {
@@ -49,20 +49,18 @@ export function MethodSection() {
         <div className="mt-14 bg-[#2D5016] rounded-3xl p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <p className="text-white font-bold text-xl mb-1">Ce que disent les études</p>
-            <p className="text-beige-200 text-sm max-w-xl">La rééducation myofonctionnelle régulière réduit l'IAH de 50% en moyenne (Camacho 2015). L'enjeu : la régularité. C'est exactement ce que Respirfacile garantit.</p>
+            <p className="text-beige-200 text-sm max-w-xl">
+              Sur des formes légères à modérées, la thérapie myofonctionnelle réduit l&apos;indice d&apos;apnées-hypopnées
+              d&apos;environ 50 % (Camacho et al., 2015). Toutes les études butent sur le même point : la régularité du
+              patient entre deux séances. C&apos;est là que Respirfacile intervient, et nulle part ailleurs.
+            </p>
           </div>
-          <div className="flex gap-8 flex-shrink-0">
-            {[
-              { val: "−50%", lab: "d'apnées en moyenne" },
-              { val: "89%", lab: "des patients restent réguliers" },
-              { val: "8 sem.", lab: "pour les premiers effets" },
-            ].map((s) => (
-              <div key={s.lab} className="text-center">
-                <p className="text-3xl font-bold text-white">{s.val}</p>
-                <p className="text-xs text-beige-300 mt-0.5">{s.lab}</p>
-              </div>
-            ))}
-          </div>
+          <a
+            href="#preuves"
+            className="flex-shrink-0 inline-flex items-center gap-2 rounded-2xl border border-beige-200/40 px-6 py-4 text-beige-100 font-semibold hover:bg-white/10 transition-colors"
+          >
+            Les 3 références, avec leurs limites →
+          </a>
         </div>
       </div>
     </section>

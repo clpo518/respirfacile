@@ -26,8 +26,7 @@ export default function DashboardError({
             Impossible de charger votre tableau de bord
           </h1>
           <p className="text-forest-600 mb-8">
-            Nous avons rencontré un problème en chargeant vos données. Veuillez réessayer ou
-            retourner à l&apos;accueil.
+            Vos données n&apos;ont pas pu être chargées. Réessayez, ou retournez à l&apos;accueil.
           </p>
           {error.digest && (
             <p className="text-xs text-forest-500 mb-6 p-3 bg-beige-100 rounded-lg">

@@ -1,40 +1,7 @@
 ﻿"use client"
 import { useState } from "react"
-
-const FAQS = [
-  {
-    q: "À qui s'adresse Respirfacile ?",
-    a: "Aux patients suivis par un orthophoniste ou un kinésithérapeute pour des troubles respiratoires du sommeil (ronflements, apnées légères à modérées, respiration buccale, SAOS). L'accès se fait via le praticien, c'est lui qui vous donne votre code d'entrée.",
-  },
-  {
-    q: "Est-ce que ça marche vraiment ?",
-    a: "Oui, à condition d'être régulier. Des études cliniques montrent qu'une rééducation myofonctionnelle réduit les apnées du sommeil de 50 % en moyenne sur les formes légères à modérées. Respirfacile est conçu pour que vous ne décrochiez pas, c'est là que tout se joue.",
-  },
-  {
-    q: "Combien de temps par jour ?",
-    a: "15 minutes suffisent. Ni plus, ni moins. Au-delà, les bénéfices plafonnent et la fatigue musculaire peut s'installer. L'application vous guide, chronomètre et s'arrête au bon moment.",
-  },
-  {
-    q: "Je dois payer quelque chose ?",
-    a: "Non. L'accès est entièrement gratuit pour le patient. C'est votre praticien qui souscrit l'abonnement pour son cabinet. Vous n'entrez jamais votre carte bancaire.",
-  },
-  {
-    q: "Ça remplace mon traitement actuel (CPAP, orthèse) ?",
-    a: "Non, et ce n'est pas l'objectif. Les exercices sont un complément thérapeutique prescrit par votre praticien. Ils renforcent les muscles des voies aériennes supérieures, ce qui améliore l'efficacité des traitements existants sur le long terme.",
-  },
-  {
-    q: "Mes données médicales sont-elles protégées ?",
-    a: "Oui. Hébergement en Europe, chiffrement de bout en bout, accès strictement limité à vous et à votre praticien. Conformité RGPD complète. Vos données ne sont jamais vendues ni utilisées à des fins commerciales.",
-  },
-  {
-    q: "Et si mon praticien arrête l'abonnement ?",
-    a: "Vos données restent accessibles pendant 60 jours après la fin de l'abonnement. Aucune donnée n'est supprimée immédiatement, vous avez le temps d'en faire une copie si besoin.",
-  },
-  {
-    q: "Je suis praticien, mes patients doivent télécharger une application ?",
-    a: "Non. Respirfacile est une application web : vos patients y accèdent depuis n'importe quel navigateur, sans installation. Vous générez un code Pro en 30 secondes, vous le transmettez, et ils sont opérationnels dès leur première connexion.",
-  },
-]
+import { FAQS } from "@/lib/content/faq"
+import { contactEmail } from "@/lib/site"
 
 export function FAQSection() {
   const [open, setOpen] = useState<number | null>(null)
@@ -90,8 +57,8 @@ export function FAQSection() {
         <div className="mt-10 text-center">
           <p className="text-sm text-forest-500">
             Une autre question ?{" "}
-            <a href="mailto:contact@respirfacile.fr" className="text-forest-700 font-semibold hover:underline underline-offset-2">
-              Écrivez-nous
+            <a href={`mailto:${contactEmail}`} className="text-forest-700 font-semibold hover:underline underline-offset-2">
+              Écrivez-moi
             </a>
           </p>
         </div>

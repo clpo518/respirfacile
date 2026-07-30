@@ -33,7 +33,7 @@ function TrialExpiredScreen() {
           </svg>
         </Link>
         <p className="text-xs text-forest-400 mt-4">
-          30 jours gratuits · Pas de CB requise
+          30 jours gratuits · Aucune carte bancaire demandée
         </p>
       </div>
     </div>

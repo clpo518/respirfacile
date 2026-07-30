@@ -13,7 +13,7 @@ export function Navbar() {
         <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-forest-600">
           <Link href="/#methode" className="hover:text-forest-700 transition-colors">Méthode</Link>
           <Link href="/#fonctionnalites" className="hover:text-forest-700 transition-colors">Fonctionnalités</Link>
-          <Link href="/#temoignages" className="hover:text-forest-700 transition-colors">Témoignages</Link>
+          <Link href="/#preuves" className="hover:text-forest-700 transition-colors">Références</Link>
           <Link href="/pricing" className="hover:text-forest-700 transition-colors">Tarifs</Link>
         </nav>
 
@@ -37,7 +37,7 @@ export function Navbar() {
         <div className="md:hidden bg-beige-100 border-t border-beige-300 px-4 py-5 space-y-1">
           <Link href="/#methode" className="block text-forest-700 font-medium py-2.5 hover:text-forest-700" onClick={() => setOpen(false)}>Méthode</Link>
           <Link href="/#fonctionnalites" className="block text-forest-700 font-medium py-2.5 hover:text-forest-700" onClick={() => setOpen(false)}>Fonctionnalités</Link>
-          <Link href="/#temoignages" className="block text-forest-700 font-medium py-2.5 hover:text-forest-700" onClick={() => setOpen(false)}>Témoignages</Link>
+          <Link href="/#preuves" className="block text-forest-700 font-medium py-2.5 hover:text-forest-700" onClick={() => setOpen(false)}>Références</Link>
           <Link href="/pricing" className="block text-forest-700 font-medium py-2.5 hover:text-forest-700" onClick={() => setOpen(false)}>Tarifs</Link>
           <div className="pt-3 border-t border-beige-300 space-y-2">
             <Link href="/auth" className="block text-forest-700 py-2.5 font-medium" onClick={() => setOpen(false)}>Connexion</Link>

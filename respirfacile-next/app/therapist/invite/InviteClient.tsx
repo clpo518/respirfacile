@@ -140,7 +140,7 @@ export function InviteClient({ therapistCode }: InviteClientProps) {
 
             {/* Info box */}
             <div className="mt-8 bg-forest-500/10 border border-forest-500/20 rounded-2xl px-4 py-3 text-sm text-forest-700">
-              <strong>💚 Rappel :</strong> Vos patients accèdent complètement gratuitement via votre code Pro. Seul votre abonnement ortho est payant.
+              <strong>💚 Rappel :</strong> vos patients accèdent gratuitement à toute l&apos;application via votre code. Seul votre abonnement de praticien est payant.
             </div>
 
             {/* Navigation */}
