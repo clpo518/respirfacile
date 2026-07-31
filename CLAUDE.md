@@ -157,20 +157,17 @@ Le patient ne paie jamais rien.
    *Root Directory* du projet GitHub sur `respirfacile-next`, ou supprimer le
    projet en double. Avant d'annoncer une mise en ligne, vérifier avec
    `curl -s <url> | grep -o '/_next/static'`.
-1. **Deux politiques RLS dangereuses sont encore actives en base.** La migration
-   `20260731000002_fix_rls_escalade_privileges.sql` les supprime mais n'a pas pu
-   être appliquée automatiquement. Tant qu'elle n'est pas passée :
-   - `profiles.admin_all_profiles` permet à n'importe quel compte de s'octroyer
-     un accès total aux profils via `user_metadata`, modifiable côté client ;
-   - `therapist_patients.service_role_all` permet à n'importe quel compte de se
-     rattacher à n'importe quel patient, ce qui débloque ses séances, son
-     journal et ses notes.
-2. **`profiles.public_can_lookup_therapist_code`** autorise le rôle `anon` à
-   lire les lignes des praticiens ayant un code, colonnes comprises : les
-   adresses électroniques des praticiens sont énumérables sans compte. À
-   remplacer par une fonction dédiée qui ne renvoie que l'existence du code.
-3. **Vue `prescription_completion` en `SECURITY DEFINER`**, signalée en erreur
+1. **Vue `prescription_completion` en `SECURITY DEFINER`**, signalée en erreur
    par le linter Supabase.
+2. **`therapist_manage_own_patients` est `FOR ALL` sans clause `WITH CHECK`.**
+   Pour un INSERT, Postgres retombe alors sur l'expression `USING`, donc un
+   praticien peut se rattacher à un patient dont il connaît l'UUID. Aucune
+   énumération n'est possible depuis que `profiles` est fermé, mais la clause
+   manque et devrait être écrite.
+3. **Le rôle est auto-déclaré à l'inscription.** `AuthForm` écrit `role` dans
+   `user_metadata` puis dans `profiles` côté client : un patient peut créer un
+   compte praticien. Sans conséquence tant que l'abonnement est vérifié à part,
+   à revoir avant l'ouverture commerciale.
 4. **Le partage du bilan par email pointe vers une route morte.**
    `/api/bilan/[patientId]` n'accepte que POST ; le médecin destinataire tombe
    sur une erreur. Le vrai bilan vit désormais sur
@@ -180,6 +177,25 @@ Le patient ne paie jamais rien.
    code.** À fusionner.
 6. **Dette `any` et règles react-hooks** en avertissement dans la configuration
    ESLint. À rembourser après `supabase gen types`.
+
+### Déjà réglé en base le 31/07/2026
+
+Ces trois politiques ont été supprimées après vérification sous RLS, et ne
+doivent jamais être recréées :
+
+- `profiles.admin_all_profiles`, qui accordait un accès total aux profils sur la
+  foi de `user_metadata`, champ modifiable par l'utilisateur lui-même ;
+- `therapist_patients.service_role_all`, déclarée sans clause `TO` donc
+  appliquée à `public` et non au rôle service, ce qui laissait n'importe quel
+  compte se rattacher à n'importe quel patient ;
+- `profiles.public_can_lookup_therapist_code`, qui rendait les adresses des
+  praticiens énumérables sans compte. Remplacée par la fonction
+  `therapist_id_for_code()`, qui ne renvoie que l'identifiant.
+
+Cette fonction est volontairement exécutable par `anon` : un patient qui
+s'inscrit n'est pas encore connecté. Le linter Supabase la signale, c'est
+attendu. Une limitation de débit reste à ajouter pour empêcher le balayage
+de codes.
 
 ## Pièges connus
 
