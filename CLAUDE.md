@@ -148,6 +148,15 @@ Le patient ne paie jamais rien.
 
 À traiter, dans cet ordre.
 
+0. **Le déploiement construit la mauvaise application.** Deux projets Vercel
+   coexistent : celui qui est connecté à GitHub build la racine, c'est-à-dire
+   l'ancienne app Vite (`respirfacile.vercel.app`, sert `/assets/index-*.js`),
+   tandis que l'app réellement visitée (`respirfacile-next.vercel.app`, sert
+   `/_next/static/...`) n'est pas connectée et reste figée. Un merge sur `main`
+   passe donc au vert sans rien changer en ligne. Correctif : régler le
+   *Root Directory* du projet GitHub sur `respirfacile-next`, ou supprimer le
+   projet en double. Avant d'annoncer une mise en ligne, vérifier avec
+   `curl -s <url> | grep -o '/_next/static'`.
 1. **Deux politiques RLS dangereuses sont encore actives en base.** La migration
    `20260731000002_fix_rls_escalade_privileges.sql` les supprime mais n'a pas pu
    être appliquée automatiquement. Tant qu'elle n'est pas passée :
