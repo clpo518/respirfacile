@@ -47,16 +47,21 @@ export function AuthForm() {
 
         let therapistId: string | null = null;
         if (role === 'patient' && proCode.trim()) {
-          const { data: therapist } = await supabase
-            .from('profiles')
-            .select('id')
-            .eq('therapist_code', proCode.trim().toUpperCase())
-            .single();
+          // Passe par une fonction dédiée qui ne renvoie que l'identifiant.
+          // Une lecture directe de `profiles` supposait d'ouvrir la table aux
+          // visiteurs non connectés, ce qui rendait les adresses de tous les
+          // praticiens énumérables.
+          const { data: resolvedId, error: lookupError } = await supabase.rpc(
+            'therapist_id_for_code',
+            { p_code: proCode.trim() },
+          );
 
-          if (!therapist) {
-            throw new Error('Ce code ne correspond a aucun praticien. Verifiez avec votre orthophoniste ou kine.');
+          if (lookupError || !resolvedId) {
+            throw new Error(
+              'Ce code ne correspond à aucun praticien. Vérifiez-le avec votre orthophoniste ou votre kinésithérapeute.',
+            );
           }
-          therapistId = therapist.id;
+          therapistId = resolvedId as string;
         }
 
         const { data: authData, error: signUpError } = await supabase.auth.signUp({

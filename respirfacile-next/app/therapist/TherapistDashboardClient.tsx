@@ -56,6 +56,13 @@ export default function TherapistDashboardClient() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data: { user } }) => {
+      // Sans session, l'écran restait bloqué sur « Chargement... » sans fin :
+      // pas de redirection, pas de message. Le praticien n'avait aucun moyen
+      // de comprendre qu'il devait se reconnecter.
+      if (!user) {
+        window.location.href = '/auth';
+        return;
+      }
       if (user) {
         setUser(user);
         // Charger le profil depuis la table profiles
@@ -189,13 +196,22 @@ export default function TherapistDashboardClient() {
         .eq('sender_role', 'therapist');
       setHasMessages((msgCount || 0) > 0);
 
-      // Charger les entrées journal récentes
-      const { data: entries } = await supabase
-        .from('journal_entries')
-        .select('*')
-        .eq('therapist_id', therapistId)
-        .order('created_at', { ascending: false })
-        .limit(10);
+      // Charger les entrées de journal récentes des patients suivis.
+      // La requête filtrait sur `therapist_id`, colonne qui n'existe pas dans
+      // `journal_entries` : elle échouait en silence et le panneau
+      // « Derniers bilans » restait vide en permanence.
+      const patientIds = (therapistPatients ?? [])
+        .map((tp: any) => tp.patient_id)
+        .filter(Boolean);
+
+      const { data: entries } = patientIds.length
+        ? await supabase
+            .from('journal_entries')
+            .select('*')
+            .in('user_id', patientIds)
+            .order('created_at', { ascending: false })
+            .limit(10)
+        : { data: [] };
 
       if (entries) {
         // Enrichir avec le nom du patient en utilisant la map déjà construite (pas de N+1)

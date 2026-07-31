@@ -91,7 +91,9 @@ const RULES: Rule[] = [
     // \p{L} évite que « kinésithérapeute » soit pris pour « kiné » : en regex
     // non unicode, l'accent casse la frontière de mot.
     name: "pas d'abréviation de profession",
-    pattern: /(?<!\p{L})(ortho|orthos|kiné|kinés)(?!\p{L})/u,
+    // « kine » sans accent avait échappé à la première version de cette règle,
+    // dans un message d'erreur de l'inscription.
+    pattern: /(?<!\p{L})(ortho|orthos|kiné|kinés|kine|kines)(?!\p{L})/u,
     why: "On écrit « orthophoniste » et « kinésithérapeute » en toutes lettres.",
   },
   {
@@ -185,6 +187,7 @@ describe("accents", () => {
     "controlee", "donnees", "regularite", "resultat", "resultats",
     "prenom", "acces", "caracteres", "kinesitherapeute", "oublie",
     "medecin", "probleme", "reponse", "reponses", "creer",
+    "verifiez", "verifier", "correspond a",
   ];
 
   it("n'affiche aucun mot français désaccentué", () => {
