@@ -11,6 +11,9 @@ interface Props {
 
 type Phase = "intro" | "running" | "input" | "rating" | "done";
 
+/** Libellés du ressenti, du plus difficile au plus confortable. */
+const COMFORT_LABELS = ["", "Difficile", "Moyen", "Bien", "Très bien", "Excellent"] as const;
+
 function ProgressRing({
   progress,
   size = 160,
@@ -52,51 +55,72 @@ export default function SessionClient({ exercise, userId }: Props) {
   const [stars, setStars] = useState(0);
   const [saving, setSaving] = useState(false);
   const [currentInstruction, setCurrentInstruction] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Le temps se lit sur l'horloge, il ne se compte pas en battements : un
+  // setInterval est fortement ralenti dès que l'onglet passe en arrière-plan,
+  // et une séance de respiration chronométrée dérivait de plusieurs dizaines
+  // de secondes si le patient regardait son téléphone ailleurs.
+  const startedAtRef = useRef<number | null>(null);
+  const pausedTotalRef = useRef(0);
+  const pausedAtRef = useRef<number | null>(null);
 
   const duration = exercise.duration_seconds;
 
-  // Timer
   useEffect(() => {
-    if (phase !== "running") return;
-    intervalRef.current = setInterval(() => {
-      setElapsed((e) => {
-        const next = e + 1;
-        // Rotate instructions every (duration / instructions.length) seconds
-        const instrCount = exercise.instructions_fr.length;
-        const step = Math.floor(duration / instrCount);
-        setCurrentInstruction(Math.min(Math.floor(next / step), instrCount - 1));
+    if (phase !== "running" || paused) return;
+    if (startedAtRef.current === null) startedAtRef.current = Date.now();
 
-        if (next >= duration) {
-          clearInterval(intervalRef.current!);
-          if (exercise.requiresInput) {
-            setPhase("input");
-          } else {
-            setPhase("rating");
-          }
+    const tick = () => {
+      const started = startedAtRef.current;
+      if (started === null) return;
+      const next = Math.floor((Date.now() - started - pausedTotalRef.current) / 1000);
+      setElapsed(next);
+
+      const instrCount = exercise.instructions_fr.length;
+      const step = Math.max(1, Math.floor(duration / instrCount));
+      setCurrentInstruction(Math.min(Math.floor(next / step), instrCount - 1));
+
+      if (next >= duration) {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        setPhase(exercise.requiresInput ? "input" : "rating");
+      }
+    };
+
+    tick();
+    intervalRef.current = setInterval(tick, 500);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [phase, paused, duration, exercise.instructions_fr.length, exercise.requiresInput]);
+
+  const togglePause = useCallback(() => {
+    setPaused((wasPaused) => {
+      if (wasPaused) {
+        // Reprise : le temps passé en pause ne compte pas dans la séance.
+        if (pausedAtRef.current !== null) {
+          pausedTotalRef.current += Date.now() - pausedAtRef.current;
+          pausedAtRef.current = null;
         }
-        return next;
-      });
-    }, 1000);
-    return () => clearInterval(intervalRef.current!);
-  }, [phase, duration, exercise.instructions_fr.length, exercise.requiresInput]);
+      } else {
+        pausedAtRef.current = Date.now();
+      }
+      return !wasPaused;
+    });
+  }, []);
 
   const handleFinishEarly = useCallback(() => {
-    clearInterval(intervalRef.current!);
-    if (exercise.requiresInput) {
-      setPhase("input");
-    } else {
-      setPhase("rating");
-    }
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setPhase(exercise.requiresInput ? "input" : "rating");
   }, [exercise.requiresInput]);
 
   const handleSave = useCallback(async () => {
     setSaving(true);
-    const score = stars > 0 ? stars * 20 : null;
+    setSaveError(null);
+
     const inputScore =
-      exercise.requiresInput && inputValue
-        ? parseInt(inputValue, 10)
-        : null;
+      exercise.requiresInput && inputValue ? parseInt(inputValue, 10) : null;
 
     try {
       const res = await fetch("/api/session/save", {
@@ -105,14 +129,25 @@ export default function SessionClient({ exercise, userId }: Props) {
         body: JSON.stringify({
           exercise_id: exercise.id,
           duration_seconds: Math.max(elapsed, 1),
-          score: inputScore ?? score,
+          // Mesure objective d'un côté, ressenti de l'autre. Le ressenti
+          // partait auparavant dans `score`, où il se confondait avec un
+          // résultat clinique sur la fiche du praticien.
+          score: inputScore,
+          comfort_rating: stars > 0 ? stars : null,
           completed: true,
         }),
       });
       if (!res.ok) throw new Error("save failed");
     } catch {
-      // fail silently — still navigate
+      // Ne jamais annoncer « enregistrée » sur un échec : le patient croirait
+      // que son praticien voit la séance, et personne ne s'en apercevrait.
+      setSaving(false);
+      setSaveError(
+        "Votre séance n'a pas pu être enregistrée. Vérifiez votre connexion et réessayez.",
+      );
+      return;
     }
+
     setSaving(false);
     setPhase("done");
     setTimeout(() => router.push("/exercises"), 1800);
@@ -248,12 +283,29 @@ export default function SessionClient({ exercise, userId }: Props) {
             ))}
           </div>
 
-          <button
-            onClick={handleFinishEarly}
-            className="mt-4 px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white font-semibold text-sm transition-colors"
-          >
-            {exercise.requiresInput ? "J'ai terminé, noter mon score →" : "Séance terminée →"}
-          </button>
+          <div className="flex flex-col items-center gap-3 mt-4 w-full max-w-sm">
+            {/* Une séance thérapeutique doit pouvoir s'interrompre : une quinte
+                de toux, un enfant qui appelle. Sans pause, le patient n'avait
+                que le choix d'abandonner. */}
+            <button
+              onClick={togglePause}
+              className="w-full px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white font-semibold text-sm transition-colors"
+            >
+              {paused ? "▶︎ Reprendre" : "⏸ Mettre en pause"}
+            </button>
+            <button
+              onClick={handleFinishEarly}
+              className="w-full px-8 py-3 bg-beige-200 hover:bg-beige-100 rounded-2xl text-forest-800 font-semibold text-sm transition-colors"
+            >
+              {exercise.requiresInput ? "J'ai terminé, noter mon score →" : "Séance terminée →"}
+            </button>
+          </div>
+
+          {paused && (
+            <p className="text-white/70 text-sm text-center max-w-xs">
+              Séance en pause. Prenez le temps qu&apos;il vous faut, le chronomètre vous attend.
+            </p>
+          )}
         </main>
       </div>
     );
@@ -328,9 +380,16 @@ export default function SessionClient({ exercise, userId }: Props) {
             ))}
           </div>
           {stars > 0 && (
-            <p className="text-sm text-forest-500 -mt-4">
-              {stars === 1 ? "Difficile" : stars === 2 ? "Moyen" : stars === 3 ? "Bien" : stars === 4 ? "Très bien" : "Excellent !"}
-            </p>
+            <p className="text-sm text-forest-500 -mt-4">{COMFORT_LABELS[stars]}</p>
+          )}
+
+          {saveError && (
+            <div
+              role="alert"
+              className="w-full rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            >
+              {saveError}
+            </div>
           )}
 
           <button
@@ -338,12 +397,13 @@ export default function SessionClient({ exercise, userId }: Props) {
             disabled={saving}
             className="w-full py-4 bg-forest-600 hover:bg-forest-700 disabled:opacity-60 text-white font-bold text-lg rounded-2xl transition-colors"
           >
-            {saving ? "Enregistrement…" : "Valider la séance ✓"}
+            {saving ? "Enregistrement…" : saveError ? "Réessayer" : "Valider la séance ✓"}
           </button>
 
           <button
             onClick={handleSave}
-            className="text-sm text-forest-400 hover:text-forest-600 transition-colors"
+            disabled={saving}
+            className="text-sm text-forest-400 hover:text-forest-600 transition-colors disabled:opacity-50"
           >
             Passer sans noter
           </button>
@@ -354,9 +414,7 @@ export default function SessionClient({ exercise, userId }: Props) {
 
   // ── DONE ─────────────────────────────────────────────────────────────────────
   const doneMinutes = Math.max(1, Math.round(Math.max(elapsed, exercise.duration_seconds) / 60));
-  const scoreLabel = stars > 0
-    ? ["", "Difficile", "Moyen", "Bien", "Très bien", "Excellent !"][stars]
-    : null;
+  const scoreLabel = stars > 0 ? COMFORT_LABELS[stars] : null;
 
   return (
     <div className="min-h-screen bg-beige-200 flex flex-col items-center justify-center px-6 gap-6 text-center">
