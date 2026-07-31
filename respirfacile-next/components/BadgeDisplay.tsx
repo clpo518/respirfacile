@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
+import { BADGES } from "@/lib/badges";
 
 interface Badge {
   id: string;
@@ -15,57 +16,16 @@ interface BadgeDisplayProps {
   userBadges: Badge[];
 }
 
-const ALL_BADGES: Badge[] = [
-  {
-    id: "first_session",
-    name: "Premier souffle",
-    emoji: "🌟",
-    description: "Complétez votre 1ère séance d'exercice.",
-    earned: false,
-  },
-  {
-    id: "week_1",
-    name: "7 jours de pratique",
-    emoji: "📅",
-    description: "Pratiquez au moins une fois par jour pendant 7 jours consécutifs.",
-    earned: false,
-  },
-  {
-    id: "pause_20",
-    name: "Pause 20 secondes",
-    emoji: "⏸️",
-    description: "Tenez 20 secondes de pause contrôlée lors d'une séance.",
-    earned: false,
-  },
-  {
-    id: "pause_25",
-    name: "Pause 25 secondes",
-    emoji: "🏆",
-    description: "Tenez 25 secondes de pause contrôlée, niveau avancé.",
-    earned: false,
-  },
-  {
-    id: "nasale_master",
-    name: "Nez libre",
-    emoji: "👃",
-    description: "Complétez 10 séances de respiration nasale.",
-    earned: false,
-  },
-  {
-    id: "coherence_30",
-    name: "Rythme régulier",
-    emoji: "💓",
-    description: "Complétez 30 séances de cohérence cardiaque.",
-    earned: false,
-  },
-  {
-    id: "month_1",
-    name: "1 mois ensemble",
-    emoji: "🎖️",
-    description: "Pratiquez pendant 30 jours au total depuis votre inscription.",
-    earned: false,
-  },
-];
+// Le catalogue vient de lib/badges.ts, seul endroit où un badge est défini :
+// cette liste était auparavant recopiée ici, avec des descriptions qui ne
+// correspondaient plus aux conditions réellement évaluées.
+const ALL_BADGES: Badge[] = BADGES.map((badge) => ({
+  id: badge.id,
+  name: badge.name,
+  emoji: badge.emoji,
+  description: badge.description,
+  earned: false,
+}));
 
 export function BadgeDisplay({ userBadges }: BadgeDisplayProps) {
   const [hoveredBadge, setHoveredBadge] = useState<string | null>(null);

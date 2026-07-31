@@ -5,7 +5,7 @@ import Link from "next/link"
 import { LogoWordmark } from "@/components/ui/Logo"
 
 export const metadata: Metadata = {
-  title: "Connexion | Respirfacile",
+  title: "Connexion",
   description: "Connectez-vous à votre espace Respirfacile",
 }
 

@@ -118,7 +118,7 @@ export default async function PatientPreviewPage() {
               </div>
             </div>
             <div>
-              <p className="font-semibold text-forest-800 mb-1">Message de votre thérapeute</p>
+              <p className="font-semibold text-forest-800 mb-1">Message de votre praticien</p>
               <p className="text-forest-700">{therapistMessage}</p>
               <p className="text-xs text-forest-500 mt-2">Reçu le {lastExerciseDate}</p>
             </div>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   EXERCISES,
+  formatScore,
   getExerciseById,
   getExercisesForProfile,
   getExercisesWithoutProfile,
@@ -50,6 +51,29 @@ describe("intégrité du catalogue", () => {
   it("retrouve un exercice par son identifiant", () => {
     expect(getExerciseById("pause_20")?.category).toBe("pause_controlee");
     expect(getExerciseById("inconnu")).toBeUndefined();
+  });
+});
+
+describe("affichage du score", () => {
+  it("rend le score de découverte en pas", () => {
+    // Contrainte terrain : le score de pause s'exprime en nombre de pas, pas
+    // en secondes seules, et surtout jamais en pourcentage.
+    expect(formatScore("pause_controlee_decouverte", 26)).toBe("26 pas");
+  });
+
+  it("rend les paliers de pause en secondes", () => {
+    expect(formatScore("pause_20", 22)).toBe("22 s");
+    expect(formatScore("pause_25", 27)).toBe("27 s");
+  });
+
+  it("n'affiche rien sans score", () => {
+    expect(formatScore("pause_20", null)).toBeNull();
+    expect(formatScore("coherence_5_5", undefined)).toBeNull();
+  });
+
+  it("n'invente aucune unité pour un exercice sans saisie", () => {
+    expect(formatScore("coherence_5_5", 5)).toBe("5");
+    expect(formatScore("exercice_inconnu", 5)).toBe("5");
   });
 });
 

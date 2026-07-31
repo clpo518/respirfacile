@@ -12,6 +12,7 @@ import { UnreadMessageBadge } from "@/components/UnreadMessageBadge";
 import { ProgressionChart } from "@/components/ProgressionChart";
 import { ActivityHeatmap } from "@/components/ActivityHeatmap";
 import { EXERCISES } from "@/lib/data/exercises";
+import { computeStreak } from "@/lib/streak";
 import CelebrationToast from "@/components/CelebrationToast";
 import Link from "next/link";
 import { MobileBottomNavClient } from "@/components/MobileBottomNavClient";
@@ -97,31 +98,16 @@ export default async function DashboardPage({
     .limit(1);
   const bestPauseScore = bestScoreData?.[0]?.score ?? null;
 
-  // Streak, jours consécutifs (simple: compter depuis hier en remontant)
   const { data: allSessions } = await supabase
     .from("sessions")
     .select("created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  let streak = 0;
-  if (allSessions && allSessions.length > 0) {
-    const sessionDays = new Set(
-      allSessions.map((s) => new Date(s.created_at).toISOString().slice(0, 10))
-    );
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    // Commencer depuis aujourd'hui ou hier
-    const checkDate = new Date(today);
-    const todayStr = checkDate.toISOString().slice(0, 10);
-    if (!sessionDays.has(todayStr)) {
-      checkDate.setDate(checkDate.getDate() - 1);
-    }
-    while (sessionDays.has(checkDate.toISOString().slice(0, 10))) {
-      streak++;
-      checkDate.setDate(checkDate.getDate() - 1);
-    }
-  }
+  // Série avec jokers : le calcul vit dans lib/streak.ts, seul endroit où la
+  // règle des 2 jokers hebdomadaires est écrite, et il est couvert par des tests.
+  const streakResult = computeStreak((allSessions || []).map((s) => s.created_at));
+  const streak = streakResult.current;
 
   // Matcher avec le catalogue d'exercices
   const prescribedExercises = (prescriptions || [])
@@ -276,7 +262,7 @@ export default async function DashboardPage({
               ),
             },
             {
-              label: "Jours consécutifs",
+              label: "Jours de suite",
               value: streak > 0 ? `${streak} 🔥` : "0",
               color: streak >= 7 ? "text-amber-600" : streak > 0 ? "text-forest-700" : "text-forest-400",
               icon: (
@@ -308,7 +294,7 @@ export default async function DashboardPage({
           {prescribedExercises.length > 0 ? (
             <>
               <p className="text-sm text-forest-500 mb-6">
-                {prescribedExercises.length} exercice{prescribedExercises.length > 1 ? "s" : ""} prescrit{prescribedExercises.length > 1 ? "s" : ""} par votre thérapeute.
+                {prescribedExercises.length} exercice{prescribedExercises.length > 1 ? "s" : ""} prescrit{prescribedExercises.length > 1 ? "s" : ""} par votre praticien.
               </p>
               <div className="space-y-3">
                 {prescribedExercises.map((ex) => (
@@ -359,7 +345,7 @@ export default async function DashboardPage({
                   <p className="text-sm text-green-700 font-semibold">🎉 Tous vos exercices du jour sont faits !</p>
                 ) : (
                   <p className="text-xs text-forest-400">
-                    {prescribedExercises.filter((e) => e.isDone).length}/{prescribedExercises.length} exercice{prescribedExercises.length > 1 ? "s" : ""} fait{prescribedExercises.length > 1 ? "s" : ""} aujourd'hui · Votre thérapeute peut ajuster ce programme.
+                    {prescribedExercises.filter((e) => e.isDone).length}/{prescribedExercises.length} exercice{prescribedExercises.length > 1 ? "s" : ""} fait{prescribedExercises.length > 1 ? "s" : ""} aujourd&apos;hui · Votre praticien peut ajuster ce programme.
                   </p>
                 )}
               </div>
@@ -369,7 +355,7 @@ export default async function DashboardPage({
               <p className="text-4xl mb-3">🩺</p>
               <p className="text-forest-700 font-medium mb-1">Aucun exercice prescrit pour l'instant</p>
               <p className="text-sm text-forest-500 mb-4">
-                Votre thérapeute n'a pas encore configuré votre programme. En attendant, vous pouvez explorer tous les exercices disponibles.
+                Votre praticien n&apos;a pas encore configuré votre programme. En attendant, vous pouvez découvrir les exercices qui se pratiquent sans consigne particulière. Les exercices de Pause Contrôlée, eux, attendent sa prescription.
               </p>
               <Link
                 href="/exercises"

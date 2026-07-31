@@ -4,7 +4,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
-  title: "Mon profil | Respirfacile",
+  title: "Mon profil",
 };
 
 export default async function TherapistProfilePage() {
