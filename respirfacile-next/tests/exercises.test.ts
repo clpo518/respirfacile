@@ -71,9 +71,12 @@ describe("affichage du score", () => {
     expect(formatScore("coherence_5_5", undefined)).toBeNull();
   });
 
-  it("n'invente aucune unité pour un exercice sans saisie", () => {
-    expect(formatScore("coherence_5_5", 5)).toBe("5");
-    expect(formatScore("exercice_inconnu", 5)).toBe("5");
+  it("n'affiche rien quand le score n'a pas d'unité", () => {
+    // D'anciennes séances portent un score sur des exercices qui ne mesurent
+    // rien : hérité du moment où le ressenti du patient était rangé dans la
+    // colonne `score`. Un nombre nu se lirait comme un pourcentage.
+    expect(formatScore("coherence_5_5", 5)).toBeNull();
+    expect(formatScore("exercice_inconnu", 5)).toBeNull();
   });
 });
 

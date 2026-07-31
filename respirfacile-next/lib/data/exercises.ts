@@ -737,7 +737,12 @@ export function getVisibleExercises(profile: PatientProfileType | null): Exercis
 export function formatScore(exerciseId: string | null | undefined, score: number | null | undefined): string | null {
   if (score == null) return null;
   const unit = exerciseId ? getExerciseById(exerciseId)?.inputUnit : undefined;
-  if (!unit) return `${score}`;
+  // Pas d'unité, pas d'affichage. Un nombre nu se fait lire comme un
+  // pourcentage d'observance. D'anciennes séances portent un score sur des
+  // exercices qui ne mesurent rien, hérité du moment où le ressenti du patient
+  // était rangé dans la colonne `score` : ces valeurs ne veulent rien dire et
+  // n'ont pas à s'afficher.
+  if (!unit) return null;
   if (unit === "secondes") return `${score} s`;
   return `${score} ${unit}`;
 }
